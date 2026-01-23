@@ -60,9 +60,31 @@ pip install -r requirements.txt
 ```
 
 **Dépendances instalées**:
-- Django 6.0.1
+- Django 4.2.9
 - SQLite3 (déjà inclus)
 - Autres dépendances (voir `requirements.txt`)
+
+### 4. Initialisation de la base de données (OBLIGATOIRE après un clone / pull)
+
+Le fichier `db.sqlite3` est **ignoré par Git** (voir `.gitignore`). Donc après un clone/pull, vous n'aurez pas la base locale (tables + données de test), ce qui fait que l'API retournera du vide / erreurs.
+
+Initialisez la base via le script :
+
+```bash
+python scripts/init_db.py
+```
+
+Pour repartir de zéro :
+
+```bash
+python scripts/init_db.py --reset
+```
+
+Windows (optionnel): script tout-en-un
+
+```powershell
+.\scripts\dev_setup_windows.ps1
+```
 
 ### 4. Initialiser la Base de Données
 
@@ -112,7 +134,10 @@ venv\Scripts\activate          # Windows
 # 3. (Optional) Mettre à jour les dépendances
 pip install -r requirements.txt
 
-# 4. Lancer le serveur Django
+# 4. S'assurer que la DB locale existe (idempotent)
+python scripts/init_db.py
+
+# 5. Lancer le serveur Django
 python manage.py runserver
 ```
 
