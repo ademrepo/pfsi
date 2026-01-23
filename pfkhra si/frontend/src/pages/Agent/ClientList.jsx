@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { Link } from 'react-router-dom';
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
@@ -31,7 +32,9 @@ const ClientList = () => {
         <div className="page-container">
             <div className="header-actions">
                 <h1>Clients</h1>
-                <button className="btn-primary">+ Nouveau Client</button>
+                <Link to="/clients/nouveau" className="btn-primary" style={{ textDecoration: 'none' }}>
+                    + Nouveau Client
+                </Link>
             </div>
 
             <table>
@@ -43,6 +46,7 @@ const ClientList = () => {
                         <th>Email</th>
                         <th>Téléphone</th>
                         <th>Adresse</th>
+                        <th>Solde</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,6 +58,9 @@ const ClientList = () => {
                             <td>{client.email}</td>
                             <td>{client.telephone}</td>
                             <td>{client.adresse}</td>
+                            <td style={{ fontWeight: '600', color: client.solde < 0 ? '#16a34a' : '#b91c1c' }}>
+                                {Number(client.solde ?? 0).toFixed(2)} €
+                            </td>
                         </tr>
                     ))}
                 </tbody>

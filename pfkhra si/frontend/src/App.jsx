@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import ExpeditionList from './pages/Agent/ExpeditionList';
 import ExpeditionForm from './pages/Agent/ExpeditionForm';
 import ClientList from './pages/Agent/ClientList';
+import ClientForm from './pages/Agent/ClientForm';
 import TourneeList from './pages/Agent/TourneeList';
 import TourneeForm from './pages/Agent/TourneeForm';
 import InvoiceList from './pages/Agent/InvoiceList';
@@ -78,6 +79,8 @@ function App() {
                     <Route path="/expeditions/nouveau" element={<ExpeditionForm />} />
                     <Route path="/expeditions/:id/edit" element={<ExpeditionForm />} />
                     <Route path="/clients" element={<ClientList />} />
+                    <Route path="/clients/nouveau" element={<ClientForm />} />
+                    <Route path="/clients/:id/edit" element={<ClientForm />} />
                     <Route path="/tournees" element={<TourneeList />} />
                     <Route path="/tournees/nouveau" element={<TourneeForm />} />
                     <Route path="/tournees/:id/edit" element={<TourneeForm />} />

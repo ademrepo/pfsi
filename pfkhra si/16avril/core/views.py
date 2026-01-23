@@ -381,11 +381,20 @@ class ExpeditionViewSet(BaseAgentViewSet):
         queryset = super().get_queryset()
         status = self.request.query_params.get('status', None)
         client = self.request.query_params.get('client_id', None)
+        tournee_id = self.request.query_params.get('tournee_id', None)
         
         if status:
-            queryset = queryset.filter(statut=status)
+            # Tolérer les anciennes valeurs (ex: triggers SQL qui écrivaient 'enregistre')
+            # pour éviter que l'UI ne "perde" des expéditions à cause d'un simple mismatch de statut.
+            s = str(status).strip()
+            variants = {s}
+            if s in {'Enregistré', 'EnregistrÃ©', 'enregistre', 'enregistré'}:
+                variants.update({'Enregistré', 'EnregistrÃ©', 'enregistre', 'enregistré'})
+            queryset = queryset.filter(statut__in=list(variants))
         if client:
             queryset = queryset.filter(client_id=client)
+        if tournee_id:
+            queryset = queryset.filter(tournee_id=tournee_id)
             
         return queryset
         

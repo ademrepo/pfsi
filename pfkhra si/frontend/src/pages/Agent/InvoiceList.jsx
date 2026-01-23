@@ -29,7 +29,12 @@ const InvoiceList = () => {
             if (currentFilters.statut) params.append('statut', currentFilters.statut);
 
             const response = await api.get(`/factures/?${params.toString()}`);
-            setInvoices(response.data);
+            const data = Array.isArray(response.data)
+                ? response.data
+                : Array.isArray(response.data.results)
+                    ? response.data.results
+                    : [];
+            setInvoices(data);
         } catch (err) {
             setError('Erreur lors du chargement des factures');
         } finally {

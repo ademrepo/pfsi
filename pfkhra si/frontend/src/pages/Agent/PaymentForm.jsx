@@ -36,41 +36,63 @@ const PaymentForm = () => {
         try {
             const res = await api.get('/clients/');
             setClients(res.data);
-            // Si on vient d'une facture, on essaie de trouver le client lié
             if (initialInvoiceId) {
                 const facRes = await api.get(`/factures/${initialInvoiceId}/`);
-                setFormData(prev => ({ ...prev, client: facRes.data.client, montant: facRes.data.reste_a_payer }));
+                setFormData(prev => ({
+                    ...prev,
+                    client: facRes.data.client,
+                    facture: facRes.data.id,
+                    montant: facRes.data.reste_a_payer
+                }));
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const fetchInvoices = async (clientId) => {
         try {
-            const res = await api.get(`/factures/?client_id=${clientId}&statut=Émise,Partiellement+Payée`);
-            // Note: le filtrage multi-statut dépend de l'implémentation backend
-            // Pour être sûr on filtre côté client si besoin
-            setInvoices(res.data.filter(f => f.statut !== 'Payée' && f.statut !== 'Annulée'));
-        } catch (err) { console.error(err); }
+            const res = await api.get(`/factures/?client_id=${clientId}`);
+            const data = Array.isArray(res.data) ? res.data : res.data.results || [];
+            setInvoices(data.filter(f => f.statut !== 'Payée' && f.statut !== 'Annulée'));
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // Si on change de facture, on peut pré-remplir le montant avec le reste à payer
         if (name === 'facture' && value) {
-            const selectedFac = invoices.find(f => f.id === parseInt(value));
+            const selectedFac = invoices.find(f => f.id === parseInt(value, 10));
             if (selectedFac) {
-                setFormData(prev => ({ ...prev, montant: selectedFac.reste_a_payer }));
+                setFormData(prev => ({
+                    ...prev,
+                    montant: selectedFac.reste_a_payer,
+                    client: selectedFac.client
+                }));
             }
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.facture) {
+            alert('Vous devez sélectionner une facture à régler.');
+            return;
+        }
+
         setLoading(true);
         try {
-            await api.post('/paiements/', formData);
+            const payload = {
+                facture: formData.facture,
+                date_paiement: formData.date_paiement,
+                mode_paiement: formData.mode_paiement,
+                montant: formData.montant,
+                statut: formData.statut
+            };
+            await api.post('/paiements/', payload);
             navigate('/paiements');
         } catch (err) {
             console.error(err);
@@ -94,8 +116,8 @@ const PaymentForm = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Facture Liée (Optionnel)</label>
-                        <select name="facture" value={formData.facture} onChange={handleChange}>
+                        <label>Facture à régler</label>
+                        <select name="facture" value={formData.facture} onChange={handleChange} required>
                             <option value="">Paiement Libre (Acompte / Solde)</option>
                             {invoices.map(f => (
                                 <option key={f.id} value={f.id}>

@@ -294,7 +294,11 @@ class ExpeditionSerializer(serializers.ModelSerializer):
         
         montant = 0
         if tarifs:
-            montant = tarifs.tarif_base + (poids * tarifs.tarif_poids_kg) + (volume * tarifs.tarif_volume_m3)
+            montant = (
+                (tarifs.tarif_base or 0) +
+                (poids * (tarifs.tarif_poids_kg or 0)) +
+                (volume * (tarifs.tarif_volume_m3 or 0))
+            )
         elif destination:
             # Fallback sur tarif par défaut de la destination
             montant = destination.tarif_base_defaut
@@ -306,48 +310,7 @@ class ExpeditionSerializer(serializers.ModelSerializer):
             validated_data['created_by'] = request.user_obj
             
         with transaction.atomic():
-            # 1. Créer l'expédition
-            print("DEBUG: Creating expedition...")
             expedition = super().create(validated_data)
-            print(f"DEBUG: Expedition created. ID={expedition.id}, est_facturee={expedition.est_facturee}")
-            
-            # 2. Générer automatiquement une facture
-            year = datetime.date.today().year
-            fac_prefix = f"FAC-{year}"
-            last_fac = Facture.objects.filter(numero_facture__startswith=fac_prefix).aggregate(Max('numero_facture'))
-            last_fac_code = last_fac['numero_facture__max']
-            fac_seq = int(last_fac_code.split('-')[-1]) + 1 if last_fac_code else 1
-            
-            total_ht = round(expedition.montant_total, 2)
-            tva_rate = 0.20
-            montant_tva = round(total_ht * tva_rate, 2)
-            total_ttc = round(total_ht + montant_tva, 2)
-            
-            print("DEBUG: Creating facture...")
-            facture = Facture.objects.create(
-                numero_facture=f"{fac_prefix}-{fac_seq:04d}",
-                client=client,
-                date_facture=datetime.date.today(),
-                total_ht=total_ht,
-                montant_tva=montant_tva,
-                total_ttc=total_ttc,
-                statut='Émise'
-            )
-            print(f"DEBUG: Facture created. ID={facture.id}")
-            
-            # 3. Lier l'expédition
-            print("DEBUG: Linking facture and expedition...")
-            FactureExpedition.objects.create(facture=facture, expedition=expedition)
-            print("DEBUG: Link created.")
-            
-            # Le trigger mets déjà à jour le statut en base
-            expedition.est_facturee = True
-            
-            # 4. Mettre à jour le solde client
-            if client:
-                client.solde += total_ttc
-                client.save()
-            
             return expedition
 
 
@@ -370,54 +333,199 @@ class TourneeSerializer(serializers.ModelSerializer):
     def get_expeditions_count(self, obj):
         return obj.expeditions.count()
 
+    def validate(self, attrs):
+        """
+        Les données de trajet (km/durée/consommation) ne doivent être renseignées
+        que lorsque la tournée est marquée 'Terminée'.
+        """
+        from rest_framework.exceptions import ValidationError
+        from decimal import Decimal, InvalidOperation
+
+        trip_fields = [
+            'kilometrage_depart',
+            'kilometrage_retour',
+            'distance_km',
+            'duree_minutes',
+            'consommation_litres',
+        ]
+
+        # Statut cible (celui qui sera persisté)
+        target_status = attrs.get('statut')
+        if not target_status and self.instance is not None:
+            target_status = getattr(self.instance, 'statut', None)
+        if target_status is not None:
+            import unicodedata
+            raw = str(target_status).strip()
+
+            # Tolérer les problèmes d'encodage historiques (ex: 'TerminÃ©e') et les remplacements '?' (ex: 'Termin?e').
+            # Canonicaliser pour comparaison: enlever accents, normaliser casse.
+            def _canon(x: str) -> str:
+                x = x.replace('?', 'e')
+                x = unicodedata.normalize('NFKD', x)
+                x = ''.join(ch for ch in x if not unicodedata.combining(ch))
+                return x.strip().lower()
+
+            canon = _canon(raw)
+            if canon == 'terminee':
+                target_status = 'Terminée'
+            elif canon == 'preparee':
+                target_status = 'Préparée'
+            elif canon == 'annulee':
+                target_status = 'Annulée'
+            else:
+                target_status = raw
+            # Si l'appelant envoie un statut, persister la version normalisée.
+            if 'statut' in attrs:
+                attrs['statut'] = target_status
+
+        # Si on envoie une valeur non vide pour un champ trajet, bloquer hors "Terminée"
+        provided_trip = False
+        for f in trip_fields:
+            if f in attrs:
+                v = attrs.get(f)
+                if v not in (None, ''):
+                    provided_trip = True
+                    break
+
+        if provided_trip and target_status != 'Terminée':
+            raise ValidationError("Les données du trajet ne peuvent être renseignées que lorsque la tournée est 'Terminée'.")
+
+        def _resolved(field_name):
+            # En PATCH, des champs requis peuvent déjà exister sur l'instance.
+            if field_name in attrs:
+                return attrs.get(field_name)
+            if self.instance is not None:
+                return getattr(self.instance, field_name, None)
+            return None
+
+        def _to_decimal(v, field_name):
+            if v in (None, ''):
+                return None
+            try:
+                return Decimal(str(v))
+            except (InvalidOperation, ValueError):
+                raise ValidationError({field_name: "Valeur numérique invalide."})
+
+        # Si la tournée est (ou devient) "Terminée", exiger les données trajet + cohérence
+        if target_status == 'Terminée':
+            # distance_km est dérivée automatiquement de (kilometrage_retour - kilometrage_depart)
+            required = ['kilometrage_depart', 'kilometrage_retour', 'consommation_litres']
+            missing = [f for f in required if _resolved(f) in (None, '')]
+            if missing:
+                raise ValidationError({f: "Champ requis pour clôturer la tournée." for f in missing})
+
+            km_depart = _to_decimal(_resolved('kilometrage_depart'), 'kilometrage_depart')
+            km_retour = _to_decimal(_resolved('kilometrage_retour'), 'kilometrage_retour')
+            consommation_litres = _to_decimal(_resolved('consommation_litres'), 'consommation_litres')
+            duree_minutes = _resolved('duree_minutes')
+            date_depart = _resolved('date_depart')
+            date_retour = _resolved('date_retour')
+
+            # Sanity: non-négatifs / positifs
+            if km_depart is not None and km_depart < 0:
+                raise ValidationError({'kilometrage_depart': "Le kilométrage ne peut pas être négatif."})
+            if km_retour is not None and km_retour < 0:
+                raise ValidationError({'kilometrage_retour': "Le kilométrage ne peut pas être négatif."})
+            if consommation_litres is not None and consommation_litres < 0:
+                raise ValidationError({'consommation_litres': "La consommation ne peut pas être négative."})
+
+            # La durée est informative: seulement vérifier que ce n'est pas négatif.
+            try:
+                duree_minutes_int = int(duree_minutes) if duree_minutes not in (None, '') else None
+            except (TypeError, ValueError):
+                raise ValidationError({'duree_minutes': "Valeur numérique invalide."})
+
+            if duree_minutes_int is not None and duree_minutes_int < 0:
+                raise ValidationError({'duree_minutes': "La durée ne peut pas être négative."})
+
+            if km_retour < km_depart:
+                raise ValidationError({'kilometrage_retour': "Le kilométrage de retour doit être >= au kilométrage de départ."})
+
+            km_diff = km_retour - km_depart
+            if km_diff <= 0:
+                raise ValidationError({'kilometrage_retour': "Le kilométrage de retour doit être strictement supérieur au kilométrage de départ."})
+
+            # Toujours recalculer et persister la distance dérivée.
+            attrs['distance_km'] = float(km_diff)
+            distance_km = km_diff
+
+            # Date depart/retour: coherence + accord avec duree_minutes (si dates presentes)
+            if date_depart and date_retour:
+                if date_retour <= date_depart:
+                    raise ValidationError({'date_retour': "La date/heure de retour doit être après la date/heure de départ."})
+                # La durée est informative: pas de contrainte de concordance avec les dates.
+
+            # Consommation: uniquement contrainte non-négative (aucune cohérence imposée).
+
+        return attrs
+
+    def _finalize_expeditions(self, tournee, expedition_ids):
+        if expedition_ids is None:
+            return
+
+        Expedition.objects.filter(tournee=tournee).exclude(id__in=expedition_ids).update(tournee=None, statut='Enregistré')
+        Expedition.objects.filter(id__in=expedition_ids).update(tournee=tournee, statut='Validé')
+
+    def _handle_tournee_completion(self, tournee):
+        from django.utils import timezone
+        delivered = tournee.expeditions.exclude(statut='Livré').select_related('client', 'tournee')
+        now = timezone.now()
+        for exp in delivered:
+            exp.statut = 'Livré'
+            exp.save(update_fields=['statut'])
+            TrackingExpedition.objects.create(
+                expedition=exp,
+                tournee=tournee,
+                chauffeur=tournee.chauffeur,
+                statut='Livré',
+                lieu=f'Tournée {tournee.code_tournee}',
+                commentaire='Tournée terminée, expédition livrée',
+                date_statut=now
+            )
+
     def create(self, validated_data):
         import datetime
         from django.db.models import Max
         from django.db import transaction
-        
+
         expedition_ids = validated_data.pop('expedition_ids', [])
-        
+
         today_str = datetime.date.today().strftime('%Y%m%d')
         prefix = f"TRN-{today_str}"
-        
+
         last_item = Tournee.objects.filter(code_tournee__startswith=prefix).aggregate(Max('code_tournee'))
         last_code = last_item['code_tournee__max']
-        
-        if last_code:
-            seq = int(last_code.split('-')[-1]) + 1
-        else:
-            seq = 1
-            
+
+        seq = int(last_code.split('-')[-1]) + 1 if last_code else 1
         validated_data['code_tournee'] = f"{prefix}-{seq:04d}"
-        if 'statut' not in validated_data:
-            validated_data['statut'] = 'Préparée'
-        
+        validated_data.setdefault('statut', 'Préparée')
+
         request = self.context.get('request')
         if request and hasattr(request, 'user_obj'):
             validated_data['created_by'] = request.user_obj
-            
+
         with transaction.atomic():
             tournee = super().create(validated_data)
-            
-            # Lier les expéditions
-            if expedition_ids:
-                Expedition.objects.filter(id__in=expedition_ids).update(tournee=tournee, statut='Validé')
-            
+            self._finalize_expeditions(tournee, expedition_ids)
+
+            if tournee.statut == 'Terminée':
+                self._handle_tournee_completion(tournee)
+
             return tournee
 
     def update(self, instance, validated_data):
         from django.db import transaction
         expedition_ids = validated_data.pop('expedition_ids', None)
-        
+
+        previous_status = instance.statut
         with transaction.atomic():
-            # Avant la mise à jour, on identifie les expéditions qui vont être retirées
-            if expedition_ids is not None:
-                # Celles qui étaient liées mais ne le sont plus
-                instance.expeditions.exclude(id__in=expedition_ids).update(tournee=None, statut='Enregistré')
-                # Celles qui ne l'étaient pas mais vont l'être
-                Expedition.objects.filter(id__in=expedition_ids).update(tournee=instance, statut='Validé')
-            
-            return super().update(instance, validated_data)
+            tournee = super().update(instance, validated_data)
+            self._finalize_expeditions(tournee, expedition_ids)
+
+            if tournee.statut == 'Terminée' and previous_status != 'Terminée':
+                self._handle_tournee_completion(tournee)
+
+            return tournee
 
 
 class FactureExpeditionSerializer(serializers.ModelSerializer):
@@ -450,7 +558,8 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def get_reste_a_payer(self, obj):
         deja_paye = Paiement.objects.filter(facture=obj).aggregate(models.Sum('montant'))['montant__sum'] or 0
-        return round(obj.total_ttc - deja_paye, 2)
+        total_ttc = obj.total_ttc or 0
+        return round(total_ttc - deja_paye, 2)
 
     def create(self, validated_data):
         import datetime
@@ -473,7 +582,7 @@ class FactureSerializer(serializers.ModelSerializer):
 
             # 2. Calcul des montants
             expeditions = Expedition.objects.filter(id__in=expedition_ids)
-            total_ht = sum(e.montant_total for e in expeditions)
+            total_ht = sum((e.montant_total or 0) for e in expeditions)
             tva_rate = 0.20 # 20% TVA par défaut
             montant_tva = total_ht * tva_rate
             total_ttc = total_ht + montant_tva
@@ -488,7 +597,8 @@ class FactureSerializer(serializers.ModelSerializer):
             for exp in expeditions:
                 FactureExpedition.objects.create(facture=facture, expedition=exp)
                 exp.est_facturee = True
-                exp.save()
+                # La base peut avoir un trigger (trg_expedition_mark_facturee) qui met Ã  jour est_facturee.
+                # Ã‰viter un UPDATE supplÃ©mentaire qui peut provoquer des conflits avec les triggers.
 
             # 4. Impact sur le solde client (Dette augmente)
             if client:
@@ -500,38 +610,37 @@ class FactureSerializer(serializers.ModelSerializer):
 
 class PaiementSerializer(serializers.ModelSerializer):
     client_details = ClientSerializer(source='client', read_only=True)
+    facture = serializers.PrimaryKeyRelatedField(queryset=Facture.objects.all())
     facture_numero = serializers.CharField(source='facture.numero_facture', read_only=True)
 
     class Meta:
         model = Paiement
-        fields = '__all__'
-        read_only_fields = ('updated_at',)
+        fields = [
+            'id', 'facture', 'facture_numero', 'client', 'client_details',
+            'date_paiement', 'mode_paiement', 'montant', 'statut', 'updated_at'
+        ]
+        read_only_fields = ('id', 'client', 'client_details', 'updated_at')
 
     def create(self, validated_data):
         from django.db import transaction
-        client = validated_data.get('client')
-        facture = validated_data.get('facture')
+        facture = validated_data['facture']
         montant = validated_data.get('montant', 0)
 
         with transaction.atomic():
-            if facture and not client:
-                client = facture.client
-                validated_data['client'] = client
-
+            client = facture.client
+            validated_data['client'] = client
             paiement = Paiement.objects.create(**validated_data)
 
-            # Impact sur le solde client (Dette diminue)
             if client:
-                client.solde -= montant
-                client.save()
+                client.solde = (client.solde or 0) - montant
+                client.save(update_fields=['solde'])
 
-            # Maj statut facture
-            if facture:
-                deja_paye = Paiement.objects.filter(facture=facture).aggregate(models.Sum('montant'))['montant__sum'] or 0
-                if deja_paye >= facture.total_ttc:
-                    facture.statut = 'Payée'
-                elif deja_paye > 0:
-                    facture.statut = 'Partiellement Payée'
-                facture.save()
+            deja_paye = Paiement.objects.filter(facture=facture).aggregate(models.Sum('montant'))['montant__sum'] or 0
+            total_ttc = facture.total_ttc or 0
+            if deja_paye >= total_ttc:
+                facture.statut = 'Payée'
+            elif deja_paye > 0:
+                facture.statut = 'Partiellement Payée'
+            facture.save(update_fields=['statut'])
 
             return paiement

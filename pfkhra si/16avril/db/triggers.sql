@@ -75,8 +75,10 @@ END;
 CREATE TRIGGER trg_expedition_tracking_initial
 AFTER INSERT ON expedition
 BEGIN
+    -- Important: aligner les statuts sur ceux utilisés par l'app (frontend/DRF)
+    -- pour que les filtres (ex: ?status=EnregistrÃ©) fonctionnent.
     INSERT INTO tracking_expedition (expedition_id, statut, lieu, date_statut)
-    VALUES (NEW.id, 'enregistre', 'Création expédition', CURRENT_TIMESTAMP);
+    VALUES (NEW.id, 'EnregistrÃ©', 'CrÃ©ation expÃ©dition', CURRENT_TIMESTAMP);
 END;
 
 CREATE TRIGGER trg_tracking_update_expedition_statut
@@ -90,6 +92,8 @@ END;
 -- ===========================
 -- SOLDE CLIENT
 -- ===========================
+-- Note: ces triggers comparent des statuts en minuscules ('validee'/'valide').
+-- Si l'app utilise d'autres valeurs (ex: 'Ã‰mise', 'PayÃ©e'), adapter ou gÃ©rer le solde cÃ´tÃ© Django.
 CREATE TRIGGER trg_facture_validee_augmente_solde
 AFTER UPDATE OF statut ON facture
 WHEN OLD.statut != 'validee' AND NEW.statut = 'validee'
@@ -109,22 +113,8 @@ BEGIN
 END;
 
 -- ===========================
--- BLOQUAGES METIER
+-- FACTURATION EXPEDITIONS
 -- ===========================
-CREATE TRIGGER trg_expedition_no_update_if_facturee
-BEFORE UPDATE ON expedition
-WHEN OLD.est_facturee = 1
-BEGIN
-    SELECT RAISE(ABORT, 'Expédition déjà facturée');
-END;
-
-CREATE TRIGGER trg_expedition_no_delete_if_facturee
-BEFORE DELETE ON expedition
-WHEN OLD.est_facturee = 1
-BEGIN
-    SELECT RAISE(ABORT, 'Expédition déjà facturée');
-END;
-
 CREATE TRIGGER trg_expedition_mark_facturee
 AFTER INSERT ON facture_expedition
 BEGIN
@@ -142,13 +132,16 @@ WHEN NEW.montant_total = 0
 BEGIN
     UPDATE expedition
     SET montant_total = (
-        SELECT d.tarif_base_defaut +
-               (NEW.poids_kg * t.tarif_poids_kg) +
-               (NEW.volume_m3 * t.tarif_volume_m3)
+        SELECT
+            COALESCE(t.tarif_base, d.tarif_base_defaut, 0) +
+            (NEW.poids_kg * COALESCE(t.tarif_poids_kg, 0)) +
+            (NEW.volume_m3 * COALESCE(t.tarif_volume_m3, 0))
         FROM tarification t
         JOIN destination d ON d.id = t.destination_id
         WHERE t.type_service_id = NEW.type_service_id
           AND t.destination_id = NEW.destination_id
+        LIMIT 1
     )
     WHERE id = NEW.id;
 END;
+

@@ -144,6 +144,9 @@ INSERT INTO client (code_client, type_client, nom, prenom, telephone, email, adr
 ('CLI-00024', 'particulier', 'Zahia', 'Imène', '0555444555', 'zahia@email.dz', '34 Rue Hassiba Ben Bouali', 'Ghardaïa', 'Algérie', 'actif'),
 ('CLI-00025', 'entreprise', 'EURL TransExport', NULL, '0666555666', 'export@transexport.dz', 'Port d''Alger', 'Alger', 'Algérie', 'actif');
 
+-- Forcer les soldes à zéro dans les insertions de clients
+UPDATE client SET solde = 0 WHERE solde IS NULL;
+
 -- ============================================
 -- 7. CHAUFFEURS (15+)
 -- ============================================
@@ -265,3 +268,17 @@ INSERT INTO expedition (client_id, type_service_id, destination_id, poids_kg, vo
 (48, 3, 28, 24.0, 1.4, 'Export Rabat', '258 Rabat Centre', 'Société MA', '+212623456789', 'enregistre', 0, 3),
 (49, 3, 30, 32.0, 1.9, 'Export Espagne', '369 Madrid', 'Client ES', '+34612345678', 'enregistre', 0, 2),
 (50, 3, 31, 35.0, 2.05, 'Export Allemagne', '741 Berlin', 'Firma DE', '+49151234567', 'enregistre', 0, 2);
+
+-- Donnees de test: completer les champs optionnels (utile pour l'UI)
+UPDATE destination
+SET code_zone = printf('%05d', 10000 + id)
+WHERE code_zone IS NULL OR TRIM(code_zone) = '';
+
+UPDATE chauffeur
+SET num_permis = 'P' || printf('%06d', 100000 + id)
+WHERE num_permis IS NULL OR TRIM(num_permis) = '';
+
+-- "Matricule vehicule" (interprete comme immatriculation): completer si manquant
+UPDATE vehicule
+SET immatriculation = 'VH-' || printf('%05d', id)
+WHERE immatriculation IS NULL OR TRIM(immatriculation) = '';
