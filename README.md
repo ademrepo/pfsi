@@ -38,6 +38,17 @@ npm run dev
 
 ---
 
+## ⚠️ Incidents & Alertes
+
+- **UI**:
+  - `Incidents` : http://localhost:3000/incidents
+  - `Alertes` : http://localhost:3000/alertes
+- **API**:
+  - `GET/POST` `/api/incidents/` (pièces jointes via `multipart/form-data`, champ `files`)
+  - `GET` `/api/alertes/` + `POST` `/api/alertes/{id}/mark_read/`
+- **Uploads (dev)**:
+  - Les fichiers (docs/photos) sont servis par Django en mode `DEBUG` via `/media/`.
+
 ## 🔧 Development Workflow
 
 ### Daily Setup

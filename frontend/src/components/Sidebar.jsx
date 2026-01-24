@@ -21,6 +21,9 @@ const Sidebar = ({ user, onLogout }) => {
                 <div className="menu-section">OPÉRATIONS</div>
                 <NavLink to="/expeditions">📦 Expéditions</NavLink>
                 <NavLink to="/tournees">🚚 Tournées</NavLink>
+                <NavLink to="/incidents">⚠️ Incidents</NavLink>
+                <NavLink to="/alertes">🔔 Alertes</NavLink>
+                <NavLink to="/reclamations">📝 Réclamations</NavLink>
                 <NavLink to="/clients">👥 Clients</NavLink>
 
                 <div className="menu-section">FACTURATION</div>

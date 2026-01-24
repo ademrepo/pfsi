@@ -2,13 +2,18 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import models
+from django.db import transaction
+from django.utils import timezone
 from .models import (
     Utilisateur, Role, AuditLog,
     Client, Chauffeur, Vehicule, Destination, TypeService, Tarification,
     Expedition, TrackingExpedition, Tournee,
+    Incident, IncidentAttachment, Alerte,
+    Reclamation,
     Facture, FactureExpedition, Paiement
 )
 from .serializers import (
@@ -17,6 +22,8 @@ from .serializers import (
     RoleSerializer, ClientSerializer, ChauffeurSerializer, VehiculeSerializer,
     DestinationSerializer, TypeServiceSerializer, TarificationSerializer,
     ExpeditionSerializer, TrackingExpeditionSerializer, TourneeSerializer,
+    IncidentSerializer, AlerteSerializer,
+    ReclamationSerializer,
     FactureSerializer, FactureExpeditionSerializer, PaiementSerializer
 )
 from .permissions import IsAuthenticated, IsAdminSysteme, IsAgentAdministratif
@@ -422,6 +429,211 @@ class TrackingExpeditionViewSet(BaseAgentViewSet):
         if exp_id:
             queryset = queryset.filter(expedition_id=exp_id)
         return queryset
+
+
+class IncidentViewSet(BaseAgentViewSet):
+    queryset = (
+        Incident.objects.select_related('expedition', 'tournee', 'created_by')
+        .prefetch_related('attachments')
+        .all()
+    )
+    serializer_class = IncidentSerializer
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        expedition_id = self.request.query_params.get('expedition_id')
+        tournee_id = self.request.query_params.get('tournee_id')
+        type_incident = self.request.query_params.get('type_incident')
+
+        if expedition_id:
+            queryset = queryset.filter(expedition_id=expedition_id)
+        if tournee_id:
+            queryset = queryset.filter(tournee_id=tournee_id)
+        if type_incident:
+            queryset = queryset.filter(type_incident=type_incident)
+
+        return queryset
+
+    def _apply_status_change(self, incident: Incident) -> str:
+        now = timezone.now()
+
+        if incident.expedition_id:
+            expedition = incident.expedition
+            expedition.statut = 'Échec de livraison'
+            expedition.save(update_fields=['statut'])
+
+            TrackingExpedition.objects.create(
+                expedition=expedition,
+                tournee=expedition.tournee,
+                chauffeur=expedition.tournee.chauffeur if expedition.tournee else None,
+                statut='Échec de livraison',
+                lieu=f"Incident {incident.code_incident}",
+                commentaire=(incident.commentaire or '').strip() or f"Incident ({incident.get_type_incident_display()})",
+                date_statut=now,
+            )
+
+            return 'SET_ECHEC_LIVRAISON'
+
+        if incident.tournee_id:
+            tournee = incident.tournee
+            tournee.statut = 'Annulée'
+            tournee.save(update_fields=['statut'])
+
+            for expedition in tournee.expeditions.exclude(statut='Livré').select_related('tournee'):
+                expedition.statut = 'Échec de livraison'
+                expedition.save(update_fields=['statut'])
+                TrackingExpedition.objects.create(
+                    expedition=expedition,
+                    tournee=tournee,
+                    chauffeur=tournee.chauffeur,
+                    statut='Échec de livraison',
+                    lieu=f"Tournée {tournee.code_tournee} (annulée)",
+                    commentaire=(incident.commentaire or '').strip() or f"Incident tournée ({incident.get_type_incident_display()})",
+                    date_statut=now,
+                )
+
+            return 'SET_ANNULEE'
+
+        return 'NONE'
+
+    def _generate_alertes(self, incident: Incident) -> None:
+        exp_code = incident.expedition.code_expedition if incident.expedition_id else None
+        trn_code = incident.tournee.code_tournee if incident.tournee_id else None
+
+        ref = exp_code or trn_code or f"#{incident.id}"
+        titre = f"Incident {incident.get_type_incident_display()} - {ref}"
+        message = (incident.commentaire or '').strip() or "Un incident a été signalé."
+
+        if incident.notify_direction:
+            Alerte.objects.create(
+                destination='DIRECTION',
+                titre=titre,
+                message=message,
+                incident=incident,
+                expedition=incident.expedition if incident.expedition_id else None,
+                tournee=incident.tournee if incident.tournee_id else None,
+            )
+
+        if incident.notify_client and incident.expedition_id and incident.expedition.client_id:
+            Alerte.objects.create(
+                destination='CLIENT',
+                titre=titre,
+                message=message,
+                incident=incident,
+                expedition=incident.expedition,
+            )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        with transaction.atomic():
+            incident = serializer.save(created_by=getattr(request, 'user_obj', None))
+
+            for f in request.FILES.getlist('files'):
+                IncidentAttachment.objects.create(
+                    incident=incident,
+                    file=f,
+                    original_name=getattr(f, 'name', None),
+                    uploaded_by=getattr(request, 'user_obj', None),
+                )
+
+            action_appliquee = self._apply_status_change(incident)
+            if action_appliquee and action_appliquee != incident.action_appliquee:
+                incident.action_appliquee = action_appliquee
+                incident.save(update_fields=['action_appliquee', 'updated_at'])
+
+            self._generate_alertes(incident)
+
+        out = self.get_serializer(incident)
+        headers = self.get_success_headers(out.data)
+        return Response(out.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class AlerteViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Alerte.objects.all()
+    serializer_class = AlerteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        destination = self.request.query_params.get('destination')
+        is_read = self.request.query_params.get('is_read')
+        incident_id = self.request.query_params.get('incident_id')
+
+        if destination:
+            queryset = queryset.filter(destination=destination)
+        if is_read in ('true', 'false', '0', '1'):
+            queryset = queryset.filter(is_read=is_read in ('true', '1'))
+        if incident_id:
+            queryset = queryset.filter(incident_id=incident_id)
+
+        # Par défaut, restreindre les alertes client aux rôles internes.
+        role_code = getattr(getattr(self.request, 'user_obj', None), 'role', None)
+        role_code = getattr(role_code, 'code', None)
+        if role_code == 'DIRECTION':
+            queryset = queryset.filter(destination='DIRECTION')
+
+        return queryset
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        alerte = self.get_object()
+        alerte.is_read = True
+        alerte.save(update_fields=['is_read'])
+        return Response(self.get_serializer(alerte).data, status=status.HTTP_200_OK)
+
+
+class ReclamationViewSet(BaseAgentViewSet):
+    queryset = (
+        Reclamation.objects.select_related('client', 'facture', 'type_service', 'traite_par', 'expedition')
+        .prefetch_related('expeditions')
+        .all()
+    )
+    serializer_class = ReclamationSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        statut = self.request.query_params.get('statut')
+        client_id = self.request.query_params.get('client_id')
+        facture_id = self.request.query_params.get('facture_id')
+        expedition_id = self.request.query_params.get('expedition_id')
+        type_service_id = self.request.query_params.get('type_service_id')
+
+        if statut:
+            queryset = queryset.filter(statut=statut)
+        if client_id:
+            queryset = queryset.filter(client_id=client_id)
+        if facture_id:
+            queryset = queryset.filter(facture_id=facture_id)
+        if type_service_id:
+            queryset = queryset.filter(type_service_id=type_service_id)
+        if expedition_id:
+            queryset = queryset.filter(models.Q(expedition_id=expedition_id) | models.Q(expeditions__id=expedition_id)).distinct()
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(traite_par=getattr(self.request, 'user_obj', None))
+
+    @action(detail=True, methods=['post'])
+    def resolve(self, request, pk=None):
+        reclamation = self.get_object()
+        reclamation.statut = 'RESOLUE'
+        reclamation.traite_par = getattr(request, 'user_obj', None)
+        reclamation.save(update_fields=['statut', 'traite_par'])
+        out = self.get_serializer(reclamation)
+        return Response(out.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        reclamation = self.get_object()
+        reclamation.statut = 'ANNULEE'
+        reclamation.traite_par = getattr(request, 'user_obj', None)
+        reclamation.save(update_fields=['statut', 'traite_par'])
+        out = self.get_serializer(reclamation)
+        return Response(out.data, status=status.HTTP_200_OK)
 
 
 class FactureViewSet(BaseAgentViewSet):

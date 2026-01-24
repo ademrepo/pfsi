@@ -10,6 +10,11 @@ import ClientList from './pages/Agent/ClientList';
 import ClientForm from './pages/Agent/ClientForm';
 import TourneeList from './pages/Agent/TourneeList';
 import TourneeForm from './pages/Agent/TourneeForm';
+import IncidentList from './pages/Agent/IncidentList';
+import IncidentForm from './pages/Agent/IncidentForm';
+import AlerteList from './pages/Agent/AlerteList';
+import ReclamationList from './pages/Agent/ReclamationList';
+import ReclamationForm from './pages/Agent/ReclamationForm';
 import InvoiceList from './pages/Agent/InvoiceList';
 import InvoiceForm from './pages/Agent/InvoiceForm';
 import InvoiceDetail from './pages/Agent/InvoiceDetail';
@@ -84,6 +89,12 @@ function App() {
                     <Route path="/tournees" element={<TourneeList />} />
                     <Route path="/tournees/nouveau" element={<TourneeForm />} />
                     <Route path="/tournees/:id/edit" element={<TourneeForm />} />
+                    <Route path="/incidents" element={<IncidentList />} />
+                    <Route path="/incidents/nouveau" element={<IncidentForm />} />
+                    <Route path="/alertes" element={<AlerteList />} />
+                    <Route path="/reclamations" element={<ReclamationList />} />
+                    <Route path="/reclamations/nouveau" element={<ReclamationForm />} />
+                    <Route path="/reclamations/:id/edit" element={<ReclamationForm />} />
 
                     <Route path="/factures" element={<InvoiceList />} />
                     <Route path="/factures/nouveau" element={<InvoiceForm />} />

@@ -283,6 +283,173 @@ class TrackingExpedition(models.Model):
         managed = True
 
 
+class Incident(models.Model):
+    TYPE_CHOICES = [
+        ('RETARD', 'Retard'),
+        ('PERTE', 'Perte'),
+        ('ENDOMMAGEMENT', 'Endommagement'),
+        ('PROBLEME_TECHNIQUE', 'Problème technique'),
+        ('AUTRE', 'Autre'),
+    ]
+
+    # Action appliquée automatiquement au statut
+    ACTION_CHOICES = [
+        ('SET_ECHEC_LIVRAISON', 'Mettre expédition en échec de livraison'),
+        ('SET_ANNULEE', 'Mettre tournée en annulée'),
+        ('NONE', 'Aucun changement de statut'),
+    ]
+
+    code_incident = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    type_incident = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    expedition = models.ForeignKey(
+        Expedition,
+        on_delete=models.CASCADE,
+        db_column='expedition_id',
+        null=True,
+        blank=True,
+        related_name='incidents',
+    )
+    tournee = models.ForeignKey(
+        Tournee,
+        on_delete=models.CASCADE,
+        db_column='tournee_id',
+        null=True,
+        blank=True,
+        related_name='incidents',
+    )
+    commentaire = models.TextField(null=True, blank=True)
+    action_appliquee = models.CharField(max_length=30, choices=ACTION_CHOICES, default='NONE')
+    notify_direction = models.BooleanField(default=True)
+    notify_client = models.BooleanField(default=False)
+    created_by = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, db_column='created_by', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        db_table = 'incident'
+        managed = True
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['type_incident', '-created_at']),
+            models.Index(fields=['expedition', '-created_at']),
+            models.Index(fields=['tournee', '-created_at']),
+        ]
+
+    def __str__(self):
+        return self.code_incident or f"Incident #{self.id}"
+
+
+def incident_attachment_upload_to(instance, filename: str) -> str:
+    incident_id = instance.incident_id or 'new'
+    return f"incidents/{incident_id}/{filename}"
+
+
+class IncidentAttachment(models.Model):
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name='attachments', db_column='incident_id')
+    file = models.FileField(upload_to=incident_attachment_upload_to)
+    original_name = models.CharField(max_length=255, null=True, blank=True)
+    uploaded_by = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, db_column='uploaded_by', null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'incident_attachment'
+        managed = True
+        ordering = ['-uploaded_at']
+
+    def __str__(self):
+        return self.original_name or self.file.name or f"Attachment #{self.id}"
+
+
+class Alerte(models.Model):
+    DEST_CHOICES = [
+        ('DIRECTION', 'Direction'),
+        ('CLIENT', 'Client'),
+    ]
+    TYPE_CHOICES = [
+        ('INCIDENT', 'Incident'),
+    ]
+
+    type_alerte = models.CharField(max_length=20, choices=TYPE_CHOICES, default='INCIDENT')
+    destination = models.CharField(max_length=20, choices=DEST_CHOICES)
+    titre = models.CharField(max_length=200)
+    message = models.TextField(null=True, blank=True)
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='alertes', db_column='incident_id')
+    expedition = models.ForeignKey(Expedition, on_delete=models.SET_NULL, null=True, blank=True, related_name='alertes', db_column='expedition_id')
+    tournee = models.ForeignKey(Tournee, on_delete=models.SET_NULL, null=True, blank=True, related_name='alertes', db_column='tournee_id')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'alerte'
+        managed = True
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['destination', 'is_read', '-created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.get_destination_display()} - {self.titre}"
+
+
+class Reclamation(models.Model):
+    STATUT_CHOICES = [
+        ('EN_COURS', 'En cours'),
+        ('RESOLUE', 'Résolue'),
+        ('ANNULEE', 'Annulée'),
+    ]
+
+    client = models.ForeignKey(Client, on_delete=models.PROTECT, db_column='client_id', null=True)
+    objet = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    date_reclamation = models.DateField(null=True, blank=True)
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='EN_COURS', null=True, blank=True)
+
+    # Liens optionnels (un ou plusieurs colis via expedition + M2M)
+    expedition = models.ForeignKey(
+        Expedition,
+        on_delete=models.SET_NULL,
+        db_column='expedition_id',
+        null=True,
+        blank=True,
+        related_name='reclamations_principales',
+    )
+    expeditions = models.ManyToManyField(
+        Expedition,
+        through='ReclamationExpedition',
+        related_name='reclamations',
+        blank=True,
+    )
+
+    facture = models.ForeignKey('Facture', on_delete=models.SET_NULL, db_column='facture_id', null=True, blank=True)
+    type_service = models.ForeignKey('TypeService', on_delete=models.SET_NULL, db_column='type_service_id', null=True, blank=True)
+
+    traite_par = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, db_column='traite_par', null=True, blank=True, related_name='reclamations_traitees')
+    date_resolution = models.DateField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'reclamation'
+        managed = True
+        ordering = ['-date_reclamation', '-id']
+        indexes = [
+            models.Index(fields=['client', '-date_reclamation']),
+            models.Index(fields=['statut', '-date_reclamation']),
+        ]
+
+    def __str__(self):
+        return f"Réclamation #{self.id}"
+
+
+class ReclamationExpedition(models.Model):
+    reclamation = models.ForeignKey(Reclamation, on_delete=models.CASCADE, db_column='reclamation_id')
+    expedition = models.ForeignKey(Expedition, on_delete=models.CASCADE, db_column='expedition_id')
+
+    class Meta:
+        db_table = 'reclamation_expedition'
+        managed = True
+        unique_together = (('reclamation', 'expedition'),)
+
+
 class Facture(models.Model):
     numero_facture = models.CharField(max_length=50, unique=True, null=True)
     client = models.ForeignKey(Client, on_delete=models.PROTECT, db_column='client_id', null=True)
@@ -302,7 +469,7 @@ class Facture(models.Model):
 
 
 class FactureExpedition(models.Model):
-    facture = models.ForeignKey(Facture, on_delete=models.CASCADE, db_column='facture_id', null=True)
+    facture = models.ForeignKey('Facture', on_delete=models.CASCADE, db_column='facture_id', null=True)
     expedition = models.ForeignKey(Expedition, on_delete=models.CASCADE, db_column='expedition_id', null=True)
 
     class Meta:
@@ -312,7 +479,7 @@ class FactureExpedition(models.Model):
 
 
 class Paiement(models.Model):
-    facture = models.ForeignKey(Facture, on_delete=models.CASCADE, db_column='facture_id', null=True, blank=True)
+    facture = models.ForeignKey('Facture', on_delete=models.CASCADE, db_column='facture_id', null=True, blank=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='client_id', null=True)
     date_paiement = models.DateField(null=True, blank=True)
     mode_paiement = models.CharField(max_length=100, null=True, blank=True)
@@ -364,6 +531,15 @@ def generate_tournee_code(sender, instance, **kwargs):
         next_id = (last_tournee.id + 1) if last_tournee else 1
         date_str = timezone.now().strftime('%Y%m%d')
         instance.code_tournee = f'TRN-{date_str}-{str(next_id).zfill(2)}'
+
+@receiver(pre_save, sender=Incident)
+def generate_incident_code(sender, instance, **kwargs):
+    """Generate incident code if not provided"""
+    if not instance.code_incident or instance.code_incident == '':
+        last_item = Incident.objects.order_by('-id').first()
+        next_id = (last_item.id + 1) if last_item else 1
+        date_str = timezone.now().strftime('%Y%m%d')
+        instance.code_incident = f'INC-{date_str}-{str(next_id).zfill(5)}'
 
 @receiver(pre_save, sender=Facture)
 def generate_facture_numero(sender, instance, **kwargs):

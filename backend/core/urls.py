@@ -5,7 +5,9 @@ from .views import (
     UtilisateurViewSet, AuditLogViewSet,
     ClientViewSet, ChauffeurViewSet, VehiculeViewSet, DestinationViewSet,
     TypeServiceViewSet, TarificationViewSet, ExpeditionViewSet, TourneeViewSet,
-    TrackingExpeditionViewSet, FactureViewSet, PaiementViewSet
+    TrackingExpeditionViewSet, IncidentViewSet, AlerteViewSet,
+    ReclamationViewSet,
+    FactureViewSet, PaiementViewSet
 )
 
 router = DefaultRouter()
@@ -20,6 +22,9 @@ router.register(r'tarifications', TarificationViewSet, basename='tarification')
 router.register(r'expeditions', ExpeditionViewSet, basename='expedition')
 router.register(r'tournees', TourneeViewSet, basename='tournee')
 router.register(r'tracking', TrackingExpeditionViewSet, basename='tracking')
+router.register(r'incidents', IncidentViewSet, basename='incident')
+router.register(r'alertes', AlerteViewSet, basename='alerte')
+router.register(r'reclamations', ReclamationViewSet, basename='reclamation')
 router.register(r'factures', FactureViewSet, basename='facture')
 router.register(r'paiements', PaiementViewSet, basename='paiement')
 
