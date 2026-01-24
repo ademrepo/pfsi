@@ -1,20 +1,21 @@
 # 🚀 PROJET PF KHRA - Transport & Logistics
 
-Système de gestion de transport et livraison avec Django et SQLite.
+Système de gestion de transport et livraison avec Django backend, React frontend, et SQLite.
 
 ---
 
-## � Table des matières
+## 📋 Table des matières
 1. [Installation Complète](#installation-complète)
 2. [Configuration du Virtual Environment](#configuration-du-virtual-environment)
-3. [Initialisation de la Base de Données](#initialisation-de-la-base-de-données)
-4. [Lancer le Serveur Django](#lancer-le-serveur-django)
-5. [Consulter la Base de Données](#consulter-la-base-de-données)
-6. [Structure du Projet](#structure-du-projet)
-7. [Base de Données](#base-de-données)
-8. [Commandes Git](#commandes-git)
-9. [Fichiers à Ignorer](#fichiers-à-ignorer)
-10. [Problèmes Courants](#problèmes-courants)
+3. [Installation Backend](#installation-backend)
+4. [Installation Frontend](#installation-frontend)
+5. [Initialisation de la Base de Données](#initialisation-de-la-base-de-données)
+6. [Lancer les Serveurs](#lancer-les-serveurs)
+7. [Structure du Projet](#structure-du-projet)
+8. [Base de Données](#base-de-données)
+9. [Commandes Git](#commandes-git)
+10. [Fichiers à Ignorer](#fichiers-à-ignorer)
+11. [Problèmes Courants](#problèmes-courants)
 
 ---
 
@@ -51,7 +52,7 @@ source venv/bin/activate
 
 **Vérifier l'activation**: Vous devriez voir `(venv)` au début de votre terminal.
 
-### 3. Installer les dépendances Python
+### 3. Installation Backend
 
 Assurez-vous que le virtual environment est **activé** (voir étape 2), puis :
 
@@ -59,12 +60,33 @@ Assurez-vous que le virtual environment est **activé** (voir étape 2), puis :
 pip install -r requirements.txt
 ```
 
-**Dépendances instalées**:
+**Dépendances installées**:
 - Django 4.2.9
+- djangorestframework 3.14.0
+- django-cors-headers 4.3.1
+- python-decouple 3.8
+- Pillow 10.1.0
 - SQLite3 (déjà inclus)
-- Autres dépendances (voir `requirements.txt`)
 
-### 4. Initialisation de la base de données (OBLIGATOIRE après un clone / pull)
+### 4. Installation Frontend
+
+Ouvrez un **nouveau terminal** (gardez le venv Python actif dans le premier) :
+
+```bash
+# Naviguer vers le dossier frontend
+cd frontend
+
+# Installer les dépendances Node.js
+npm install
+```
+
+**Dépendances frontend installées**:
+- React 18.2.0
+- React Router DOM 6.20.0
+- Axios 1.6.2
+- Vite 5.0.8
+
+### 5. Initialisation de la base de données (OBLIGATOIRE après un clone / pull)
 
 Le fichier `db.sqlite3` est **ignoré par Git** (voir `.gitignore`). Donc après un clone/pull, vous n'aurez pas la base locale (tables + données de test), ce qui fait que l'API retournera du vide / erreurs.
 
@@ -101,44 +123,57 @@ Le script:
 3. Crée les triggers (`triggers.sql`)
 4. Insère les données de test (`data.sql`)
 
-### 5. Lancer le serveur Django
+### 6. Lancer les Serveurs
 
+#### Backend Django (Terminal 1)
 Revenir au dossier principal :
 
 ```bash
 cd ..
 
 # Assurez-vous que le venv est toujours activé
-# Windows: venv\Scripts\activate
-# Linux/Mac: source venv/bin/activate
-
 python manage.py runserver
 ```
 
-**Le serveur est actif sur**: http://127.0.0.1:8000
+**Le backend est actif sur**: http://127.0.0.1:8000
+
+#### Frontend React (Terminal 2)
+Dans le deuxième terminal :
+
+```bash
+# Assurez-vous d'être dans le dossier frontend
+cd frontend
+npm run dev
+```
+
+**Le frontend est actif sur**: http://localhost:3000
+
+#### Accès à l'application
+- **Interface web**: http://localhost:3000
+- **API REST**: http://127.0.0.1:8000/api/
+- **Admin Django**: http://127.0.0.1:8000/admin/
+
+**Login par défaut**:
+- Nom d'utilisateur: `admin`
+- Mot de passe: `password123`
 
 ---
 
 ## 📌 Utilisation Quotidienne
 
-### Avant chaque session de développement :
+### Démarrage rapide :
 
 ```bash
-# 1. Naviguer au dossier du projet
+# Terminal 1 - Backend
 cd 16avril
-
-# 2. Activer le virtual environment
 venv\Scripts\activate          # Windows
 # source venv/bin/activate    # Linux/Mac
+python scripts/init_db.py      # Initialiser la DB si besoin
+python manage.py runserver     # Démarrer Django
 
-# 3. (Optional) Mettre à jour les dépendances
-pip install -r requirements.txt
-
-# 4. S'assurer que la DB locale existe (idempotent)
-python scripts/init_db.py
-
-# 5. Lancer le serveur Django
-python manage.py runserver
+# Terminal 2 - Frontend
+cd frontend
+npm run dev                     # Démarrer React
 ```
 
 ### Après votre session :
