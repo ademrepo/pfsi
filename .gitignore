@@ -1,0 +1,36 @@
+# --- Python / Django ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+.venv/
+venv/
+env/
+*.log
+
+# --- Frontend (Node/React) ---
+node_modules/
+dist/
+build/
+.eslintcache
+.stylelintcache
+
+# --- IDE & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Security ---
+.env
+
+# --- Project Specific ---
+*.bak
+input.txt
+migration_error.txt
+error_log.txt
+triggers_output.txt
+reproduce_issue.py
+test_login_api.py
+check_integrity.py
