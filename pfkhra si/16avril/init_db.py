@@ -43,16 +43,23 @@ def init_db():
 
     # 3. Create Superuser (Admin) if not exists
     print("\n[2/4] Ensuring admin user exists...")
-    create_superuser_script = """
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'password123')
-    print("Created superuser 'admin' (password: password123)")
-else:
-    print("Superuser 'admin' already exists.")
-"""
-    run_command(f'"{sys.executable}" manage.py shell -c "{create_superuser_script}"', cwd=BASE_DIR)
+    try:
+        # Setup Django environment within this script
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mon_projet.settings')
+        import django
+        django.setup()
+        
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@example.com', 'password123')
+            print("Created superuser 'admin' (password: password123)")
+        else:
+            print("Superuser 'admin' already exists.")
+    except Exception as e:
+        print(f"Error creating superuser: {e}")
+        # Don't exit, try to continue to SQL scripts which are critical
+
 
     # 4. Apply SQL Scripts (Schema updates, Data, Triggers)
     # Note: We skip parts of schema.sql that might conflict if needed, 

@@ -154,6 +154,7 @@ CREATE TABLE tournee (
     duree_minutes INTEGER,
     consommation_litres REAL,
     notes TEXT,
+    points_passage TEXT,
     created_by INTEGER,
     updated_at DATETIME,
     FOREIGN KEY (chauffeur_id) REFERENCES chauffeur(id),
@@ -179,11 +180,13 @@ CREATE TABLE expedition (
     statut TEXT,
     montant_total REAL DEFAULT 0,
     est_facturee INTEGER DEFAULT 0,
+    tournee_id INTEGER,
     created_by INTEGER,
     updated_at DATETIME,
     FOREIGN KEY (client_id) REFERENCES client(id),
     FOREIGN KEY (type_service_id) REFERENCES type_service(id),
-    FOREIGN KEY (destination_id) REFERENCES destination(id)
+    FOREIGN KEY (destination_id) REFERENCES destination(id),
+    FOREIGN KEY (tournee_id) REFERENCES tournee(id)
 );
 
 CREATE TABLE tracking_expedition (

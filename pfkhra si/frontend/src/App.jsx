@@ -100,7 +100,7 @@ function App() {
                                 { header: 'Nom', key: 'nom' },
                                 { header: 'Prénom', key: 'prenom' },
                                 { header: 'Téléphone', key: 'telephone' },
-                                { header: 'Permis', key: 'permis' }
+                                { header: 'Permis', key: 'num_permis' }
                             ]}
                         />
                     } />
@@ -110,7 +110,7 @@ function App() {
                             title="Référentiel Véhicules"
                             endpoint="/vehicules/"
                             columns={[
-                                { header: 'Matricule', key: 'matricule' },
+                                { header: 'Matricule', key: 'immatriculation' },
                                 { header: 'Marque', key: 'marque' },
                                 { header: 'Modèle', key: 'modele' },
                                 { header: 'Chauffeur', key: 'chauffeur_details', render: (v) => v.chauffeur_details ? `${v.chauffeur_details.nom} ${v.chauffeur_details.prenom}` : '-' }
@@ -125,7 +125,7 @@ function App() {
                             columns={[
                                 { header: 'Pays', key: 'pays' },
                                 { header: 'Ville', key: 'ville' },
-                                { header: 'Code Postal', key: 'code_postal' },
+                                { header: 'Code Zone', key: 'code_zone' },
                                 { header: 'Tarif par défaut', key: 'tarif_base_defaut', render: (d) => `${d.tarif_base_defaut} €` }
                             ]}
                         />
