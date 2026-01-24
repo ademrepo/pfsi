@@ -95,13 +95,13 @@ git branch -d feature/name    # Delete merged branch
 
 ### Initialize/Reset Database
 ```bash
-python scripts/init_db.py      # Fresh setup with auto-fixes
+python scripts/init_db.py      # Fresh setup (schema + data only)
 python scripts/init_db.py --reset  # Complete reset
+python manage.py migrate       # Apply Django migrations
 ```
 
 ### Fix Database Issues
 ```bash
-python scripts/fix_db_integrity.py  # Fix foreign key constraints
 python manage.py migrate           # Apply Django migrations
 python simple_test.py              # Test authentication
 ```
@@ -110,7 +110,6 @@ python simple_test.py              # Test authentication
 ```bash
 python scripts/init_db.py --reset
 python manage.py migrate
-python scripts/fix_db_integrity.py
 git add db/ && git commit -m "Update DB: description"
 ```
 
@@ -120,12 +119,12 @@ git add db/ && git commit -m "Update DB: description"
 
 ### Migration Errors
 ```bash
-# Foreign key constraint issues
-python scripts/fix_db_integrity.py
-
-# Reset everything
+# Reset database and reapply migrations
 python scripts/init_db.py --reset
 python manage.py migrate
+
+# Check migration status
+python manage.py showmigrations
 ```
 
 ### Port Conflicts
@@ -161,15 +160,19 @@ git push origin adot
 ```
 16avril/
 ├── core/                 # Django app (models, views, serializers)
+│   ├── models.py         # Django models with business logic
+│   ├── signals.py        # Django signals (replaces SQL triggers)
+│   └── migrations/       # Django migrations
 ├── mon_projet/           # Django settings
 ├── frontend/             # React app
 ├── scripts/              # Utility scripts
-│   ├── init_db.py       # Database initialization
-│   └── fix_db_integrity.py
-├── db/                   # SQL schema and data
+│   └── init_db.py        # Database initialization (schema + data only)
+├── db/                   # SQL schema and data (no triggers)
 ├── requirements.txt       # Python dependencies
 └── README.md            # This file
 ```
+
+**🔧 Architecture Change**: Now using **pure Django** - no SQL triggers! All business logic is handled by Django models and signals.
 
 ---
 
@@ -187,7 +190,7 @@ git push origin adot
 - [ ] Tests pass (`python simple_test.py`)
 - [ ] No migration errors (`python manage.py migrate --check`)
 - [ ] Clear commit message
-- [ ] Database integrity OK
+- [ ] Django models managed=True (no SQL triggers)
 
 ### Code Quality
 - Small, frequent commits
@@ -255,4 +258,4 @@ git push --force-with-lease origin adot
 
 ---
 
-**🚀 Ready for development! This setup ensures zero migration errors and smooth collaboration.**
+**🚀 Ready for development! This setup uses pure Django with no SQL triggers for better reliability and maintainability.**

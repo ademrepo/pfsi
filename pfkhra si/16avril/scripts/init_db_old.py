@@ -16,7 +16,7 @@ def _db_has_any_tables(con: sqlite3.Connection) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Initialize 16avril/db.sqlite3 from SQL files (schema + data only - no triggers)."
+        description="Initialize 16avril/db.sqlite3 from SQL files (schema + triggers + data)."
     )
     parser.add_argument("--reset", action="store_true", help="Delete existing db.sqlite3 and recreate it.")
     args = parser.parse_args()
@@ -24,10 +24,10 @@ def main():
     base_dir = Path(__file__).resolve().parent.parent  # 16avril/
     db_path = base_dir / "db.sqlite3"
     schema_path = base_dir / "db" / "schema.sql"
+    triggers_path = base_dir / "db" / "triggers.sql"
     data_path = base_dir / "db" / "data.sql"
 
-    # Only check for schema and data files - no more triggers
-    for p in (schema_path, data_path):
+    for p in (schema_path, triggers_path, data_path):
         if not p.exists():
             raise SystemExit(f"Missing SQL file: {p}")
 
@@ -46,6 +46,7 @@ def main():
 
         print(f"Initializing DB: {db_path}")
         _exec_sql_file(cur, schema_path)
+        _exec_sql_file(cur, triggers_path)
         _exec_sql_file(cur, data_path)
         
         # Fix foreign key constraints after data insertion
@@ -72,10 +73,11 @@ def main():
         """)
         
         con.commit()
-        print("DB initialized OK - Django will handle all business logic (no SQL triggers).")
+        print("DB initialized OK with foreign key constraints fixed.")
     finally:
         con.close()
 
 
 if __name__ == "__main__":
     main()
+

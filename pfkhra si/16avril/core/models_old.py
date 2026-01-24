@@ -10,7 +10,7 @@ class Role(models.Model):
     
     class Meta:
         db_table = 'role'
-        managed = True  # Table déjà créée via schema.sql
+        managed = False  # Table déjà créée via schema.sql
     
     def __str__(self):
         return self.libelle
@@ -34,7 +34,7 @@ class Utilisateur(models.Model):
     
     class Meta:
         db_table = 'utilisateur'
-        managed = True  # Table déjà créée via schema.sql
+        managed = False  # Table déjà créée via schema.sql
     
     def __str__(self):
         return f"{self.prenom} {self.nom} ({self.username})"
@@ -113,7 +113,7 @@ class Client(models.Model):
 
     class Meta:
         db_table = 'client'
-        managed = True
+        managed = False
 
     def __str__(self):
         if self.prenom:
@@ -137,7 +137,7 @@ class Chauffeur(models.Model):
 
     class Meta:
         db_table = 'chauffeur'
-        managed = True
+        managed = False
 
     def __str__(self):
         return f"{self.nom} {self.prenom} ({self.matricule})"
@@ -158,7 +158,7 @@ class Vehicule(models.Model):
 
     class Meta:
         db_table = 'vehicule'
-        managed = True
+        managed = False
 
     def __str__(self):
         return f"{self.marque} {self.modele} - {self.immatriculation}"
@@ -175,7 +175,7 @@ class Destination(models.Model):
 
     class Meta:
         db_table = 'destination'
-        managed = True
+        managed = False
 
     def __str__(self):
         return f"{self.ville}, {self.pays} ({self.zone_geographique})"
@@ -192,7 +192,7 @@ class TypeService(models.Model):
 
     class Meta:
         db_table = 'type_service'
-        managed = True
+        managed = False
 
     def __str__(self):
         return self.libelle
@@ -210,7 +210,7 @@ class Tarification(models.Model):
 
     class Meta:
         db_table = 'tarification'
-        managed = True
+        managed = False
 
 
 class Tournee(models.Model):
@@ -233,7 +233,7 @@ class Tournee(models.Model):
 
     class Meta:
         db_table = 'tournee'
-        managed = True
+        managed = False
 
     def __str__(self):
         return self.code_tournee
@@ -260,7 +260,7 @@ class Expedition(models.Model):
 
     class Meta:
         db_table = 'expedition'
-        managed = True
+        managed = False
 
     def __str__(self):
         return self.code_expedition
@@ -277,7 +277,7 @@ class TrackingExpedition(models.Model):
 
     class Meta:
         db_table = 'tracking_expedition'
-        managed = True
+        managed = False
 
 
 class Facture(models.Model):
@@ -292,7 +292,7 @@ class Facture(models.Model):
 
     class Meta:
         db_table = 'facture'
-        managed = True
+        managed = False
 
     def __str__(self):
         return self.numero_facture or f"Facture #{self.id}"
@@ -304,7 +304,7 @@ class FactureExpedition(models.Model):
 
     class Meta:
         db_table = 'facture_expedition'
-        managed = True
+        managed = False
         unique_together = (('facture', 'expedition'),)
 
 
@@ -319,7 +319,7 @@ class Paiement(models.Model):
 
     class Meta:
         db_table = 'paiement'
-        managed = True
+        managed = False
 
     def __str__(self):
         return f"Paiement {self.id} - {self.montant}€"
