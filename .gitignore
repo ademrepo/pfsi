@@ -8,6 +8,7 @@ db.sqlite3
 venv/
 env/
 *.log
+.gitignore
 
 # --- Frontend (Node/React) ---
 node_modules/
