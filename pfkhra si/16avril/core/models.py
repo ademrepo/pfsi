@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 
 class Role(models.Model):
@@ -323,4 +326,77 @@ class Paiement(models.Model):
 
     def __str__(self):
         return f"Paiement {self.id} - {self.montant}€"
+
+
+# Django Signals to replace SQL triggers
+
+@receiver(pre_save, sender=Client)
+def generate_client_code(sender, instance, **kwargs):
+    """Generate client code if not provided"""
+    if not instance.code_client or instance.code_client == '':
+        # Get the next ID (this is a workaround, ideally use a sequence)
+        last_client = Client.objects.order_by('-id').first()
+        next_id = (last_client.id + 1) if last_client else 1
+        instance.code_client = f'CLI-{str(next_id).zfill(5)}'
+
+@receiver(pre_save, sender=Chauffeur)
+def generate_chauffeur_matricule(sender, instance, **kwargs):
+    """Generate chauffeur matricule if not provided"""
+    if not instance.matricule or instance.matricule == '':
+        last_chauffeur = Chauffeur.objects.order_by('-id').first()
+        next_id = (last_chauffeur.id + 1) if last_chauffeur else 1
+        instance.matricule = f'CHF-{str(next_id).zfill(5)}'
+
+@receiver(pre_save, sender=Expedition)
+def generate_expedition_code(sender, instance, **kwargs):
+    """Generate expedition code if not provided"""
+    if not instance.code_expedition or instance.code_expedition == '':
+        last_expedition = Expedition.objects.order_by('-id').first()
+        next_id = (last_expedition.id + 1) if last_expedition else 1
+        date_str = timezone.now().strftime('%Y%m%d')
+        instance.code_expedition = f'EXP-{date_str}-{str(next_id).zfill(5)}'
+
+@receiver(pre_save, sender=Tournee)
+def generate_tournee_code(sender, instance, **kwargs):
+    """Generate tournee code if not provided"""
+    if not instance.code_tournee or instance.code_tournee == '':
+        last_tournee = Tournee.objects.order_by('-id').first()
+        next_id = (last_tournee.id + 1) if last_tournee else 1
+        date_str = timezone.now().strftime('%Y%m%d')
+        instance.code_tournee = f'TRN-{date_str}-{str(next_id).zfill(2)}'
+
+@receiver(pre_save, sender=Facture)
+def generate_facture_numero(sender, instance, **kwargs):
+    """Generate invoice number if not provided"""
+    if not instance.numero_facture or instance.numero_facture == '':
+        last_facture = Facture.objects.order_by('-id').first()
+        next_id = (last_facture.id + 1) if last_facture else 1
+        date_str = timezone.now().strftime('%Y%m')
+        instance.numero_facture = f'FACT-{date_str}-{str(next_id).zfill(5)}'
+
+@receiver(post_save, sender=Expedition)
+def expedition_post_save(sender, instance, created, **kwargs):
+    """Handle expedition creation and updates"""
+    if created:
+        # Create initial tracking entry
+        TrackingExpedition.objects.create(
+            expedition=instance,
+            statut='Enregistré',
+            lieu='Création expédition',
+            date_statut=timezone.now()
+        )
+
+@receiver(post_save, sender=TrackingExpedition)
+def tracking_post_save(sender, instance, created, **kwargs):
+    """Update expedition statut when new tracking is created"""
+    if created and instance.expedition:
+        instance.expedition.statut = instance.statut
+        instance.expedition.save(update_fields=['statut'])
+
+@receiver(post_save, sender=FactureExpedition)
+def facture_expedition_post_save(sender, instance, created, **kwargs):
+    """Mark expedition as invoiced when linked to invoice"""
+    if created:
+        instance.expedition.est_facturee = True
+        instance.expedition.save(update_fields=['est_facturee'])
 

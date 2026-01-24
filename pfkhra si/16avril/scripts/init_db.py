@@ -5,7 +5,10 @@ from pathlib import Path
 
 def _exec_sql_file(cur, path: Path):
     sql = path.read_text(encoding="utf-8", errors="replace")
+    # Disable foreign key constraints during data loading
+    cur.execute("PRAGMA foreign_keys = OFF;")
     cur.executescript(sql)
+    cur.execute("PRAGMA foreign_keys = ON;")
 
 
 def _db_has_any_tables(con: sqlite3.Connection) -> bool:
