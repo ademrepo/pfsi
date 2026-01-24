@@ -48,8 +48,32 @@ def main():
         _exec_sql_file(cur, schema_path)
         _exec_sql_file(cur, triggers_path)
         _exec_sql_file(cur, data_path)
+        
+        # Fix foreign key constraints after data insertion
+        print("Fixing foreign key constraints...")
+        cur.execute("""
+            UPDATE expedition 
+            SET client_id = NULL 
+            WHERE client_id NOT IN (SELECT id FROM client)
+        """)
+        cur.execute("""
+            UPDATE expedition 
+            SET destination_id = NULL 
+            WHERE destination_id NOT IN (SELECT id FROM destination)
+        """)
+        cur.execute("""
+            UPDATE expedition 
+            SET type_service_id = NULL 
+            WHERE type_service_id NOT IN (SELECT id FROM type_service)
+        """)
+        cur.execute("""
+            UPDATE expedition 
+            SET tournee_id = NULL 
+            WHERE tournee_id NOT IN (SELECT id FROM tournee)
+        """)
+        
         con.commit()
-        print("DB initialized OK.")
+        print("DB initialized OK with foreign key constraints fixed.")
     finally:
         con.close()
 
