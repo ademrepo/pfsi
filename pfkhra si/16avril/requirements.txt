@@ -1,8 +1,0 @@
-# Pinned versions that exist on PyPI and are known to work with this project.
-# NOTE: This project loads its custom tables from SQLite SQL scripts (db/schema.sql + db/data.sql).
-
-Django==4.2.9
-djangorestframework==3.14.0
-django-cors-headers==4.3.1
-python-decouple==3.8
-Pillow==12.1.0
