@@ -109,7 +109,7 @@ def analytics_advanced_view(request):
         incidents_series = _fill_month_series(incidents_by_month_rows, start_dt, end_dt, key='count')
         incidents_forecast = _forecast(incidents_series, 'count')
 
-        # Incidents by zone
+
         incident_zones = (
             incident_current_qs.filter(expedition__isnull=False)
             .values('expedition__destination__zone_geographique')
@@ -133,10 +133,10 @@ def analytics_advanced_view(request):
 
         top_zones_by_incidents = incident_zones[:10]
 
-        # Peak periods
+
         peak_months = sorted(shipments_series, key=lambda x: x['count'], reverse=True)[:6]
 
-        # Top customers by volume
+
         top_customers_volume = (
             exp_current_qs.values('client_id', 'client__nom', 'client__prenom')
             .annotate(shipments=Count('id'))
@@ -152,7 +152,7 @@ def analytics_advanced_view(request):
             if r['client_id'] is not None
         ]
 
-        # Top customers by revenue
+
         top_customers_revenue = (
             fac_current_qs.values('client_id', 'client__nom', 'client__prenom')
             .annotate(revenue=Sum('total_ttc'))
@@ -168,7 +168,6 @@ def analytics_advanced_view(request):
             if r['client_id'] is not None
         ]
 
-        # Top destinations
         top_destinations = (
             exp_current_qs.values(
                 'destination_id',
@@ -194,7 +193,6 @@ def analytics_advanced_view(request):
             if r['destination_id'] is not None
         ]
 
-        # Top drivers
         driver_rows = (
             tour_current_qs.filter(statut='Terminée', chauffeur__isnull=False)
             .values('chauffeur_id', 'chauffeur__nom', 'chauffeur__prenom')
@@ -247,12 +245,11 @@ def analytics_advanced_view(request):
             })
         top_drivers = sorted(top_drivers, key=lambda x: x['score'], reverse=True)[:10]
 
-        # Profitability assumptions
         fuel_price_per_liter = float(request.query_params.get('fuel_price_per_liter', 1.5))
         driver_cost_per_hour = float(request.query_params.get('driver_cost_per_hour', 8.0))
         vehicle_cost_per_km = float(request.query_params.get('vehicle_cost_per_km', 0.3))
 
-        # Cost estimation
+
         route_cost_total = 0.0
         for t in tour_current_qs.filter(statut='Terminée').only('distance_km', 'duree_minutes', 'consommation_litres'):
             dist = float(t.distance_km or 0)
@@ -267,7 +264,6 @@ def analytics_advanced_view(request):
         profit_estimated = round(float(revenue_estimated) - float(route_cost_total), 2)
         margin_percent = round((profit_estimated / float(revenue_estimated)) * 100.0, 2) if revenue_estimated else None
 
-        # Profitability by service type
         revenue_by_service_rows = (
             exp_current_qs.values('type_service_id', 'type_service__libelle')
             .annotate(revenue=Sum('montant_total'), shipments=Count('id'))
@@ -289,7 +285,7 @@ def analytics_advanced_view(request):
                 'margin_percent': round((prof / rev) * 100.0, 2) if rev else None,
             })
 
-        # Staffing forecasts
+
         cap_shipments_per_vehicle_per_day = float(request.query_params.get('cap_shipments_per_vehicle_per_day', 30))
         cap_shipments_per_driver_per_day = float(request.query_params.get('cap_shipments_per_driver_per_day', 25))
         working_days_per_month = float(request.query_params.get('working_days_per_month', 22))
@@ -313,7 +309,6 @@ def analytics_advanced_view(request):
                 'required_drivers': drivers,
             })
 
-        # Map points
         destination_points = (
             exp_current_qs.values(
                 'destination_id',

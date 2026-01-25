@@ -102,7 +102,7 @@ def logout_view(request):
     Détruit la session utilisateur.
     Toujours sans erreur, même si non authentifié.
     """
-    # Log de déconnexion si on a un utilisateur attaché
+
     try:
         if hasattr(request, 'user_obj') and request.user_obj:
             create_audit_log(
@@ -111,7 +111,7 @@ def logout_view(request):
                 request=request
             )
     finally:
-        # Détruire la session quelle que soit la situation
+
         try:
             request.session.flush()
         except Exception:

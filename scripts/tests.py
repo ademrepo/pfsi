@@ -1,6 +1,16 @@
+import os
+import sys
 import datetime
 import json
 import re
+
+# Setup Django environment
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backend'))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mon_projet.settings')
+
+import django
+django.setup()
 
 from django.core import mail
 from django.test import TestCase
@@ -8,7 +18,7 @@ from django.utils import timezone
 from django.test.utils import override_settings
 from rest_framework.test import APIClient, APIRequestFactory
 
-from .models import (
+from core.models import (
     Role,
     Utilisateur,
     Client,
@@ -22,7 +32,7 @@ from .models import (
     Incident,
     PasswordResetToken,
 )
-from .views import analytics_advanced_view
+from core.views import analytics_advanced_view
 
 
 @override_settings(DEBUG=False)
