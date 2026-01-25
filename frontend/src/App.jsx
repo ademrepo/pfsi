@@ -45,8 +45,14 @@ function App() {
             const response = await api.get('/auth/me/');
             setUser(response.data);
         } catch (error) {
-            console.log("No active session");
+            console.log("No active session or backend not available:", error.message);
             setUser(null);
+            // Clear any stale session cookies
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
         } finally {
             setLoading(false);
         }
