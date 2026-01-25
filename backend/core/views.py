@@ -54,6 +54,13 @@ def login_view(request):
     if serializer.is_valid():
         user = serializer.validated_data['user']
         
+        # Renouveler la clé de session pour éviter la fixation de session
+        try:
+            request.session.cycle_key()
+        except Exception:
+            # En dernier recours, flush
+            request.session.flush()
+        
         # Créer la session
         request.session['user_id'] = user.id
         request.session['username'] = user.username
@@ -88,22 +95,27 @@ def login_view(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def logout_view(request):
     """
     Endpoint de déconnexion.
     Détruit la session utilisateur.
+    Toujours sans erreur, même si non authentifié.
     """
-    # Log de déconnexion
-    if hasattr(request, 'user_obj') and request.user_obj:
-        create_audit_log(
-            user=request.user_obj,
-            action_type='LOGOUT',
-            request=request
-        )
-    
-    # Détruire la session
-    request.session.flush()
+    # Log de déconnexion si on a un utilisateur attaché
+    try:
+        if hasattr(request, 'user_obj') and request.user_obj:
+            create_audit_log(
+                user=request.user_obj,
+                action_type='LOGOUT',
+                request=request
+            )
+    finally:
+        # Détruire la session quelle que soit la situation
+        try:
+            request.session.flush()
+        except Exception:
+            pass
     
     return Response({
         'message': 'Déconnexion réussie'
@@ -119,6 +131,11 @@ def current_user_view(request):
     if hasattr(request, 'user_obj') and request.user_obj:
         serializer = UtilisateurSerializer(request.user_obj)
         return Response(serializer.data)
+    # Session invalide ou absente: la nettoyer explicitement
+    try:
+        request.session.flush()
+    except Exception:
+        pass
     return Response(
         {'detail': 'Non authentifié'},
         status=status.HTTP_401_UNAUTHORIZED

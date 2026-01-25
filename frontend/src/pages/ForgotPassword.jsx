@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { Link } from 'react-router-dom';
+import { Truck, ArrowLeft, Mail } from 'lucide-react';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -25,17 +26,53 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f0f2f5' }}>
-            <div className="container" style={{ maxWidth: '420px', width: '100%' }}>
-                <h1>Mot de passe oublié</h1>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+        <div className="login-container">
+            <div className="login-card">
+                <div className="login-logo">
+                    <div className="login-logo-icon">
+                        <Truck size={24} strokeWidth={2.5} />
+                    </div>
+                    <span className="login-logo-text">Logistique Pro</span>
+                </div>
+
+                <h1 className="login-title">Mot de passe oublié</h1>
+                <p className="login-subtitle">
                     Entrez votre email. Si un compte existe, vous recevrez un lien sécurisé pour réinitialiser votre mot de passe.
                 </p>
 
-                {error && <div className="error">{error}</div>}
-                {message && <div style={{ background: '#ecfdf5', border: '1px solid #10b98133', padding: '0.75rem', borderRadius: '8px', color: '#065f46', marginBottom: '1rem' }}>{message}</div>}
+                {error && (
+                    <div style={{ 
+                        background: 'var(--status-delayed-bg)', 
+                        color: 'var(--status-delayed-text)',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500'
+                    }}>
+                        {error}
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit}>
+                {message && (
+                    <div style={{ 
+                        background: 'var(--status-delivered-bg)', 
+                        color: 'var(--status-delivered-text)',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}>
+                        <Mail size={16} />
+                        {message}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input
@@ -43,19 +80,30 @@ const ForgotPassword = () => {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="ex: admin@transport.dz"
+                            placeholder="exemple@logistique.pro"
                             required
                             disabled={loading}
                         />
                     </div>
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Envoi...' : 'Envoyer le lien'}
+                    <button type="submit" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
+                        {loading ? 'Envoi en cours...' : 'Envoyer le lien'}
                     </button>
                 </form>
 
-                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                    <Link to="/login" style={{ color: 'var(--primary)' }}>Retour à la connexion</Link>
+                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                    <Link to="/login" style={{ 
+                        color: 'var(--text-muted)',
+                        textDecoration: 'none',
+                        fontSize: '0.875rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        transition: 'color 0.2s'
+                    }}>
+                        <ArrowLeft size={16} />
+                        Retour à la connexion
+                    </Link>
                 </div>
             </div>
         </div>

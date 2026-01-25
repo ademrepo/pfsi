@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
+import { Truck, ArrowLeft, CheckCircle } from 'lucide-react';
 
 function useQuery() {
     const { search } = useLocation();
@@ -43,20 +44,67 @@ const ResetPassword = () => {
     const missingToken = !token;
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f0f2f5' }}>
-            <div className="container" style={{ maxWidth: '420px', width: '100%' }}>
-                <h1>Nouveau mot de passe</h1>
+        <div className="login-container">
+            <div className="login-card">
+                <div className="login-logo">
+                    <div className="login-logo-icon">
+                        <Truck size={24} strokeWidth={2.5} />
+                    </div>
+                    <span className="login-logo-text">Logistique Pro</span>
+                </div>
+
+                <h1 className="login-title">Nouveau mot de passe</h1>
+                <p className="login-subtitle">
+                    Choisissez un nouveau mot de passe sécurisé pour votre compte.
+                </p>
 
                 {missingToken && (
-                    <div className="error">
-                        Token manquant. Ouvre le lien reçu par email.
+                    <div style={{ 
+                        background: 'var(--status-delayed-bg)', 
+                        color: 'var(--status-delayed-text)',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500'
+                    }}>
+                        Token manquant. Veuillez utiliser le lien reçu par email.
                     </div>
                 )}
 
-                {error && <div className="error">{error}</div>}
-                {message && <div style={{ background: '#ecfdf5', border: '1px solid #10b98133', padding: '0.75rem', borderRadius: '8px', color: '#065f46', marginBottom: '1rem' }}>{message}</div>}
+                {error && (
+                    <div style={{ 
+                        background: 'var(--status-delayed-bg)', 
+                        color: 'var(--status-delayed-text)',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500'
+                    }}>
+                        {error}
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit}>
+                {message && (
+                    <div style={{ 
+                        background: 'var(--status-delivered-bg)', 
+                        color: 'var(--status-delivered-text)',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}>
+                        <CheckCircle size={16} />
+                        {message}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
                         <label htmlFor="new_password">Nouveau mot de passe</label>
                         <input
@@ -64,6 +112,7 @@ const ResetPassword = () => {
                             id="new_password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Minimum 8 caractères"
                             required
                             disabled={loading || missingToken}
                         />
@@ -76,18 +125,30 @@ const ResetPassword = () => {
                             id="confirm"
                             value={confirm}
                             onChange={(e) => setConfirm(e.target.value)}
+                            placeholder="Retapez votre mot de passe"
                             required
                             disabled={loading || missingToken}
                         />
                     </div>
 
-                    <button type="submit" disabled={loading || missingToken}>
-                        {loading ? 'Validation...' : 'Valider'}
+                    <button type="submit" disabled={loading || missingToken} style={{ width: '100%', marginTop: '0.5rem' }}>
+                        {loading ? 'Validation...' : 'Réinitialiser le mot de passe'}
                     </button>
                 </form>
 
-                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                    <Link to="/login" style={{ color: 'var(--primary)' }}>Retour à la connexion</Link>
+                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                    <Link to="/login" style={{ 
+                        color: 'var(--text-muted)',
+                        textDecoration: 'none',
+                        fontSize: '0.875rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        transition: 'color 0.2s'
+                    }}>
+                        <ArrowLeft size={16} />
+                        Retour à la connexion
+                    </Link>
                 </div>
             </div>
         </div>

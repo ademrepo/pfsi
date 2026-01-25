@@ -1,13 +1,32 @@
 # 🚀 PF KHRA - Transport & Logistics Management
 
-### 1. Clone Repository
+## Quick Start
+
+### Option 1: One-Click Start (Recommended)
 ```bash
-git clone https://github.com/ademrepo/pfsi.git 16avril
-cd 16avril
+git clone https://github.com/ademrepo/pfsi.git
+cd pfsi
+.\start_app.bat
 ```
 
-### 2. Backend Setup
+### Option 2: Manual Setup
 ```bash
+# 1. Clone and setup
+git clone https://github.com/ademrepo/pfsi.git
+cd pfsi
+npm run install-all
+
+# 2. Start both servers
+npm run start
+```
+
+### Option 3: Detailed Setup
+```bash
+# 1. Clone repository
+git clone https://github.com/ademrepo/pfsi.git 16avril
+cd 16avril
+
+# 2. Backend Setup
 cd backend
 python -m venv venv
 venv\Scripts\activate
@@ -19,22 +38,25 @@ python manage.py migrate
 
 # Start Django server
 python manage.py runserver
-```
 
-### 3. Frontend Setup
-```bash
-# New terminal
+# 3. Frontend Setup (New terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
-### 4. Access Application
+## 🌐 Application Access
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://127.0.0.1:8000/api/
 - **Django Admin**: http://127.0.0.1:8000/admin/
 
-**Login**: admin / password123
+**Default Login**: admin / password123
+
+## 📖 Detailed Documentation
+For comprehensive setup instructions, troubleshooting, and development workflow, see:
+- [Server Workflow Guide](docs/SERVER_WORKFLOW.md)
+- [Testing Workflow](docs/TESTING_WORKFLOW.md)
+- [API Documentation](docs/API_ANALYTICS_AND_AUTH.md)
 
 ---
 

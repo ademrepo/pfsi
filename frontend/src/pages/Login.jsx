@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { Link, useNavigate } from 'react-router-dom';
+import { Truck, CircleHelp } from 'lucide-react';
 
 const Login = ({ onLogin }) => {
     const [username, setUsername] = useState('');
@@ -33,47 +34,84 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f0f2f5' }}>
-            <div className="container" style={{ maxWidth: '400px', width: '100%' }}>
-                <h1>Connexion</h1>
+        <div className="login-container">
+            <div className="login-card">
+                <div className="login-logo">
+                    <div className="login-logo-icon">
+                        <Truck size={24} strokeWidth={2.5} />
+                    </div>
+                    <span className="login-logo-text">Logistique Pro</span>
+                </div>
 
-                {error && <div className="error">{error}</div>}
+                <h1 className="login-title">Connexion</h1>
+                <p className="login-subtitle">
+                    Accédez à votre portail administrateur pour gérer<br />
+                    vos opérations logistiques.
+                </p>
 
-                <form onSubmit={handleLogin}>
+                {error && (
+                    <div style={{ 
+                        background: 'var(--status-delayed-bg)', 
+                        color: 'var(--status-delayed-text)',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500'
+                    }}>
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleLogin} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="username">Nom d'utilisateur</label>
+                        <label htmlFor="username">Email</label>
                         <input
                             type="text"
                             id="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Ex: admin / agent1"
+                            placeholder="exemple@logistique.pro"
                             required
                             disabled={loading}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Mot de passe</label>
+                        <div className="form-group-row">
+                            <label htmlFor="password">Mot de passe</label>
+                            <Link to="/forgot-password" className="form-link">
+                                Mot de passe oublié ?
+                            </Link>
+                        </div>
                         <input
                             type="password"
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Mot de passe"
+                            placeholder="••••••••••••"
                             required
                             disabled={loading}
                         />
                     </div>
 
-                    <button type="submit" disabled={loading}>
+                    <button type="submit" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
                         {loading ? 'Connexion en cours...' : 'Se connecter'}
                     </button>
                 </form>
 
-                <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#666', textAlign: 'center' }}>
-                    <p>Comptes de test (password123):</p>
-                    <p>admin, agent1, comptable1, logistique1</p>
+                <div className="login-help">
+                    <a href="#" className="login-help-link">
+                        <CircleHelp size={18} />
+                        Besoin d'aide ?
+                    </a>
+                </div>
+
+                <div style={{ marginTop: '1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    <p style={{ marginBottom: '0.5rem' }}>Comptes de test (password123):</p>
+                    <p style={{ fontWeight: '500', color: 'var(--text-secondary)' }}>
+                        admin, agent1, comptable1, logistique1
+                    </p>
                 </div>
             </div>
         </div>

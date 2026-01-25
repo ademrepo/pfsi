@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { Download, Search as SearchIcon } from 'lucide-react';
+import PageHeader from '../../components/PageHeader';
 
 const ReadOnlyTable = ({ title, endpoint, columns }) => {
     const [data, setData] = useState([]);
@@ -38,22 +40,31 @@ const ReadOnlyTable = ({ title, endpoint, columns }) => {
         window.print();
     };
 
-    if (loading) return <div>Chargement...</div>;
-    if (error) return <div className="error">{error}</div>;
+    if (loading) return <div className="page-container">Chargement...</div>;
+    if (error) return <div className="page-container"><div className="error">{error}</div></div>;
 
     return (
         <div className="page-container">
-            <div className="header-actions">
-                <h1>{title}</h1>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+            <PageHeader 
+                title={title}
+                subtitle="Données de référence en lecture seule"
+            />
+
+            <div className="top-bar">
+                <div className="search-bar">
+                    <SearchIcon size={18} className="search-icon" />
                     <input
                         type="text"
                         placeholder="Rechercher..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
                     />
-                    <button className="secondary" onClick={handlePrint}>Imprimer</button>
+                </div>
+                <div className="top-bar-actions">
+                    <button className="secondary" onClick={handlePrint}>
+                        <Download size={18} />
+                        Imprimer
+                    </button>
                 </div>
             </div>
 
@@ -78,11 +89,21 @@ const ReadOnlyTable = ({ title, endpoint, columns }) => {
                         ))}
                         {filteredData.length === 0 && (
                             <tr>
-                                <td colSpan={columns.length} style={{ textAlign: 'center' }}>Aucun résultat.</td>
+                                <td colSpan={columns.length} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                                    Aucun résultat.
+                                </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            <div style={{ 
+                marginTop: '1.5rem',
+                fontSize: '0.875rem',
+                color: 'var(--text-muted)'
+            }}>
+                Affichage de {filteredData.length} sur {data.length} résultats
             </div>
         </div>
     );

@@ -13,6 +13,8 @@ import {
     Bar,
     Legend,
 } from 'recharts';
+import { TrendingUp, Package, DollarSign, Truck } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 const formatPct = (v) => (v === null || v === undefined ? '-' : `${v}%`);
 
@@ -128,64 +130,74 @@ const Analytics = () => {
 
     return (
         <div className="page-container">
-            <div className="header-actions">
-                <div>
-                    <h1 style={{ marginBottom: '0.5rem' }}>Analytics</h1>
-                    <div style={{ color: 'var(--text-muted)' }}>
-                        Période: {data.period?.start} → {data.period?.end}
-                    </div>
-                </div>
+            <PageHeader 
+                title="Rapports & Analytics"
+                subtitle={`Période d'analyse: ${data.period?.start || ''} → ${data.period?.end || ''}`}
+            />
 
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'end', flexWrap: 'wrap' }}>
-                    <div>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Début</label>
-                        <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
-                    </div>
-                    <div>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Fin</label>
-                        <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
-                    </div>
-                    <button onClick={fetchData} style={{ height: '42px' }}>Appliquer</button>
+            <div style={{ 
+                background: 'var(--surface)', 
+                padding: '1.5rem', 
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--border-light)',
+                marginBottom: '2rem',
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'flex-end',
+                flexWrap: 'wrap'
+            }}>
+                <div className="form-group" style={{ marginBottom: 0, flex: 1, minWidth: '200px' }}>
+                    <label>Date de début</label>
+                    <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
                 </div>
+                <div className="form-group" style={{ marginBottom: 0, flex: 1, minWidth: '200px' }}>
+                    <label>Date de fin</label>
+                    <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
+                </div>
+                <button onClick={fetchData}>Appliquer les filtres</button>
             </div>
 
-            <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+            <div className="stats-grid" style={{ marginBottom: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                 {kpi.map((x) => (
                     <div key={x.label} className="stat-card">
-                        <h3 style={{ marginBottom: '0.5rem' }}>{x.label}</h3>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.25rem' }}>{x.value}</div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{x.sub}</div>
+                        <div className="stat-card-header">
+                            <span className="stat-card-label">{x.label}</span>
+                        </div>
+                        <div className="stat-card-value" style={{ fontSize: '1.75rem' }}>{x.value}</div>
+                        <div className="stat-card-meta">
+                            <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{x.sub}</span>
+                        </div>
                     </div>
                 ))}
             </div>
 
             <div className="stats-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 <div className="stat-card">
-                    <h3 style={{ marginBottom: '1rem' }}>Expéditions (mensuel)</h3>
+                    <h3 style={{ marginBottom: '1.5rem', fontSize: '1.125rem', fontWeight: '600' }}>Évolution des Expéditions</h3>
                     <div style={{ width: '100%', height: 280 }}>
                         <ResponsiveContainer>
                             <LineChart data={series} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="month" />
-                                <YAxis />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
+                                <XAxis dataKey="month" stroke="var(--text-muted)" />
+                                <YAxis stroke="var(--text-muted)" />
                                 <Tooltip />
-                                <Line type="monotone" dataKey="shipments" stroke="#4f46e5" strokeWidth={2} dot={false} />
+                                <Line type="monotone" dataKey="shipments" stroke="var(--primary)" strokeWidth={3} dot={{ fill: 'var(--primary)', r: 4 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <h3 style={{ marginBottom: '1rem' }}>Chiffre d'affaires (mensuel)</h3>
+                    <h3 style={{ marginBottom: '1.5rem', fontSize: '1.125rem', fontWeight: '600' }}>Chiffre d'Affaires (TTC)</h3>
                     <div style={{ width: '100%', height: 280 }}>
                         <ResponsiveContainer>
                             <BarChart data={series} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="month" />
-                                <YAxis />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
+                                <XAxis dataKey="month" stroke="var(--text-muted)" />
+                                <YAxis stroke="var(--text-muted)" />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="revenue" fill="#10b981" />
+                                <Bar dataKey="revenue" fill="var(--status-delivered-text)" radius={[8, 8, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -194,7 +206,7 @@ const Analytics = () => {
 
             <div className="stats-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
                 <div className="stat-card">
-                    <h3 style={{ marginBottom: '1rem' }}>Carburant (mensuel)</h3>
+                    <h3 style={{ marginBottom: '1.5rem', fontSize: '1.125rem', fontWeight: '600' }}>Consommation Carburant</h3>
                     <div style={{ width: '100%', height: 280 }}>
                         <ResponsiveContainer>
                             <LineChart data={series} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>

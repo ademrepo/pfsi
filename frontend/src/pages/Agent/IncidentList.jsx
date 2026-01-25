@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../../api';
+import { AlertTriangle, Plus, Download, MoreVertical } from 'lucide-react';
+import PageHeader from '../../components/PageHeader';
+import TopBar from '../../components/TopBar';
+import StatsGrid from '../../components/StatsGrid';
 
 const TYPE_LABELS = {
     RETARD: 'Retard',
@@ -26,6 +30,7 @@ const IncidentList = () => {
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const expeditionId = query.get('expedition_id');
     const tourneeId = query.get('tournee_id');
@@ -58,45 +63,125 @@ const IncidentList = () => {
     if (loading) return <div className="page-container">Chargement...</div>;
     if (error) return <div className="page-container error">{error}</div>;
 
+    const filteredIncidents = incidents.filter(inc =>
+        inc.code_incident?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inc.expedition_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inc.tournee_code?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const stats = [
+        {
+            label: 'Total Incidents',
+            value: incidents.length.toLocaleString(),
+            icon: AlertTriangle
+        },
+        {
+            label: 'Retards',
+            value: incidents.filter(i => i.type_incident === 'RETARD').length,
+            badge: <span className="status-badge status-retard">Retard</span>
+        },
+        {
+            label: 'Pertes',
+            value: incidents.filter(i => i.type_incident === 'PERTE').length
+        },
+        {
+            label: 'Endommagements',
+            value: incidents.filter(i => i.type_incident === 'ENDOMMAGEMENT').length
+        }
+    ];
+
     return (
         <div className="page-container">
-            <div className="header-actions">
-                <h1>Incidents</h1>
-                <Link
-                    to={`/incidents/nouveau${expeditionId ? `?expedition_id=${expeditionId}` : tourneeId ? `?tournee_id=${tourneeId}` : ''}`}
-                    className="btn-primary"
-                    style={{ textDecoration: 'none' }}
-                >
-                    + Signaler un incident
-                </Link>
-            </div>
+            <PageHeader 
+                title="Incidents"
+                subtitle="Suivez et gérez les incidents signalés"
+            />
+
+            <TopBar
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                searchPlaceholder="Rechercher un incident..."
+                actions={
+                    <>
+                        <button className="secondary">
+                            <Download size={18} />
+                            Exporter
+                        </button>
+                        <Link
+                            to={`/incidents/nouveau${expeditionId ? `?expedition_id=${expeditionId}` : tourneeId ? `?tournee_id=${tourneeId}` : ''}`}
+                            style={{ textDecoration: 'none' }}
+                        >
+                            <button>
+                                <Plus size={18} />
+                                Signaler un incident
+                            </button>
+                        </Link>
+                    </>
+                }
+            />
+
+            <StatsGrid stats={stats} />
 
             <div className="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Code</th>
-                            <th>Date</th>
-                            <th>Type</th>
-                            <th>Référence</th>
-                            <th>Action statut</th>
-                            <th>Pièces jointes</th>
+                            <th>CODE</th>
+                            <th>DATE</th>
+                            <th>TYPE</th>
+                            <th>RÉFÉRENCE</th>
+                            <th>ACTION STATUT</th>
+                            <th>PIÈCES JOINTES</th>
+                            <th>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {incidents.map((inc) => (
+                        {filteredIncidents.map((inc) => (
                             <tr key={inc.id}>
-                                <td style={{ fontWeight: '600' }}>{inc.code_incident}</td>
-                                <td>{inc.created_at ? new Date(inc.created_at).toLocaleString() : '-'}</td>
-                                <td>{TYPE_LABELS[inc.type_incident] || inc.type_incident}</td>
-                                <td>{refLabel(inc)}</td>
+                                <td>
+                                    <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>
+                                        {inc.code_incident}
+                                    </div>
+                                </td>
+                                <td>
+                                    {inc.created_at ? new Date(inc.created_at).toLocaleDateString('fr-FR', { 
+                                        day: '2-digit', 
+                                        month: 'short', 
+                                        year: 'numeric' 
+                                    }) : '-'}
+                                </td>
+                                <td>
+                                    <span className={`status-badge ${inc.type_incident === 'RETARD' ? 'status-retard' : 'status-neutral'}`}>
+                                        {TYPE_LABELS[inc.type_incident] || inc.type_incident}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style={{ fontWeight: '500' }}>
+                                        {refLabel(inc)}
+                                    </div>
+                                </td>
                                 <td>{ACTION_LABELS[inc.action_appliquee] || inc.action_appliquee}</td>
-                                <td>{inc.attachments?.length || 0}</td>
+                                <td>
+                                    <span style={{ 
+                                        background: 'var(--bg-page)',
+                                        padding: '0.35rem 0.75rem',
+                                        borderRadius: '6px',
+                                        fontWeight: '600',
+                                        fontSize: '0.875rem'
+                                    }}>
+                                        {inc.attachments?.length || 0}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button className="btn-icon">
+                                        <MoreVertical size={18} />
+                                    </button>
+                                </td>
                             </tr>
                         ))}
-                        {incidents.length === 0 && (
+                        {filteredIncidents.length === 0 && (
                             <tr>
-                                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                                     Aucun incident trouvé.
                                 </td>
                             </tr>
