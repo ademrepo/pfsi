@@ -30,7 +30,7 @@ class Utilisateur(models.Model):
     nom = models.CharField(max_length=150)
     prenom = models.CharField(max_length=150)
     telephone = models.CharField(max_length=20, null=True, blank=True)
-    role = models.ForeignKey(Role, on_delete=models.PROTECT, db_column='role_id')
+    role = models.ForeignKey(Role, on_delete=models.PROTECT, db_column='role_id', default=1)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -97,6 +97,28 @@ class AuditLog(models.Model):
     
     def __str__(self):
         return f"{self.username} - {self.get_action_type_display()} - {self.timestamp}"
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='password_reset_tokens', db_column='utilisateur_id')
+    token_hash = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'password_reset_token'
+        managed = True
+        indexes = [
+            models.Index(fields=['token_hash']),
+            models.Index(fields=['expires_at']),
+            models.Index(fields=['user', '-created_at']),
+        ]
+
+    def is_valid(self):
+        if self.used_at is not None:
+            return False
+        return timezone.now() <= self.expires_at
 
 
 class Client(models.Model):
@@ -172,6 +194,8 @@ class Destination(models.Model):
     ville = models.CharField(max_length=100, null=True, blank=True)
     zone_geographique = models.CharField(max_length=100, null=True, blank=True)
     code_zone = models.CharField(max_length=50, null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     tarif_base_defaut = models.FloatField()
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

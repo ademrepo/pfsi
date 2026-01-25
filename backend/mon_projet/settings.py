@@ -171,3 +171,8 @@ SESSION_COOKIE_NAME = 'transport_sessionid'
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+FRONTEND_BASE_URL = 'http://localhost:3000'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@localhost'

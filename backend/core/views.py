@@ -1,24 +1,35 @@
+import datetime
+import hashlib
+import secrets
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from django.core.mail import send_mail
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import models
+from django.db.models import Count, Sum, Q
+from django.db.models.functions import TruncMonth
 from django.db import transaction
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from .models import (
     Utilisateur, Role, AuditLog,
     Client, Chauffeur, Vehicule, Destination, TypeService, Tarification,
     Expedition, TrackingExpedition, Tournee,
     Incident, IncidentAttachment, Alerte,
     Reclamation,
-    Facture, FactureExpedition, Paiement
+    Facture, FactureExpedition, Paiement,
+    PasswordResetToken
 )
 from .serializers import (
     LoginSerializer, UtilisateurSerializer, UtilisateurCreateSerializer,
     UtilisateurUpdateSerializer, PasswordResetSerializer, AuditLogSerializer,
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer,
     RoleSerializer, ClientSerializer, ChauffeurSerializer, VehiculeSerializer,
     DestinationSerializer, TypeServiceSerializer, TarificationSerializer,
     ExpeditionSerializer, TrackingExpeditionSerializer, TourneeSerializer,
@@ -121,6 +132,769 @@ def get_csrf_token(request):
     Endpoint pour obtenir le token CSRF.
     """
     return Response({'detail': 'CSRF cookie set'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_request_view(request):
+    serializer = PasswordResetRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    email = serializer.validated_data['email']
+    user = Utilisateur.objects.filter(email__iexact=email, is_active=True).first()
+
+    # Always return success to avoid email enumeration.
+    if not user:
+        return Response({'message': 'Si le compte existe, un email a été envoyé.'}, status=status.HTTP_200_OK)
+
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(raw_token.encode('utf-8')).hexdigest()
+
+    expires_at = timezone.now() + datetime.timedelta(hours=1)
+    PasswordResetToken.objects.create(user=user, token_hash=token_hash, expires_at=expires_at)
+
+    frontend_base = getattr(settings, 'FRONTEND_BASE_URL', 'http://localhost:3000')
+    reset_link = f"{frontend_base}/reset-password?token={raw_token}"
+
+    subject = "Réinitialisation du mot de passe"
+    body = (
+        f"Bonjour {user.get_full_name()},\n\n"
+        f"Vous avez demandé la réinitialisation de votre mot de passe.\n"
+        f"Cliquez sur le lien suivant pour définir un nouveau mot de passe (valide 1 heure):\n\n"
+        f"{reset_link}\n\n"
+        f"Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.\n"
+    )
+
+    send_mail(
+        subject,
+        body,
+        getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@localhost'),
+        [user.email],
+        fail_silently=True,
+    )
+
+    create_audit_log(
+        user=user,
+        action_type='PASSWORD_RESET',
+        request=request,
+        details={'mode': 'self_service_request'},
+    )
+
+    return Response({'message': 'Si le compte existe, un email a été envoyé.'}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_confirm_view(request):
+    serializer = PasswordResetConfirmSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    raw_token = serializer.validated_data['token']
+    token_hash = hashlib.sha256(raw_token.encode('utf-8')).hexdigest()
+
+    token_obj = PasswordResetToken.objects.select_related('user').filter(token_hash=token_hash).first()
+    if not token_obj or not token_obj.is_valid():
+        return Response({'detail': 'Token invalide ou expiré.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = token_obj.user
+    user.password = make_password(serializer.validated_data['new_password'])
+    user.save(update_fields=['password'])
+
+    token_obj.used_at = timezone.now()
+    token_obj.save(update_fields=['used_at'])
+
+    create_audit_log(
+        user=user,
+        action_type='PASSWORD_RESET',
+        request=request,
+        details={'mode': 'self_service_confirm'},
+    )
+
+    return Response({'message': 'Mot de passe mis à jour avec succès.'}, status=status.HTTP_200_OK)
+
+
+def _parse_period(request):
+    end = parse_date(request.query_params.get('end') or '')
+    start = parse_date(request.query_params.get('start') or '')
+
+    if end is None:
+        end_dt = timezone.now().date()
+    else:
+        end_dt = end
+
+    if start is None:
+        start_dt = end_dt - datetime.timedelta(days=365)
+    else:
+        start_dt = start
+
+    if start_dt > end_dt:
+        start_dt, end_dt = end_dt, start_dt
+
+    return start_dt, end_dt
+
+
+def _fill_month_series(rows, start_dt, end_dt, key='count'):
+    def _month_key(val):
+        if val is None:
+            return None
+        if hasattr(val, 'date') and callable(getattr(val, 'date')):
+            val = val.date()
+        return val.replace(day=1)
+
+    by_month = {k: (r.get(key) or 0) for r in rows if (k := _month_key(r.get('month'))) is not None}
+    out = []
+    cur = datetime.date(start_dt.year, start_dt.month, 1)
+    end_month = datetime.date(end_dt.year, end_dt.month, 1)
+    while cur <= end_month:
+        out.append({'month': cur.isoformat(), key: float(by_month.get(cur, 0))})
+        if cur.month == 12:
+            cur = datetime.date(cur.year + 1, 1, 1)
+        else:
+            cur = datetime.date(cur.year, cur.month + 1, 1)
+    return out
+
+
+def _growth_rate(current, previous):
+    if previous in (None, 0):
+        return None
+    return round(((current - previous) / previous) * 100.0, 2)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def analytics_summary_view(request):
+    start_dt, end_dt = _parse_period(request)
+    prev_end = start_dt
+    prev_start = start_dt - (end_dt - start_dt)
+
+    # Shipments
+    exp_current_qs = Expedition.objects.filter(date_creation__date__gte=start_dt, date_creation__date__lte=end_dt)
+    exp_prev_qs = Expedition.objects.filter(date_creation__date__gte=prev_start, date_creation__date__lt=prev_end)
+    shipments_total = exp_current_qs.count()
+    shipments_prev = exp_prev_qs.count()
+    shipments_growth = _growth_rate(shipments_total, shipments_prev)
+
+    shipments_by_month_rows = (
+        exp_current_qs.annotate(month=TruncMonth('date_creation'))
+        .values('month')
+        .annotate(count=Count('id'))
+        .order_by('month')
+    )
+    shipments_series = _fill_month_series(shipments_by_month_rows, start_dt, end_dt, key='count')
+
+    # Revenue (invoiced)
+    fac_current_qs = Facture.objects.filter(date_facture__gte=start_dt, date_facture__lte=end_dt)
+    fac_prev_qs = Facture.objects.filter(date_facture__gte=prev_start, date_facture__lt=prev_end)
+    revenue_total = fac_current_qs.aggregate(v=Sum('total_ttc'))['v'] or 0
+    revenue_prev = fac_prev_qs.aggregate(v=Sum('total_ttc'))['v'] or 0
+    revenue_growth = _growth_rate(revenue_total, revenue_prev)
+
+    revenue_by_month_rows = (
+        fac_current_qs.annotate(month=TruncMonth('date_facture'))
+        .values('month')
+        .annotate(total=Sum('total_ttc'))
+        .order_by('month')
+    )
+    revenue_series = _fill_month_series(revenue_by_month_rows, start_dt, end_dt, key='total')
+
+    # Routes (completed)
+    tour_current_qs = Tournee.objects.filter(date_tournee__gte=start_dt, date_tournee__lte=end_dt)
+    tour_prev_qs = Tournee.objects.filter(date_tournee__gte=prev_start, date_tournee__lt=prev_end)
+    routes_completed_total = tour_current_qs.filter(statut='Terminée').count()
+    routes_completed_prev = tour_prev_qs.filter(statut='Terminée').count()
+    routes_growth = _growth_rate(routes_completed_total, routes_completed_prev)
+
+    # Delivery success rate
+    delivered = exp_current_qs.filter(statut='Livré').count()
+    failed = exp_current_qs.filter(statut='Échec de livraison').count()
+    denom = delivered + failed
+    success_rate = round((delivered / denom) * 100.0, 2) if denom else None
+
+    # Top customers by volume
+    top_customers_volume = (
+        exp_current_qs.values('client_id', 'client__nom', 'client__prenom')
+        .annotate(shipments=Count('id'))
+        .order_by('-shipments')[:10]
+    )
+    top_customers_volume = [
+        {
+            'client_id': r['client_id'],
+            'client_name': (f"{r['client__nom']} {r['client__prenom']}".strip() if r['client__prenom'] else r['client__nom']),
+            'shipments': r['shipments'],
+        }
+        for r in top_customers_volume
+        if r['client_id'] is not None
+    ]
+
+    # Top customers by revenue
+    top_customers_revenue = (
+        fac_current_qs.values('client_id', 'client__nom', 'client__prenom')
+        .annotate(revenue=Sum('total_ttc'))
+        .order_by('-revenue')[:10]
+    )
+    top_customers_revenue = [
+        {
+            'client_id': r['client_id'],
+            'client_name': (f"{r['client__nom']} {r['client__prenom']}".strip() if r['client__prenom'] else r['client__nom']),
+            'revenue': float(r['revenue'] or 0),
+        }
+        for r in top_customers_revenue
+        if r['client_id'] is not None
+    ]
+
+    # Top destinations
+    top_destinations = (
+        exp_current_qs.values('destination_id', 'destination__ville', 'destination__pays', 'destination__zone_geographique')
+        .annotate(shipments=Count('id'))
+        .order_by('-shipments')[:10]
+    )
+    top_destinations = [
+        {
+            'destination_id': r['destination_id'],
+            'label': f"{r['destination__ville']}, {r['destination__pays']}",
+            'zone': r['destination__zone_geographique'],
+            'shipments': r['shipments'],
+        }
+        for r in top_destinations
+        if r['destination_id'] is not None
+    ]
+
+    # Incidents by zone (based on expedition destination)
+    incident_current_qs = Incident.objects.filter(created_at__date__gte=start_dt, created_at__date__lte=end_dt)
+    incident_zones = (
+        incident_current_qs.filter(expedition__isnull=False)
+        .values('expedition__destination__zone_geographique')
+        .annotate(incidents=Count('id'))
+        .order_by('-incidents')
+    )
+    incident_zones = [
+        {'zone': r['expedition__destination__zone_geographique'] or 'N/A', 'incidents': r['incidents']}
+        for r in incident_zones
+    ]
+
+    top_zones_by_shipments = (
+        exp_current_qs.values('destination__zone_geographique')
+        .annotate(shipments=Count('id'))
+        .order_by('-shipments')[:10]
+    )
+    top_zones_by_shipments = [
+        {'zone': r['destination__zone_geographique'] or 'N/A', 'shipments': r['shipments']}
+        for r in top_zones_by_shipments
+    ]
+
+    top_zones_by_incidents = incident_zones[:10]
+
+    # Top drivers (completed routes + incidents)
+    driver_rows = (
+        tour_current_qs.filter(statut='Terminée', chauffeur__isnull=False)
+        .values('chauffeur_id', 'chauffeur__nom', 'chauffeur__prenom')
+        .annotate(
+            tournees=Count('id'),
+            distance=Sum('distance_km'),
+            fuel=Sum('consommation_litres'),
+            incidents=Count('incidents', distinct=True),
+        )
+        .order_by('-tournees')[:10]
+    )
+    top_drivers = []
+    for r in driver_rows:
+        score = (r['tournees'] or 0) - 0.5 * (r['incidents'] or 0)
+        top_drivers.append({
+            'chauffeur_id': r['chauffeur_id'],
+            'name': f"{r['chauffeur__nom']} {r['chauffeur__prenom']}",
+            'tournees_completed': r['tournees'] or 0,
+            'distance_km': float(r['distance'] or 0),
+            'fuel_l': float(r['fuel'] or 0),
+            'incidents': r['incidents'] or 0,
+            'score': round(score, 2),
+        })
+
+    # Peak periods (top 6 months by shipments)
+    peak_months = sorted(shipments_series, key=lambda x: x['count'], reverse=True)[:6]
+
+    # Forecast (simple moving average of last 3 months)
+    def _forecast(series, key):
+        vals = [s[key] for s in series if s[key] is not None]
+        if len(vals) < 3:
+            return []
+        window = vals[-3:]
+        avg = sum(window) / 3.0
+        last_month = datetime.date.fromisoformat(series[-1]['month'])
+        out = []
+        cur = last_month
+        for _ in range(3):
+            if cur.month == 12:
+                cur = datetime.date(cur.year + 1, 1, 1)
+            else:
+                cur = datetime.date(cur.year, cur.month + 1, 1)
+            out.append({'month': cur.isoformat(), key: round(float(avg), 2)})
+        return out
+
+    shipments_forecast = _forecast(shipments_series, 'count')
+    revenue_forecast = _forecast(revenue_series, 'total')
+
+    return Response({
+        'period': {'start': start_dt.isoformat(), 'end': end_dt.isoformat()},
+        'shipments': {
+            'total': shipments_total,
+            'growth_rate_percent': shipments_growth,
+            'delivered': delivered,
+            'failed': failed,
+            'success_rate_percent': success_rate,
+            'series': shipments_series,
+            'forecast_next_3_months': shipments_forecast,
+        },
+        'revenue': {
+            'total_ttc': round(float(revenue_total), 2),
+            'growth_rate_percent': revenue_growth,
+            'series': revenue_series,
+            'forecast_next_3_months': revenue_forecast,
+        },
+        'routes': {
+            'completed': routes_completed_total,
+            'growth_rate_percent': routes_growth,
+        },
+        'rankings': {
+            'top_customers_by_volume': top_customers_volume,
+            'top_customers_by_revenue': top_customers_revenue,
+            'top_destinations': top_destinations,
+            'top_drivers': top_drivers,
+        },
+        'incidents': {
+            'by_zone': incident_zones,
+        },
+        'peaks': {
+            'months': peak_months,
+        },
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def analytics_advanced_view(request):
+    import traceback
+    try:
+        start_dt, end_dt = _parse_period(request)
+        prev_end = start_dt
+        prev_start = start_dt - (end_dt - start_dt)
+
+        exp_current_qs = Expedition.objects.filter(date_creation__date__gte=start_dt, date_creation__date__lte=end_dt)
+        exp_prev_qs = Expedition.objects.filter(date_creation__date__gte=prev_start, date_creation__date__lt=prev_end)
+        fac_current_qs = Facture.objects.filter(date_facture__gte=start_dt, date_facture__lte=end_dt)
+        fac_prev_qs = Facture.objects.filter(date_facture__gte=prev_start, date_facture__lt=prev_end)
+        tour_current_qs = Tournee.objects.filter(date_tournee__gte=start_dt, date_tournee__lte=end_dt)
+        tour_prev_qs = Tournee.objects.filter(date_tournee__gte=prev_start, date_tournee__lt=prev_end)
+        incident_current_qs = Incident.objects.filter(created_at__date__gte=start_dt, created_at__date__lte=end_dt)
+        incident_prev_qs = Incident.objects.filter(created_at__date__gte=prev_start, created_at__date__lt=prev_end)
+
+        def _forecast(series, key):
+            vals = [s[key] for s in series if s.get(key) is not None]
+            if len(vals) < 3:
+                return []
+            window = vals[-3:]
+            avg = sum(window) / 3.0
+            last_month = datetime.date.fromisoformat(series[-1]['month'])
+            out = []
+            cur = last_month
+            for _ in range(3):
+                if cur.month == 12:
+                    cur = datetime.date(cur.year + 1, 1, 1)
+                else:
+                    cur = datetime.date(cur.year, cur.month + 1, 1)
+                out.append({'month': cur.isoformat(), key: round(float(avg), 2)})
+            return out
+
+        shipments_total = exp_current_qs.count()
+        shipments_prev = exp_prev_qs.count()
+        shipments_growth = _growth_rate(shipments_total, shipments_prev)
+
+        delivered = exp_current_qs.filter(statut='Livré').count()
+        failed = exp_current_qs.filter(statut='Échec de livraison').count()
+        delayed = exp_current_qs.filter(incidents__type_incident='RETARD').distinct().count()
+
+        denom = delivered + failed
+        success_rate = round((delivered / denom) * 100.0, 2) if denom else None
+        failed_rate = round((failed / denom) * 100.0, 2) if denom else None
+        delayed_rate = round((delayed / shipments_total) * 100.0, 2) if shipments_total else None
+
+        shipments_by_month_rows = (
+            exp_current_qs.annotate(month=TruncMonth('date_creation'))
+            .values('month')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
+        shipments_series = _fill_month_series(shipments_by_month_rows, start_dt, end_dt, key='count')
+        shipments_forecast = _forecast(shipments_series, 'count')
+
+        revenue_total = fac_current_qs.aggregate(v=Sum('total_ttc'))['v'] or 0
+        revenue_prev = fac_prev_qs.aggregate(v=Sum('total_ttc'))['v'] or 0
+        revenue_growth = _growth_rate(revenue_total, revenue_prev)
+
+        revenue_by_month_rows = (
+            fac_current_qs.annotate(month=TruncMonth('date_facture'))
+            .values('month')
+            .annotate(total=Sum('total_ttc'))
+            .order_by('month')
+        )
+        revenue_series = _fill_month_series(revenue_by_month_rows, start_dt, end_dt, key='total')
+        revenue_forecast = _forecast(revenue_series, 'total')
+
+        routes_completed_total = tour_current_qs.filter(statut='Terminée').count()
+        routes_completed_prev = tour_prev_qs.filter(statut='Terminée').count()
+        routes_growth = _growth_rate(routes_completed_total, routes_completed_prev)
+
+        routes_by_month_rows = (
+            tour_current_qs.filter(statut='Terminée')
+            .annotate(month=TruncMonth('date_tournee'))
+            .values('month')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
+        routes_series = _fill_month_series(routes_by_month_rows, start_dt, end_dt, key='count')
+        routes_forecast = _forecast(routes_series, 'count')
+
+        fuel_by_month_rows = (
+            tour_current_qs.filter(statut='Terminée')
+            .annotate(month=TruncMonth('date_tournee'))
+            .values('month')
+            .annotate(total=Sum('consommation_litres'))
+            .order_by('month')
+        )
+        fuel_series = _fill_month_series(fuel_by_month_rows, start_dt, end_dt, key='total')
+        fuel_forecast = _forecast(fuel_series, 'total')
+
+        total_distance = tour_current_qs.filter(statut='Terminée').aggregate(v=Sum('distance_km'))['v'] or 0
+        total_fuel = tour_current_qs.filter(statut='Terminée').aggregate(v=Sum('consommation_litres'))['v'] or 0
+        fuel_per_100km = round((float(total_fuel) / float(total_distance)) * 100.0, 2) if total_distance else None
+
+        incidents_total = incident_current_qs.count()
+        incidents_prev = incident_prev_qs.count()
+        incidents_growth = _growth_rate(incidents_total, incidents_prev)
+
+        incidents_by_month_rows = (
+            incident_current_qs.annotate(month=TruncMonth('created_at'))
+            .values('month')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
+        incidents_series = _fill_month_series(incidents_by_month_rows, start_dt, end_dt, key='count')
+        incidents_forecast = _forecast(incidents_series, 'count')
+
+        # Incidents by zone
+        incident_zones = (
+            incident_current_qs.filter(expedition__isnull=False)
+            .values('expedition__destination__zone_geographique')
+            .annotate(incidents=Count('id'))
+            .order_by('-incidents')
+        )
+        incident_zones = [
+            {'zone': r['expedition__destination__zone_geographique'] or 'N/A', 'incidents': r['incidents']}
+            for r in incident_zones
+        ]
+
+        top_zones_by_shipments = (
+            exp_current_qs.values('destination__zone_geographique')
+            .annotate(shipments=Count('id'))
+            .order_by('-shipments')[:10]
+        )
+        top_zones_by_shipments = [
+            {'zone': r['destination__zone_geographique'] or 'N/A', 'shipments': r['shipments']}
+            for r in top_zones_by_shipments
+        ]
+
+        top_zones_by_incidents = incident_zones[:10]
+
+        # Peak periods
+        peak_months = sorted(shipments_series, key=lambda x: x['count'], reverse=True)[:6]
+
+        # Top customers by volume
+        top_customers_volume = (
+            exp_current_qs.values('client_id', 'client__nom', 'client__prenom')
+            .annotate(shipments=Count('id'))
+            .order_by('-shipments')[:10]
+        )
+        top_customers_volume = [
+            {
+                'client_id': r['client_id'],
+                'client_name': (f"{r['client__nom']} {r['client__prenom']}".strip() if r['client__prenom'] else r['client__nom']),
+                'shipments': r['shipments'],
+            }
+            for r in top_customers_volume
+            if r['client_id'] is not None
+        ]
+
+        # Top customers by revenue
+        top_customers_revenue = (
+            fac_current_qs.values('client_id', 'client__nom', 'client__prenom')
+            .annotate(revenue=Sum('total_ttc'))
+            .order_by('-revenue')[:10]
+        )
+        top_customers_revenue = [
+            {
+                'client_id': r['client_id'],
+                'client_name': (f"{r['client__nom']} {r['client__prenom']}".strip() if r['client__prenom'] else r['client__nom']),
+                'revenue': float(r['revenue'] or 0),
+            }
+            for r in top_customers_revenue
+            if r['client_id'] is not None
+        ]
+
+        # Top destinations
+        top_destinations = (
+            exp_current_qs.values(
+                'destination_id',
+                'destination__ville',
+                'destination__pays',
+                'destination__zone_geographique',
+                'destination__latitude',
+                'destination__longitude',
+            )
+            .annotate(shipments=Count('id'))
+            .order_by('-shipments')[:10]
+        )
+        top_destinations = [
+            {
+                'destination_id': r['destination_id'],
+                'label': f"{r['destination__ville']}, {r['destination__pays']}",
+                'zone': r['destination__zone_geographique'],
+                'shipments': r['shipments'],
+                'latitude': r['destination__latitude'],
+                'longitude': r['destination__longitude'],
+            }
+            for r in top_destinations
+            if r['destination_id'] is not None
+        ]
+
+        # Top drivers
+        driver_rows = (
+            tour_current_qs.filter(statut='Terminée', chauffeur__isnull=False)
+            .values('chauffeur_id', 'chauffeur__nom', 'chauffeur__prenom')
+            .annotate(
+                tournees=Count('id'),
+                distance=Sum('distance_km'),
+                fuel=Sum('consommation_litres'),
+                duree=Sum('duree_minutes'),
+                incidents=Count('incidents', distinct=True),
+                delivered_shipments=Count('expeditions', filter=Q(expeditions__statut='Livré'), distinct=True),
+                failed_shipments=Count('expeditions', filter=Q(expeditions__statut='Échec de livraison'), distinct=True),
+                delayed_shipments=Count('expeditions', filter=Q(expeditions__incidents__type_incident='RETARD'), distinct=True),
+            )
+            .order_by('-tournees')[:20]
+        )
+        top_drivers = []
+        for r in driver_rows:
+            tours = float(r['tournees'] or 0)
+            incidents = float(r['incidents'] or 0)
+            distance = float(r['distance'] or 0)
+            fuel = float(r['fuel'] or 0)
+            duree_min = float(r['duree'] or 0)
+            delivered_shipments = float(r['delivered_shipments'] or 0)
+            failed_shipments = float(r['failed_shipments'] or 0)
+            delayed_shipments = float(r['delayed_shipments'] or 0)
+
+            speed_kmh = round((distance / (duree_min / 60.0)), 2) if duree_min else None
+            deliveries_per_100km = round((delivered_shipments / distance) * 100.0, 2) if distance else None
+            deliveries_per_liter = round((delivered_shipments / fuel), 2) if fuel else None
+            punctuality_proxy = round((delivered_shipments / (delivered_shipments + delayed_shipments)) * 100.0, 2) if (delivered_shipments + delayed_shipments) else None
+            quality_proxy = round((delivered_shipments / (delivered_shipments + failed_shipments)) * 100.0, 2) if (delivered_shipments + failed_shipments) else None
+
+            score = (tours * 1.0) + (delivered_shipments * 0.2) - (incidents * 0.8) - (failed_shipments * 0.6) - (delayed_shipments * 0.3)
+            top_drivers.append({
+                'chauffeur_id': r['chauffeur_id'],
+                'name': f"{r['chauffeur__nom']} {r['chauffeur__prenom']}",
+                'tournees_completed': int(tours),
+                'distance_km': distance,
+                'fuel_l': fuel,
+                'incidents': int(incidents),
+                'delivered_shipments': int(delivered_shipments),
+                'failed_shipments': int(failed_shipments),
+                'delayed_shipments': int(delayed_shipments),
+                'speed_kmh': speed_kmh,
+                'deliveries_per_100km': deliveries_per_100km,
+                'deliveries_per_liter': deliveries_per_liter,
+                'punctuality_percent': punctuality_proxy,
+                'quality_percent': quality_proxy,
+                'score': round(float(score), 2),
+            })
+        top_drivers = sorted(top_drivers, key=lambda x: x['score'], reverse=True)[:10]
+
+        # Profitability assumptions
+        fuel_price_per_liter = float(request.query_params.get('fuel_price_per_liter', 1.5))
+        driver_cost_per_hour = float(request.query_params.get('driver_cost_per_hour', 8.0))
+        vehicle_cost_per_km = float(request.query_params.get('vehicle_cost_per_km', 0.3))
+
+        # Cost estimation
+        route_cost_total = 0.0
+        for t in tour_current_qs.filter(statut='Terminée').only('distance_km', 'duree_minutes', 'consommation_litres'):
+            dist = float(t.distance_km or 0)
+            fuel_l = float(t.consommation_litres or 0)
+            minutes = float(t.duree_minutes or 0)
+            route_cost_total += (fuel_l * fuel_price_per_liter) + ((minutes / 60.0) * driver_cost_per_hour) + (dist * vehicle_cost_per_km)
+
+        avg_cost_per_route = round((route_cost_total / routes_completed_total), 2) if routes_completed_total else None
+        avg_shipments_per_route = round((shipments_total / routes_completed_total), 2) if routes_completed_total else None
+
+        revenue_estimated = exp_current_qs.aggregate(v=Sum('montant_total'))['v'] or 0
+        profit_estimated = round(float(revenue_estimated) - float(route_cost_total), 2)
+        margin_percent = round((profit_estimated / float(revenue_estimated)) * 100.0, 2) if revenue_estimated else None
+
+        # Profitability by service type
+        revenue_by_service_rows = (
+            exp_current_qs.values('type_service_id', 'type_service__libelle')
+            .annotate(revenue=Sum('montant_total'), shipments=Count('id'))
+            .order_by('-revenue')
+        )
+        profitability_by_service = []
+        for r in revenue_by_service_rows:
+            share = (float(r['revenue'] or 0) / float(revenue_estimated)) if revenue_estimated else 0
+            cost_alloc = route_cost_total * share
+            rev = float(r['revenue'] or 0)
+            prof = rev - cost_alloc
+            profitability_by_service.append({
+                'type_service_id': r['type_service_id'],
+                'type_service': r['type_service__libelle'] or 'N/A',
+                'shipments': r['shipments'],
+                'revenue_estimated': round(rev, 2),
+                'cost_estimated': round(float(cost_alloc), 2),
+                'profit_estimated': round(float(prof), 2),
+                'margin_percent': round((prof / rev) * 100.0, 2) if rev else None,
+            })
+
+        # Staffing forecasts
+        cap_shipments_per_vehicle_per_day = float(request.query_params.get('cap_shipments_per_vehicle_per_day', 30))
+        cap_shipments_per_driver_per_day = float(request.query_params.get('cap_shipments_per_driver_per_day', 25))
+        working_days_per_month = float(request.query_params.get('working_days_per_month', 22))
+
+        def _staffing_from_monthly_shipments(monthly_shipments):
+            denom_vehicle = cap_shipments_per_vehicle_per_day * working_days_per_month
+            denom_driver = cap_shipments_per_driver_per_day * working_days_per_month
+            vehicles = math.ceil(monthly_shipments / denom_vehicle) if denom_vehicle else None
+            drivers = math.ceil(monthly_shipments / denom_driver) if denom_driver else None
+            return vehicles, drivers
+
+        staffing_forecast = []
+        for row in shipments_forecast:
+            m = row['month']
+            vol = float(row['count'] or 0)
+            vehicles, drivers = _staffing_from_monthly_shipments(vol)
+            staffing_forecast.append({
+                'month': m,
+                'forecast_shipments': round(vol, 2),
+                'required_vehicles': vehicles,
+                'required_drivers': drivers,
+            })
+
+        # Map points
+        destination_points = (
+            exp_current_qs.values(
+                'destination_id',
+                'destination__ville',
+                'destination__pays',
+                'destination__zone_geographique',
+                'destination__latitude',
+                'destination__longitude',
+            )
+            .annotate(shipments=Count('id'), incidents=Count('incidents', distinct=True))
+            .order_by('-shipments')
+        )
+        destination_points = [
+            {
+                'destination_id': r['destination_id'],
+                'label': f"{r['destination__ville']}, {r['destination__pays']}",
+                'zone': r['destination__zone_geographique'],
+                'latitude': r['destination__latitude'],
+                'longitude': r['destination__longitude'],
+                'shipments': r['shipments'],
+                'incidents': r['incidents'],
+            }
+            for r in destination_points
+            if r['destination_id'] is not None and r['destination__latitude'] is not None and r['destination__longitude'] is not None
+        ]
+
+        return Response({
+            'period': {'start': start_dt.isoformat(), 'end': end_dt.isoformat()},
+            'shipments': {
+                'total': shipments_total,
+                'growth_rate_percent': shipments_growth,
+                'delivered': delivered,
+                'failed': failed,
+                'delayed': delayed,
+                'success_rate_percent': success_rate,
+                'failed_rate_percent': failed_rate,
+                'delayed_rate_percent': delayed_rate,
+                'series': shipments_series,
+                'forecast_next_3_months': shipments_forecast,
+            },
+            'revenue': {
+                'total_ttc': round(float(revenue_total), 2),
+                'growth_rate_percent': revenue_growth,
+                'series': revenue_series,
+                'forecast_next_3_months': revenue_forecast,
+            },
+            'routes': {
+                'completed': routes_completed_total,
+                'growth_rate_percent': routes_growth,
+                'series': routes_series,
+                'forecast_next_3_months': routes_forecast,
+            },
+            'fuel': {
+                'total_liters': round(float(total_fuel), 2),
+                'fuel_per_100km': fuel_per_100km,
+                'series': fuel_series,
+                'forecast_next_3_months': fuel_forecast,
+            },
+            'incidents': {
+                'total': incidents_total,
+                'growth_rate_percent': incidents_growth,
+                'series': incidents_series,
+                'forecast_next_3_months': incidents_forecast,
+                'by_zone': incident_zones,
+            },
+            'operations': {
+                'avg_cost_per_route_estimated': avg_cost_per_route,
+                'avg_shipments_per_route': avg_shipments_per_route,
+            },
+            'profitability': {
+                'assumptions': {
+                    'fuel_price_per_liter': fuel_price_per_liter,
+                    'driver_cost_per_hour': driver_cost_per_hour,
+                    'vehicle_cost_per_km': vehicle_cost_per_km,
+                },
+                'revenue_estimated_from_shipments': round(float(revenue_estimated), 2),
+                'cost_estimated_from_routes': round(float(route_cost_total), 2),
+                'profit_estimated': profit_estimated,
+                'margin_percent': margin_percent,
+                'by_service_type': profitability_by_service,
+            },
+            'rankings': {
+                'top_customers_by_volume': top_customers_volume,
+                'top_customers_by_revenue': top_customers_revenue,
+                'top_destinations': top_destinations,
+                'top_drivers': top_drivers,
+            },
+            'staffing': {
+                'assumptions': {
+                    'cap_shipments_per_vehicle_per_day': cap_shipments_per_vehicle_per_day,
+                    'cap_shipments_per_driver_per_day': cap_shipments_per_driver_per_day,
+                    'working_days_per_month': working_days_per_month,
+                },
+                'forecast_next_3_months': staffing_forecast,
+            },
+            'map': {
+                'destination_points': destination_points,
+            },
+            'zones': {
+                'top_by_shipments': top_zones_by_shipments,
+                'top_by_incidents': top_zones_by_incidents,
+            },
+            'peaks': {
+                'months': peak_months,
+            },
+        })
+    except Exception as e:
+        print("[ANALYTICS ADVANCED ERROR]")
+        traceback.print_exc()
+        raise
 
 
 @api_view(['GET'])
@@ -710,3 +1484,4 @@ class PaiementViewSet(BaseAgentViewSet):
                 else:
                     facture.statut = 'Émise'
                 facture.save()
+

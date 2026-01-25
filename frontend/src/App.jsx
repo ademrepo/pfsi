@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import api from './api';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
 import Layout from './components/Layout';
 import ExpeditionList from './pages/Agent/ExpeditionList';
 import ExpeditionForm from './pages/Agent/ExpeditionForm';
@@ -74,10 +77,19 @@ function App() {
                     !user ? <Login onLogin={handleLoginSuccess} /> : <Navigate to="/" replace />
                 } />
 
+                <Route path="/forgot-password" element={
+                    !user ? <ForgotPassword /> : <Navigate to="/" replace />
+                } />
+
+                <Route path="/reset-password" element={
+                    !user ? <ResetPassword /> : <Navigate to="/" replace />
+                } />
+
                 <Route element={
                     user ? <Layout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace state={{ from: location }} />
                 }>
                     <Route path="/" element={<Dashboard user={user} />} />
+                    <Route path="/analytics" element={<Analytics />} />
 
                     {/* Opérations & Référentiels (Unified Access) */}
                     <Route path="/expeditions" element={<ExpeditionList />} />

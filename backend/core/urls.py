@@ -2,6 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     login_view, logout_view, current_user_view, get_csrf_token, get_roles,
+    password_reset_request_view, password_reset_confirm_view,
+    analytics_summary_view, analytics_advanced_view,
     UtilisateurViewSet, AuditLogViewSet,
     ClientViewSet, ChauffeurViewSet, VehiculeViewSet, DestinationViewSet,
     TypeServiceViewSet, TarificationViewSet, ExpeditionViewSet, TourneeViewSet,
@@ -35,6 +37,12 @@ urlpatterns = [
     path('auth/me/', current_user_view, name='current-user'),
     path('auth/csrf/', get_csrf_token, name='csrf-token'),
     path('auth/roles/', get_roles, name='roles'),
+    path('auth/password-reset/request/', password_reset_request_view, name='password-reset-request'),
+    path('auth/password-reset/confirm/', password_reset_confirm_view, name='password-reset-confirm'),
+
+    # Analytics
+    path('analytics/summary/', analytics_summary_view, name='analytics-summary'),
+    path('analytics/advanced/', analytics_advanced_view, name='analytics-advanced'),
     
     # Router endpoints (utilisateurs, audit-logs)
     path('', include(router.urls)),

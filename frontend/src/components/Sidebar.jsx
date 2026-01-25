@@ -18,6 +18,8 @@ const Sidebar = ({ user, onLogout }) => {
                     🏠 Tableau de bord
                 </NavLink>
 
+                <NavLink to="/analytics">📊 Analytics</NavLink>
+
                 <div className="menu-section">OPÉRATIONS</div>
                 <NavLink to="/expeditions">📦 Expéditions</NavLink>
                 <NavLink to="/tournees">🚚 Tournées</NavLink>

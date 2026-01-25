@@ -22,7 +22,10 @@ class LoginSerializer(serializers.Serializer):
         
         if username and password:
             try:
-                user = Utilisateur.objects.select_related('role').get(username=username)
+                if '@' in username:
+                    user = Utilisateur.objects.select_related('role').get(email__iexact=username)
+                else:
+                    user = Utilisateur.objects.select_related('role').get(username=username)
             except Utilisateur.DoesNotExist:
                 raise serializers.ValidationError(
                     "Nom d'utilisateur ou mot de passe incorrect."
@@ -53,6 +56,23 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Le nom d'utilisateur et le mot de passe sont requis."
             )
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password_confirm']:
+            raise serializers.ValidationError({
+                'new_password': "Les mots de passe ne correspondent pas."
+            })
+        return attrs
 
 
 class RoleSerializer(serializers.ModelSerializer):
