@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { Search, Download, Plus, Calendar, Filter, TrendingUp, Lock, Trash2 } from 'lucide-react';
+import { Search, Download, Plus, Calendar, Filter, TrendingUp, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 const ExpeditionList = () => {
     const [expeditions, setExpeditions] = useState([]);
@@ -9,6 +9,19 @@ const ExpeditionList = () => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedId, setSelectedId] = useState(null);
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpenMenuId(null);
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         fetchExpeditions();
@@ -138,9 +151,9 @@ const ExpeditionList = () => {
                     <div className="stat-card-header">
                         <span className="stat-card-label">En cours de livraison</span>
                     </div>
-                    <div className="stat-card-value">{stats.enCours}</div>
+                    <div className="stat-card-value stat-card-value--accent">{stats.enCours}</div>
                     <div className="stat-card-meta">
-                        <span className="status-badge status-actif">Actif</span>
+                        <span className="status-badge status-actif">ACTIF</span>
                     </div>
                 </div>
 
@@ -157,7 +170,7 @@ const ExpeditionList = () => {
                     </div>
                     <div className="stat-card-value">{stats.retards}</div>
                     <div className="stat-card-meta">
-                        <span className="status-badge status-action-requise">Action requise</span>
+                        <span className="status-badge status-action-requise">ACTION REQUISE</span>
                     </div>
                 </div>
             </div>
@@ -197,13 +210,13 @@ const ExpeditionList = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <button className="btn-icon">
+            <div className="filters-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                    <button type="button" className="btn-icon" title="Période">
                         <Calendar size={18} />
                     </button>
                     <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Oct 2023</span>
-                    <button className="btn-icon">
+                    <button type="button" className="btn-icon" title="Filtres">
                         <Filter size={18} />
                     </button>
                 </div>
@@ -213,6 +226,7 @@ const ExpeditionList = () => {
                 <table>
                     <thead>
                         <tr>
+                            <th aria-label="Sélection" />
                             <th>N° DE SUIVI</th>
                             <th>EXPÉDITEUR</th>
                             <th>DESTINATAIRE</th>
@@ -222,93 +236,107 @@ const ExpeditionList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredExpeditions.map((exp) => (
-                            <tr key={exp.id}>
-                                <td>
-                                    <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>
-                                        {exp.code_expedition}
-                                    </div>
-                                    <div className="table-secondary-text">
-                                        {exp.type_service_details?.libelle || 'Standard Ground'}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style={{ fontWeight: '500', color: 'var(--text-main)' }}>
-                                        {exp.client_details ? `${exp.client_details.nom} ${exp.client_details.prenom || ''}`.trim() : 'Inconnu'}
-                                    </div>
-                                    <div className="table-secondary-text">
-                                        {exp.client_details?.ville || 'N/A'}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style={{ fontWeight: '500', color: 'var(--text-main)' }}>
-                                        {exp.destination_details?.ville || 'Destination'}
-                                    </div>
-                                    <div className="table-secondary-text">
-                                        {exp.destination_details?.pays || 'Pays'}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style={{ fontWeight: '500', color: 'var(--text-main)' }}>
-                                        {new Date(exp.date_creation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                    </div>
-                                    <div className="table-secondary-text">
-                                        {new Date(exp.date_creation).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className={`status-badge ${getStatusClass(exp.statut)}`}>
-                                        {exp.statut === 'En cours de livraison' ? 'En cours de livraison' : 
-                                         exp.statut === 'En centre de tri' ? 'En centre de tri' :
-                                         exp.statut === 'En transit' ? 'En transit' :
-                                         exp.statut === 'Livré' ? 'Livré' :
-                                         exp.statut}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                                        {(() => {
-                                            const isDelivered = exp.statut === 'Livré' || exp.statut === 'LivrÃ©';
-                                            const canEdit = !isDelivered && !exp.tournee;
-                                            if (canEdit) {
-                                                return (
-                                                    <Link
-                                                        to={`/expeditions/${exp.id}/edit`}
-                                                        style={{
-                                                            textDecoration: 'none',
-                                                            color: 'var(--text-secondary)',
-                                                            fontSize: '0.875rem',
-                                                            fontWeight: '500'
-                                                        }}
+                        {filteredExpeditions.map((exp) => {
+                            const isDelivered = exp.statut === 'Livré' || exp.statut === 'LivrÃ©';
+                            const canEdit = !isDelivered && !exp.tournee;
+                            const isMenuOpen = openMenuId === exp.id;
+                            return (
+                                <tr
+                                    key={exp.id}
+                                    className={selectedId === exp.id ? 'table-row--selected' : ''}
+                                >
+                                    <td>
+                                        <input
+                                            type="radio"
+                                            name="exp-selection"
+                                            className="table-radio"
+                                            checked={selectedId === exp.id}
+                                            onChange={() => setSelectedId(exp.id)}
+                                            aria-label={`Sélectionner ${exp.code_expedition}`}
+                                        />
+                                    </td>
+                                    <td>
+                                        <div className="table-cell-primary">
+                                            {exp.code_expedition}
+                                        </div>
+                                        <div className="table-secondary-text">
+                                            {exp.type_service_details?.libelle || 'Standard Ground'}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="table-cell-primary">
+                                            {exp.client_details ? `${exp.client_details.nom} ${exp.client_details.prenom || ''}`.trim() : 'Inconnu'}
+                                        </div>
+                                        <div className="table-secondary-text">
+                                            {exp.client_details?.ville || 'N/A'}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="table-cell-primary">
+                                            {exp.destination_details?.ville || 'Destination'}
+                                        </div>
+                                        <div className="table-secondary-text">
+                                            {exp.destination_details?.pays || 'Pays'}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="table-cell-primary">
+                                            {new Date(exp.date_creation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                        </div>
+                                        <div className="table-secondary-text">
+                                            {new Date(exp.date_creation).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className={`status-badge ${getStatusClass(exp.statut)}`}>
+                                            {exp.statut === 'En cours de livraison' ? 'En cours de livraison' : 
+                                             exp.statut === 'En centre de tri' ? 'En centre de tri' :
+                                             exp.statut === 'En transit' ? 'En transit' :
+                                             exp.statut === 'Livré' ? 'Livré' :
+                                             exp.statut}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="table-actions-wrap" ref={isMenuOpen ? menuRef : null}>
+                                            <button
+                                                type="button"
+                                                className="table-actions-btn"
+                                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(isMenuOpen ? null : exp.id); }}
+                                                aria-expanded={isMenuOpen}
+                                                aria-haspopup="true"
+                                                title="Actions"
+                                            >
+                                                <MoreVertical size={18} />
+                                            </button>
+                                            {isMenuOpen && (
+                                                <div className="table-actions-dropdown">
+                                                    {canEdit && (
+                                                        <Link
+                                                            to={`/expeditions/${exp.id}/edit`}
+                                                            onClick={() => setOpenMenuId(null)}
+                                                        >
+                                                            <Pencil size={16} />
+                                                            Modifier
+                                                        </Link>
+                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        className="table-actions-danger"
+                                                        onClick={() => { handleDelete(exp.id); setOpenMenuId(null); }}
                                                     >
-                                                        Modifier
-                                                    </Link>
-                                                );
-                                            }
-
-                                            if (isDelivered) {
-                                                return <Lock size={18} title="Livrée" style={{ color: 'var(--text-muted)' }} />;
-                                            }
-
-                                            return <span style={{ color: 'var(--text-muted)' }}>—</span>;
-                                        })()}
-
-                                        <button
-                                            className="btn-icon"
-                                            type="button"
-                                            title="Supprimer"
-                                            onClick={() => handleDelete(exp.id)}
-                                            style={{ color: '#b91c1c' }}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                                        <Trash2 size={16} />
+                                                        Supprimer
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                         {filteredExpeditions.length === 0 && (
                             <tr>
-                                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                                <td colSpan="7" style={{ textAlign: 'center', padding: 'var(--space-3xl)', color: 'var(--text-muted)' }}>
                                     Aucune expédition trouvée.
                                 </td>
                             </tr>
@@ -317,15 +345,12 @@ const ExpeditionList = () => {
                 </table>
             </div>
 
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                marginTop: '1.5rem',
-                fontSize: '0.875rem',
-                color: 'var(--text-muted)'
-            }}>
-                <span>Affichage de 1 à {filteredExpeditions.length} sur {stats.total} résultats</span>
+            <div className="table-pagination">
+                <span>Affichage de 1 à {Math.min(filteredExpeditions.length, 10)} sur {stats.total} résultats</span>
+                <div className="table-pagination-actions">
+                    <button type="button" className="secondary" disabled>Précédent</button>
+                    <button type="button" className="secondary">Suivant</button>
+                </div>
             </div>
         </div>
     );

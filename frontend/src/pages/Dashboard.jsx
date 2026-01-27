@@ -30,7 +30,7 @@ const Dashboard = ({ user }) => {
                     <div className="stat-card-header">
                         <span className="stat-card-label">En cours de livraison</span>
                     </div>
-                    <div className="stat-card-value">89</div>
+                    <div className="stat-card-value stat-card-value--accent">89</div>
                     <div className="stat-card-meta">
                         <span className="status-badge status-actif">ACTIF</span>
                     </div>
