@@ -1,6 +1,8 @@
 import argparse
 import sqlite3
 from pathlib import Path
+import time
+import sys
 
 
 def _exec_sql_file(cur, path: Path):
@@ -19,37 +21,63 @@ def _db_has_any_tables(con: sqlite3.Connection) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Initialize backend/db.sqlite3 from SQL files (schema + data only - no triggers)."
+        description="Initialize backend/db.sqlite3 from SQL files (schema + data + optional demo seed)."
     )
     parser.add_argument("--reset", action="store_true", help="Delete existing db.sqlite3 and recreate it.")
+    parser.add_argument("--seed-demo", action="store_true", help="Load seed_demo.sql for realistic test data.")
     args = parser.parse_args()
 
     base_dir = Path(__file__).resolve().parent.parent  # 16avril/
     db_path = base_dir / "backend" / "db.sqlite3"
     schema_path = base_dir / "db" / "schema.sql"
     data_path = base_dir / "db" / "data.sql"
+    seed_demo_path = base_dir / "db" / "seed_demo.sql"
 
-    # Only check for schema and data files - no more triggers
+    # Check for required files
     for p in (schema_path, data_path):
         if not p.exists():
             raise SystemExit(f"Missing SQL file: {p}")
 
     if args.reset and db_path.exists():
-        db_path.unlink()
+        attempts = 3
+        for i in range(attempts):
+            try:
+                db_path.unlink()
+                break  # Success
+            except PermissionError:
+                if i < attempts - 1:
+                    print(f"Warning: Could not delete database file '{db_path}'. Retrying in 2 seconds...")
+                    time.sleep(2)
+                else:
+                    print(f"Error: Could not delete existing database file at {db_path}.")
+                    print("Please ensure no other programs are using this file (e.g., a database viewer or a previous run of the application).")
+                    sys.exit(1)
 
     con = sqlite3.connect(db_path)
     try:
         con.execute("PRAGMA foreign_keys = ON;")
         cur = con.cursor()
 
-        # If db exists and already has tables, don't overwrite unless --reset.
         if not args.reset and _db_has_any_tables(con):
             print(f"DB already initialized: {db_path}")
+            if args.seed_demo and seed_demo_path.exists():
+                print("Loading seed_demo.sql...")
+                _exec_sql_file(cur, seed_demo_path)
+                con.commit()
+                print("Demo data loaded successfully!")
             return
 
         print(f"Initializing DB: {db_path}")
         _exec_sql_file(cur, schema_path)
         _exec_sql_file(cur, data_path)
+        
+        # Load demo seed data if requested
+        if args.seed_demo:
+            if seed_demo_path.exists():
+                print("Loading seed_demo.sql...")
+                _exec_sql_file(cur, seed_demo_path)
+            else:
+                print(f"Warning: seed_demo.sql not found at {seed_demo_path}")
         
         # Fix foreign key constraints after data insertion
         print("Fixing foreign key constraints...")

@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 Starting PF KHRA Transport & Logistics Management System...
+echo 🚀 Starting PF KHRA Transport ^& Logistics Management System...
 echo.
 
 REM Check if npm is installed
@@ -41,7 +41,8 @@ if not exist "backend\venv" (
 echo 🔧 Initializing database...
 cd backend
 call venv\Scripts\activate
-python ../scripts/init_db.py
+python ../scripts/init_db.py --reset --seed-demo
+python manage.py migrate --fake core 0013
 python manage.py migrate
 cd ..
 

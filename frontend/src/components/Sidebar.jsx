@@ -112,8 +112,16 @@ const Sidebar = ({ user, onLogout }) => {
                 )}
             </nav>
 
-            <button onClick={onLogout} className="logout-btn">
+            <NavLink to="/settings">
+                <Settings size={18} />
                 Paramètres
+            </NavLink>
+
+            <button onClick={onLogout} className="logout-btn">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Users size={18} style={{ transform: 'rotate(180deg)' }} /> {/* Using Users as placeholder for LogOut if not available, checking imports.. LogOut not imported, using existing User or just text */}
+                    Déconnexion
+                </div>
             </button>
         </div>
     );

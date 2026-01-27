@@ -24,6 +24,28 @@ CREATE TABLE utilisateur (
     FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
+CREATE TABLE audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilisateur_id INTEGER,
+    username TEXT NOT NULL,
+    action_type TEXT NOT NULL,
+    ip_address TEXT,
+    user_agent TEXT,
+    details TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id)
+);
+
+CREATE TABLE password_reset_token (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilisateur_id INTEGER NOT NULL,
+    token_hash TEXT UNIQUE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME,
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id)
+);
+
 -- ===========================
 -- FAVORIS
 -- ===========================
@@ -107,6 +129,8 @@ CREATE TABLE destination (
     code_zone TEXT,
     tarif_base_defaut REAL NOT NULL,
     is_active INTEGER DEFAULT 1,
+    latitude REAL,
+    longitude REAL,
     updated_at DATETIME
 );
 
@@ -246,17 +270,20 @@ CREATE TABLE paiement (
 -- ===========================
 CREATE TABLE incident (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code_incident TEXT UNIQUE,
+    type_incident TEXT,
     expedition_id INTEGER,
     tournee_id INTEGER,
-    type_incident TEXT,
-    gravite TEXT,
-    description TEXT,
-    statut TEXT,
-    date_declaration DATE,
-    date_cloture DATE,
-    declare_par INTEGER,
-    piece_jointe TEXT,
-    CHECK (expedition_id IS NOT NULL OR tournee_id IS NOT NULL)
+    commentaire TEXT,
+    action_appliquee TEXT DEFAULT 'NONE',
+    notify_direction INTEGER DEFAULT 1,
+    notify_client INTEGER DEFAULT 0,
+    created_by INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME,
+    FOREIGN KEY (expedition_id) REFERENCES expedition(id),
+    FOREIGN KEY (tournee_id) REFERENCES tournee(id),
+    FOREIGN KEY (created_by) REFERENCES utilisateur(id)
 );
 
 CREATE TABLE reclamation (
@@ -268,6 +295,47 @@ CREATE TABLE reclamation (
     statut TEXT,
     expedition_id INTEGER,
     facture_id INTEGER,
+    type_service_id INTEGER,
     traite_par INTEGER,
     date_resolution DATE
+);
+
+-- ===========================
+-- TABLES MANQUANTES (pour seed_demo.sql)
+-- ===========================
+
+CREATE TABLE reclamation_expedition (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reclamation_id INTEGER,
+    expedition_id INTEGER,
+    UNIQUE (reclamation_id, expedition_id),
+    FOREIGN KEY (reclamation_id) REFERENCES reclamation(id),
+    FOREIGN KEY (expedition_id) REFERENCES expedition(id)
+);
+
+CREATE TABLE incident_attachment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    incident_id INTEGER,
+    file TEXT,
+    original_name TEXT,
+    uploaded_by INTEGER,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (incident_id) REFERENCES incident(id),
+    FOREIGN KEY (uploaded_by) REFERENCES utilisateur(id)
+);
+
+CREATE TABLE alerte (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type_alerte TEXT,
+    destination TEXT,
+    titre TEXT,
+    message TEXT,
+    incident_id INTEGER,
+    expedition_id INTEGER,
+    tournee_id INTEGER,
+    is_read INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (incident_id) REFERENCES incident(id),
+    FOREIGN KEY (expedition_id) REFERENCES expedition(id),
+    FOREIGN KEY (tournee_id) REFERENCES tournee(id)
 );

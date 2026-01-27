@@ -239,7 +239,7 @@ INSERT INTO expedition (client_id, type_service_id, destination_id, poids_kg, vo
 (23, 1, 11, 14.8, 0.85, 'Produits alimentaires', '78 Marché Central, Biskra', 'Épicerie', '0772345678', 'en_livraison', 0, 2),
 (24, 1, 12, 28.0, 1.6, 'Textile', '23 Zone Commerciale, Chlef', 'Boutique', '0773456789', 'centre_tri', 0, 2),
 (25, 1, 13, 16.5, 0.95, 'Matériel scolaire', '56 Rue École, Skikda', 'Librairie', '0774567890', 'en_transit', 0, 3),
-(26, 1, 14, 31.0, 1.75, 'Meubles', '89 Avenue Hassan, Mostaganem', 'M. Client', '0775678901', 'livre', 0, 2),
+(25, 1, 14, 31.0, 1.75, 'Meubles', '89 Avenue Hassan, Mostaganem', 'M. Client', '0775678901', 'livre', 0, 2),
 (27, 1, 15, 19.5, 1.15, 'Électronique', '12 Cité Nouvelle, El Oued', 'Magasin Tech', '0776789012', 'livre', 0, 2),
 (28, 1, 16, 24.0, 1.4, 'Quincaillerie', '45 Souk, Béchar', 'Commerce', '0777890123', 'en_livraison', 0, 3),
 (29, 2, 9, 6.5, 0.4, 'Urgent Béjaïa', '78 Centre, Béjaïa', 'Client Express', '0778901234', 'centre_tri', 0, 2),
