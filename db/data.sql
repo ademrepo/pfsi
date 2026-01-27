@@ -24,6 +24,7 @@ INSERT INTO utilisateur (username, email, password, nom, prenom, telephone, role
 ('admin', 'admin@transport.dz', 'password123', 'Benali', 'Ahmed', '0555123456', 1, 1),
 ('agent1', 'agent1@transport.dz', 'password123', 'Kaci', 'Fatima', '0666234567', 2, 1),
 ('agent2', 'agent2@transport.dz', 'password123', 'Meziane', 'Karim', '0777345678', 2, 1),
+('agent3', 'ademglps@gmail.com', 'password123', 'Meziane', 'Karim', '0777345678', 2, 1)
 ('comptable1', 'compta@transport.dz', 'password123', 'Saidi', 'Meriem', '0555456789', 3, 1),
 ('logistique1', 'logi@transport.dz', 'password123', 'Hamdi', 'Yacine', '0666567890', 4, 1);
 

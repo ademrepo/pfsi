@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import secrets
 import math
+import logging
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
@@ -40,6 +41,8 @@ from .serializers import (
 )
 from .permissions import IsAuthenticated, IsAdminSysteme, IsAgentAdministratif
 from .utils import create_audit_log
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -123,7 +126,7 @@ def logout_view(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def current_user_view(request):
     """
     Retourne les informations de l'utilisateur connecté.
@@ -169,7 +172,7 @@ def password_reset_request_view(request):
     token_hash = hashlib.sha256(raw_token.encode('utf-8')).hexdigest()
 
     expires_at = timezone.now() + datetime.timedelta(hours=1)
-    PasswordResetToken.objects.create(user=user, token_hash=token_hash, expires_at=expires_at)
+    token_obj = PasswordResetToken.objects.create(user=user, token_hash=token_hash, expires_at=expires_at)
 
     frontend_base = getattr(settings, 'FRONTEND_BASE_URL', 'http://localhost:3000')
     reset_link = f"{frontend_base}/reset-password?token={raw_token}"
@@ -183,13 +186,22 @@ def password_reset_request_view(request):
         f"Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.\n"
     )
 
-    send_mail(
-        subject,
-        body,
-        getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@localhost'),
-        [user.email],
-        fail_silently=True,
-    )
+    try:
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@localhost'),
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+    except Exception:
+        # Keep the response generic to avoid email enumeration, but log the error.
+        logger.exception("Failed to send password reset email (user_id=%s)", user.id)
+        try:
+            token_obj.delete()
+        except Exception:
+            pass
+        return Response({'message': 'Si le compte existe, un email a été envoyé.'}, status=status.HTTP_200_OK)
 
     create_audit_log(
         user=user,
@@ -1308,13 +1320,38 @@ class IncidentViewSet(BaseAgentViewSet):
             )
 
         if incident.notify_client and incident.expedition_id and incident.expedition.client_id:
-            Alerte.objects.create(
+            alerte = Alerte.objects.create(
                 destination='CLIENT',
                 titre=titre,
                 message=message,
                 incident=incident,
                 expedition=incident.expedition,
             )
+
+            client = incident.expedition.client
+            to_email = (client.email or '').strip() if client else ''
+            if to_email:
+                try:
+                    full_name = f"{(client.prenom or '').strip()} {(client.nom or '').strip()}".strip() or "Client"
+                    subject = f"[Logistique Pro] {titre}"
+                    body = (
+                        f"Bonjour {full_name},\n\n"
+                        f"Un incident a été signalé concernant votre expédition {exp_code or ref}.\n"
+                        f"Type: {incident.get_type_incident_display()}\n"
+                        f"Détails: {message}\n\n"
+                        f"Référence alerte: #{alerte.id}\n\n"
+                        "Cordialement,\n"
+                        "Logistique Pro\n"
+                    )
+                    send_mail(
+                        subject=subject,
+                        message=body,
+                        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+                        recipient_list=[to_email],
+                        fail_silently=False,
+                    )
+                except Exception:
+                    logger.exception("Failed to send client email for incident_id=%s", incident.id)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
