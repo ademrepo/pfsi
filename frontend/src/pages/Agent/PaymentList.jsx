@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { CreditCard, Plus, Download, MoreVertical } from 'lucide-react';
+import { CreditCard, Plus, Download, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -181,8 +181,14 @@ const PaymentList = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <button className="btn-icon">
-                                        <MoreVertical size={18} />
+                                    <button
+                                        className="btn-icon"
+                                        type="button"
+                                        title="Supprimer"
+                                        onClick={() => handleDelete(p.id)}
+                                        style={{ color: '#b91c1c' }}
+                                    >
+                                        <Trash2 size={18} />
                                     </button>
                                 </td>
                             </tr>

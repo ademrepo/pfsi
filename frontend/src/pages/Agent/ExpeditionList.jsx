@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { Search, Download, Plus, Calendar, Filter, MoreVertical, TrendingUp } from 'lucide-react';
+import { Search, Download, Plus, Calendar, Filter, TrendingUp, Lock, Trash2 } from 'lucide-react';
 
 const ExpeditionList = () => {
     const [expeditions, setExpeditions] = useState([]);
@@ -62,10 +62,20 @@ const ExpeditionList = () => {
     };
 
     // Filter expeditions based on active tab
-    const filteredExpeditions = expeditions.filter(exp => {
-        const matchesSearch = exp.code_expedition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exp.client_details?.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exp.destination_details?.ville?.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredExpeditions = expeditions.filter((exp) => {
+        const query = (searchTerm || '').trim().toLowerCase();
+        if (!query) return true;
+
+        const code = (exp.code_expedition || '').toLowerCase();
+        const clientNom = (exp.client_details?.nom || '').toLowerCase();
+        const clientPrenom = (exp.client_details?.prenom || '').toLowerCase();
+        const destVille = (exp.destination_details?.ville || '').toLowerCase();
+
+        const matchesSearch =
+            code.includes(query) ||
+            clientNom.includes(query) ||
+            clientPrenom.includes(query) ||
+            destVille.includes(query);
         
         if (!matchesSearch) return false;
 
@@ -203,9 +213,6 @@ const ExpeditionList = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th style={{ width: '40px' }}>
-                                <input type="checkbox" />
-                            </th>
                             <th>N° DE SUIVI</th>
                             <th>EXPÉDITEUR</th>
                             <th>DESTINATAIRE</th>
@@ -217,9 +224,6 @@ const ExpeditionList = () => {
                     <tbody>
                         {filteredExpeditions.map((exp) => (
                             <tr key={exp.id}>
-                                <td>
-                                    <input type="checkbox" />
-                                </td>
                                 <td>
                                     <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>
                                         {exp.code_expedition}
@@ -262,24 +266,41 @@ const ExpeditionList = () => {
                                     </span>
                                 </td>
                                 <td>
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                        {!exp.tournee && (
-                                            <>
-                                                <Link
-                                                    to={`/expeditions/${exp.id}/edit`}
-                                                    style={{
-                                                        textDecoration: 'none',
-                                                        color: 'var(--text-secondary)',
-                                                        fontSize: '0.875rem',
-                                                        fontWeight: '500'
-                                                    }}
-                                                >
-                                                    Modifier
-                                                </Link>
-                                            </>
-                                        )}
-                                        <button className="btn-icon">
-                                            <MoreVertical size={18} />
+                                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                                        {(() => {
+                                            const isDelivered = exp.statut === 'Livré' || exp.statut === 'LivrÃ©';
+                                            const canEdit = !isDelivered && !exp.tournee;
+                                            if (canEdit) {
+                                                return (
+                                                    <Link
+                                                        to={`/expeditions/${exp.id}/edit`}
+                                                        style={{
+                                                            textDecoration: 'none',
+                                                            color: 'var(--text-secondary)',
+                                                            fontSize: '0.875rem',
+                                                            fontWeight: '500'
+                                                        }}
+                                                    >
+                                                        Modifier
+                                                    </Link>
+                                                );
+                                            }
+
+                                            if (isDelivered) {
+                                                return <Lock size={18} title="Livrée" style={{ color: 'var(--text-muted)' }} />;
+                                            }
+
+                                            return <span style={{ color: 'var(--text-muted)' }}>—</span>;
+                                        })()}
+
+                                        <button
+                                            className="btn-icon"
+                                            type="button"
+                                            title="Supprimer"
+                                            onClick={() => handleDelete(exp.id)}
+                                            style={{ color: '#b91c1c' }}
+                                        >
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
                                 </td>
@@ -287,7 +308,7 @@ const ExpeditionList = () => {
                         ))}
                         {filteredExpeditions.length === 0 && (
                             <tr>
-                                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                                     Aucune expédition trouvée.
                                 </td>
                             </tr>
@@ -305,10 +326,6 @@ const ExpeditionList = () => {
                 color: 'var(--text-muted)'
             }}>
                 <span>Affichage de 1 à {filteredExpeditions.length} sur {stats.total} résultats</span>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="secondary" style={{ padding: '0.5rem 1rem' }}>Précédent</button>
-                    <button style={{ padding: '0.5rem 1rem' }}>Suivant</button>
-                </div>
             </div>
         </div>
     );

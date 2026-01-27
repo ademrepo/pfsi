@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { FileSpreadsheet, Plus, Download, MoreVertical, Eye } from 'lucide-react';
+import { FileSpreadsheet, Plus, Download, Eye, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -219,8 +219,14 @@ const InvoiceList = () => {
                                                 <Eye size={18} />
                                             </button>
                                         </Link>
-                                        <button className="btn-icon">
-                                            <MoreVertical size={18} />
+                                        <button
+                                            className="btn-icon"
+                                            type="button"
+                                            title="Supprimer"
+                                            onClick={() => handleDelete(f.id)}
+                                            style={{ color: '#b91c1c' }}
+                                        >
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
                                 </td>

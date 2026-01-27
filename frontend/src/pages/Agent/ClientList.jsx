@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { Users, Plus, Download, MoreVertical } from 'lucide-react';
+import { Users, Plus, Download, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -30,15 +30,31 @@ const ClientList = () => {
         }
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm('Voulez-vous vraiment supprimer ce client ?')) return;
+        try {
+            await api.delete(`/clients/${id}/`);
+            fetchClients();
+        } catch (err) {
+            const errorMsg = err.response?.data?.detail || "Impossible de supprimer ce client.";
+            alert(errorMsg);
+        }
+    };
+
     if (loading) return <div className="page-container">Chargement...</div>;
     if (error) return <div className="page-container error">{error}</div>;
 
-    const filteredClients = clients.filter(client =>
-        client.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.prenom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.code_client.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredClients = clients.filter((client) => {
+        const query = (searchTerm || '').trim().toLowerCase();
+        if (!query) return true;
+
+        const nom = (client.nom || '').toLowerCase();
+        const prenom = (client.prenom || '').toLowerCase();
+        const email = (client.email || '').toLowerCase();
+        const code = (client.code_client || '').toLowerCase();
+
+        return nom.includes(query) || prenom.includes(query) || email.includes(query) || code.includes(query);
+    });
 
     const totalBalance = clients.reduce((sum, c) => sum + (Number(c.solde) || 0), 0);
     const activeClients = clients.filter(c => c.solde < 0).length;
@@ -149,8 +165,14 @@ const ClientList = () => {
                                         >
                                             Modifier
                                         </Link>
-                                        <button className="btn-icon">
-                                            <MoreVertical size={18} />
+                                        <button
+                                            className="btn-icon"
+                                            type="button"
+                                            title="Supprimer"
+                                            onClick={() => handleDelete(client.id)}
+                                            style={{ color: '#b91c1c' }}
+                                        >
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
                                 </td>

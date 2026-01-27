@@ -5,7 +5,19 @@ import { Truck, LayoutDashboard, TrendingUp, Package, MapPin, AlertCircle, Bell,
 const Sidebar = ({ user, onLogout }) => {
     if (!user) return null;
 
-    const isAdmin = user.role_code === 'ADMIN';
+    const ROLE_LABELS = {
+        ADMIN: 'Administrateur',
+        AGENT: 'Agent',
+        LOGISTIQUE: 'Logistique',
+        COMPTABLE: 'Comptable',
+        DIRECTION: 'Direction',
+        CHAUFFEUR: 'Chauffeur',
+    };
+
+    const roleCode = user.role_code;
+    const isAdmin = roleCode === 'ADMIN';
+    const roleLabel = ROLE_LABELS[roleCode] || user.role_display || roleCode || 'Utilisateur';
+    const portalLabel = `Portail ${roleLabel}`;
 
     return (
         <div className="sidebar">
@@ -15,13 +27,13 @@ const Sidebar = ({ user, onLogout }) => {
                 </div>
                 <div className="sidebar-logo-text">
                     <h2>Logistique Pro</h2>
-                    <p>Portail Admin</p>
+                    <p>{portalLabel}</p>
                 </div>
             </div>
 
             <div className="user-info">
                 <h3>{user.full_name || user.username}</h3>
-                <span className="role-badge">{user.role_display}</span>
+                <span className="role-badge">{roleLabel}</span>
             </div>
 
             <nav>

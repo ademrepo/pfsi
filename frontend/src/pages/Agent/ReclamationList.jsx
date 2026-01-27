@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api';
-import { FileText, Plus, Download, MoreVertical } from 'lucide-react';
+import { FileText, Plus, Download, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -30,6 +30,17 @@ const ReclamationList = () => {
         } catch (e) {
             setError("Erreur lors du chargement des réclamations.");
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Voulez-vous vraiment supprimer cette réclamation ?')) return;
+        try {
+            await api.delete(`/reclamations/${id}/`);
+            fetchItems();
+        } catch (err) {
+            const errorMsg = err.response?.data?.detail || "Impossible de supprimer cette réclamation.";
+            alert(errorMsg);
         }
     };
 
@@ -165,8 +176,14 @@ const ReclamationList = () => {
                                         >
                                             Modifier
                                         </Link>
-                                        <button className="btn-icon">
-                                            <MoreVertical size={18} />
+                                        <button
+                                            className="btn-icon"
+                                            type="button"
+                                            title="Supprimer"
+                                            onClick={() => handleDelete(r.id)}
+                                            style={{ color: '#b91c1c' }}
+                                        >
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
                                 </td>

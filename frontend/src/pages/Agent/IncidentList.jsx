@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../../api';
-import { AlertTriangle, Plus, Download, MoreVertical } from 'lucide-react';
+import { AlertTriangle, Plus, Download, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -51,6 +51,17 @@ const IncidentList = () => {
         } catch (e) {
             setError("Erreur lors du chargement des incidents.");
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Voulez-vous vraiment supprimer cet incident ?')) return;
+        try {
+            await api.delete(`/incidents/${id}/`);
+            fetchIncidents();
+        } catch (err) {
+            const errorMsg = err.response?.data?.detail || "Impossible de supprimer cet incident.";
+            alert(errorMsg);
         }
     };
 
@@ -173,8 +184,14 @@ const IncidentList = () => {
                                     </span>
                                 </td>
                                 <td>
-                                    <button className="btn-icon">
-                                        <MoreVertical size={18} />
+                                    <button
+                                        className="btn-icon"
+                                        type="button"
+                                        title="Supprimer"
+                                        onClick={() => handleDelete(inc.id)}
+                                        style={{ color: '#b91c1c' }}
+                                    >
+                                        <Trash2 size={18} />
                                     </button>
                                 </td>
                             </tr>
