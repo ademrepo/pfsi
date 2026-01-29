@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
+import PageHeader from '../../components/PageHeader';
+import { ArrowLeft } from 'lucide-react';
 
 const ClientForm = () => {
     const { id } = useParams();
@@ -75,12 +77,35 @@ const ClientForm = () => {
 
     return (
         <div className="page-container">
-            <h1>{isEdit ? 'Modifier le client' : 'Nouveau client'}</h1>
+            <button 
+                onClick={() => navigate('/clients')}
+                style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    marginBottom: '1rem',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0'
+                }}
+            >
+                <ArrowLeft size={18} />
+                Retour aux clients
+            </button>
+
+            <PageHeader 
+                title={isEdit ? 'Modifier le client' : 'Nouveau client'}
+                subtitle={isEdit ? 'Modifiez les informations du client' : 'Créez un nouveau client dans la base de données'}
+            />
+
             <div className="form-card" style={{ maxWidth: '900px' }}>
                 <form onSubmit={handleSubmit}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div className="form-group">
-                            <label>Type</label>
+                            <label>Type de client</label>
                             <select name="type_client" value={formData.type_client} onChange={handleChange} required>
                                 <option value="particulier">Particulier</option>
                                 <option value="entreprise">Entreprise</option>
@@ -88,39 +113,39 @@ const ClientForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Nom</label>
-                            <input name="nom" value={formData.nom} onChange={handleChange} required />
+                            <label>Nom *</label>
+                            <input name="nom" value={formData.nom} onChange={handleChange} placeholder="Nom du client" required />
                         </div>
 
                         <div className="form-group">
                             <label>Prénom</label>
-                            <input name="prenom" value={formData.prenom} onChange={handleChange} />
+                            <input name="prenom" value={formData.prenom} onChange={handleChange} placeholder="Prénom du client" />
                         </div>
 
                         <div className="form-group">
                             <label>Téléphone</label>
-                            <input name="telephone" value={formData.telephone} onChange={handleChange} />
+                            <input name="telephone" value={formData.telephone} onChange={handleChange} placeholder="+33 6 12 34 56 78" />
                         </div>
 
                         <div className="form-group">
                             <label>Email</label>
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="client@exemple.fr" />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Ville</label>
+                            <input name="ville" value={formData.ville} onChange={handleChange} placeholder="Paris" />
                         </div>
 
                         <div className="form-group">
                             <label>Pays</label>
-                            <input name="pays" value={formData.pays} onChange={handleChange} />
+                            <input name="pays" value={formData.pays} onChange={handleChange} placeholder="France" />
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label>Adresse</label>
-                        <textarea name="adresse" value={formData.adresse} onChange={handleChange} rows="2" />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Ville</label>
-                        <input name="ville" value={formData.ville} onChange={handleChange} />
+                        <label>Adresse complète</label>
+                        <textarea name="adresse" value={formData.adresse} onChange={handleChange} rows="3" placeholder="123 Rue de la République, 75001 Paris" />
                     </div>
 
                     <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
@@ -138,4 +163,3 @@ const ClientForm = () => {
 };
 
 export default ClientForm;
-

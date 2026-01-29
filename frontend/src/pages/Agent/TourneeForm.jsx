@@ -327,6 +327,15 @@ const TourneeForm = () => {
                         <button type="submit" disabled={loading}>
                             {loading ? 'Enregistrement...' : isEdit ? 'Mettre à jour' : 'Créer la tournée'}
                         </button>
+                        {isEdit && (
+                            <button
+                                type="button"
+                                className="secondary"
+                                onClick={() => navigate(`/incidents/nouveau?tournee_id=${id}`)}
+                            >
+                                Signaler un incident
+                            </button>
+                        )}
                         <button type="button" className="secondary" onClick={() => navigate('/tournees')}>
                             Annuler
                         </button>

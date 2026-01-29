@@ -4,7 +4,10 @@ from django.db import models
 from .models import (
     Utilisateur, Role, AuditLog,
     Client, Chauffeur, Vehicule, Destination, TypeService, Tarification,
-    Expedition, TrackingExpedition, Tournee, Facture, FactureExpedition, Paiement
+    Expedition, TrackingExpedition, Tournee,
+    Incident, IncidentAttachment, Alerte,
+    Reclamation, ReclamationExpedition,
+    Facture, FactureExpedition, Paiement
 )
 
 
@@ -19,7 +22,10 @@ class LoginSerializer(serializers.Serializer):
         
         if username and password:
             try:
-                user = Utilisateur.objects.select_related('role').get(username=username)
+                if '@' in username:
+                    user = Utilisateur.objects.select_related('role').get(email__iexact=username)
+                else:
+                    user = Utilisateur.objects.select_related('role').get(username=username)
             except Utilisateur.DoesNotExist:
                 raise serializers.ValidationError(
                     "Nom d'utilisateur ou mot de passe incorrect."
@@ -50,6 +56,23 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Le nom d'utilisateur et le mot de passe sont requis."
             )
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password_confirm']:
+            raise serializers.ValidationError({
+                'new_password': "Les mots de passe ne correspondent pas."
+            })
+        return attrs
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -220,6 +243,156 @@ class TrackingExpeditionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrackingExpedition
         fields = '__all__'
+
+
+class IncidentAttachmentSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IncidentAttachment
+        fields = ['id', 'file', 'file_url', 'original_name', 'uploaded_by', 'uploaded_at']
+        read_only_fields = ['uploaded_by', 'uploaded_at']
+
+    def get_file_url(self, obj):
+        if obj.file and hasattr(obj.file, 'url'):
+            return obj.file.url
+        return None
+
+
+class IncidentSerializer(serializers.ModelSerializer):
+    attachments = IncidentAttachmentSerializer(many=True, read_only=True)
+    expedition_code = serializers.CharField(source='expedition.code_expedition', read_only=True)
+    tournee_code = serializers.CharField(source='tournee.code_tournee', read_only=True)
+
+    class Meta:
+        model = Incident
+        fields = '__all__'
+        read_only_fields = ('code_incident', 'action_appliquee', 'created_by', 'created_at', 'updated_at')
+
+    def validate(self, attrs):
+        expedition = attrs.get('expedition') if 'expedition' in attrs else getattr(self.instance, 'expedition', None)
+        tournee = attrs.get('tournee') if 'tournee' in attrs else getattr(self.instance, 'tournee', None)
+
+        if bool(expedition) == bool(tournee):
+            raise serializers.ValidationError("Vous devez renseigner soit une expédition soit une tournée (pas les deux).")
+
+        # notify_client n'a de sens que pour une expédition (client)
+        notify_client = attrs.get('notify_client') if 'notify_client' in attrs else getattr(self.instance, 'notify_client', False)
+        if notify_client and not expedition:
+            raise serializers.ValidationError({'notify_client': "Disponible uniquement pour un incident lié à une expédition."})
+
+        return attrs
+
+
+class AlerteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alerte
+        fields = '__all__'
+        read_only_fields = ('created_at',)
+
+
+class ReclamationSerializer(serializers.ModelSerializer):
+    client_details = ClientSerializer(source='client', read_only=True)
+    facture_details = serializers.SerializerMethodField()
+    type_service_details = TypeServiceSerializer(source='type_service', read_only=True)
+
+    expedition_codes = serializers.SerializerMethodField()
+    expedition_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
+
+    class Meta:
+        model = Reclamation
+        fields = '__all__'
+
+    def get_expedition_codes(self, obj):
+        codes = []
+        if obj.expedition_id and obj.expedition and obj.expedition.code_expedition:
+            codes.append(obj.expedition.code_expedition)
+        # M2M
+        try:
+            for exp in obj.expeditions.all():
+                if exp and exp.code_expedition and exp.code_expedition not in codes:
+                    codes.append(exp.code_expedition)
+        except Exception:
+            pass
+        return codes
+
+    def get_facture_details(self, obj):
+        facture = getattr(obj, 'facture', None)
+        if not facture:
+            return None
+        serializer_cls = globals().get('FactureSerializer')
+        if serializer_cls is None:
+            # Fallback minimal
+            return {'id': facture.id, 'numero_facture': getattr(facture, 'numero_facture', None)}
+        return serializer_cls(facture).data
+
+    def validate(self, attrs):
+        expedition = attrs.get('expedition') if 'expedition' in attrs else getattr(self.instance, 'expedition', None)
+        expedition_ids = attrs.get('expedition_ids', None)
+        facture = attrs.get('facture') if 'facture' in attrs else getattr(self.instance, 'facture', None)
+        type_service = attrs.get('type_service') if 'type_service' in attrs else getattr(self.instance, 'type_service', None)
+
+        has_colis = bool(expedition) or bool(expedition_ids and len(expedition_ids) > 0)
+        if not (has_colis or facture or type_service):
+            raise serializers.ValidationError(
+                "Une réclamation doit être liée à au moins un colis (expédition), une facture ou un service."
+            )
+
+        return attrs
+
+    def _sync_expeditions(self, reclamation: Reclamation, expedition_ids):
+        if expedition_ids is None:
+            return
+
+        expedition_ids = [int(x) for x in expedition_ids]
+        expedition_ids = list(dict.fromkeys(expedition_ids))  # dedupe keep order
+
+        # Set "expedition" main link to first one (legacy column)
+        if expedition_ids:
+            reclamation.expedition_id = expedition_ids[0]
+            reclamation.save(update_fields=['expedition_id'])
+
+        # Ensure M2M links match list
+        ReclamationExpedition.objects.filter(reclamation=reclamation).exclude(expedition_id__in=expedition_ids).delete()
+        existing = set(ReclamationExpedition.objects.filter(reclamation=reclamation).values_list('expedition_id', flat=True))
+        to_create = [ReclamationExpedition(reclamation=reclamation, expedition_id=eid) for eid in expedition_ids if eid not in existing]
+        if to_create:
+            ReclamationExpedition.objects.bulk_create(to_create)
+
+        # If no ids provided, do not touch legacy expedition unless explicitly set to null by caller.
+
+    def create(self, validated_data):
+        expedition_ids = validated_data.pop('expedition_ids', None)
+        reclamation = super().create(validated_data)
+
+        # If legacy expedition is set but M2M empty, mirror it for "1 colis" cases
+        if expedition_ids is None and reclamation.expedition_id:
+            expedition_ids = [reclamation.expedition_id]
+
+        self._sync_expeditions(reclamation, expedition_ids)
+        return reclamation
+
+    def update(self, instance, validated_data):
+        expedition_ids = validated_data.pop('expedition_ids', None)
+
+        statut_before = instance.statut
+        instance = super().update(instance, validated_data)
+
+        # Auto-set resolution date when moving to RESOLUE
+        from django.utils import timezone
+        if instance.statut == 'RESOLUE' and not instance.date_resolution:
+            instance.date_resolution = timezone.now().date()
+            instance.save(update_fields=['date_resolution'])
+        if statut_before == 'RESOLUE' and instance.statut != 'RESOLUE':
+            # keep date_resolution as history (do not clear)
+            pass
+
+        # Keep M2M in sync
+        if expedition_ids is None and instance.expedition_id and instance.expeditions.count() == 0:
+            expedition_ids = [instance.expedition_id]
+        self._sync_expeditions(instance, expedition_ids)
+
+        return instance
 
 
 class ExpeditionSerializer(serializers.ModelSerializer):

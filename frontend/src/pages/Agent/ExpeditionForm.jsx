@@ -179,6 +179,15 @@ const ExpeditionForm = () => {
                         <button type="submit" disabled={loading}>
                             {loading ? 'Enregistrement...' : isEdit ? 'Mettre à jour' : 'Créer l\'expédition'}
                         </button>
+                        {isEdit && (
+                            <button
+                                type="button"
+                                className="secondary"
+                                onClick={() => navigate(`/incidents/nouveau?expedition_id=${id}`)}
+                            >
+                                Signaler un incident
+                            </button>
+                        )}
                         <button type="button" className="secondary" onClick={() => navigate('/expeditions')}>
                             Annuler
                         </button>

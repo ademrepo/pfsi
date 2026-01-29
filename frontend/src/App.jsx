@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import api from './api';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
 import Layout from './components/Layout';
 import ExpeditionList from './pages/Agent/ExpeditionList';
 import ExpeditionForm from './pages/Agent/ExpeditionForm';
@@ -10,6 +13,11 @@ import ClientList from './pages/Agent/ClientList';
 import ClientForm from './pages/Agent/ClientForm';
 import TourneeList from './pages/Agent/TourneeList';
 import TourneeForm from './pages/Agent/TourneeForm';
+import IncidentList from './pages/Agent/IncidentList';
+import IncidentForm from './pages/Agent/IncidentForm';
+import AlerteList from './pages/Agent/AlerteList';
+import ReclamationList from './pages/Agent/ReclamationList';
+import ReclamationForm from './pages/Agent/ReclamationForm';
 import InvoiceList from './pages/Agent/InvoiceList';
 import InvoiceForm from './pages/Agent/InvoiceForm';
 import InvoiceDetail from './pages/Agent/InvoiceDetail';
@@ -37,8 +45,14 @@ function App() {
             const response = await api.get('/auth/me/');
             setUser(response.data);
         } catch (error) {
-            console.log("No active session");
+            console.log("No active session or backend not available:", error.message);
             setUser(null);
+            // Clear any stale session cookies
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
         } finally {
             setLoading(false);
         }
@@ -69,10 +83,19 @@ function App() {
                     !user ? <Login onLogin={handleLoginSuccess} /> : <Navigate to="/" replace />
                 } />
 
+                <Route path="/forgot-password" element={
+                    !user ? <ForgotPassword /> : <Navigate to="/" replace />
+                } />
+
+                <Route path="/reset-password" element={
+                    !user ? <ResetPassword /> : <Navigate to="/" replace />
+                } />
+
                 <Route element={
                     user ? <Layout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace state={{ from: location }} />
                 }>
                     <Route path="/" element={<Dashboard user={user} />} />
+                    <Route path="/analytics" element={<Analytics />} />
 
                     {/* Opérations & Référentiels (Unified Access) */}
                     <Route path="/expeditions" element={<ExpeditionList />} />
@@ -84,6 +107,12 @@ function App() {
                     <Route path="/tournees" element={<TourneeList />} />
                     <Route path="/tournees/nouveau" element={<TourneeForm />} />
                     <Route path="/tournees/:id/edit" element={<TourneeForm />} />
+                    <Route path="/incidents" element={<IncidentList />} />
+                    <Route path="/incidents/nouveau" element={<IncidentForm />} />
+                    <Route path="/alertes" element={<AlerteList />} />
+                    <Route path="/reclamations" element={<ReclamationList />} />
+                    <Route path="/reclamations/nouveau" element={<ReclamationForm />} />
+                    <Route path="/reclamations/:id/edit" element={<ReclamationForm />} />
 
                     <Route path="/factures" element={<InvoiceList />} />
                     <Route path="/factures/nouveau" element={<InvoiceForm />} />

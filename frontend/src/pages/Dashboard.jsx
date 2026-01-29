@@ -1,80 +1,236 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { TrendingUp, Package, Truck, Users, FileText, MapPin } from 'lucide-react';
 
 const Dashboard = ({ user }) => {
     return (
         <div className="page-container">
-            <div className="dashboard-header" style={{ marginBottom: '2.5rem' }}>
-                <h1 style={{ margin: 0 }}>Bonjour, {user?.full_name || user?.username} 👋</h1>
-                <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                    Voici l'état actuel de votre plateforme de gestion de transport.
+            <div className="page-header">
+                <h1>Tableau de Bord</h1>
+                <p className="page-subtitle">
+                    Aperçu global de votre activité logistique
                 </p>
             </div>
 
             <div className="stats-grid">
                 <div className="stat-card">
-                    <span style={{ fontSize: '2rem', marginBottom: '1rem', display: 'block' }}>📦</span>
-                    <h3 style={{ marginBottom: '0.5rem' }}>Expéditions</h3>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                        Gérez les envois, le tracking et la facturation.
-                    </p>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <Link to="/expeditions/nouveau" className="btn-primary" style={{ textDecoration: 'none', padding: '0.5rem 1rem' }}>+ Nouveau</Link>
-                        <Link to="/expeditions" className="btn-primary" style={{ textDecoration: 'none', background: 'var(--bg-main)', color: 'var(--text-main)', padding: '0.5rem 1rem', border: '1px solid var(--border)' }}>Consulter</Link>
+                    <div className="stat-card-header">
+                        <span className="stat-card-label">Total Expéditions</span>
+                    </div>
+                    <div className="stat-card-value">1,248</div>
+                    <div className="stat-card-meta">
+                        <span className="badge-increase">
+                            <TrendingUp size={12} />
+                            12%
+                        </span>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <span style={{ fontSize: '2rem', marginBottom: '1rem', display: 'block' }}>🚚</span>
-                    <h3 style={{ marginBottom: '0.5rem' }}>Tournées</h3>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                        Organisez et affectez vos livraisons aux chauffeurs.
-                    </p>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <Link to="/tournees/nouveau" className="btn-primary" style={{ textDecoration: 'none', padding: '0.5rem 1rem' }}>+ Planifier</Link>
-                        <Link to="/tournees" className="btn-primary" style={{ textDecoration: 'none', background: 'var(--bg-main)', color: 'var(--text-main)', padding: '0.5rem 1rem', border: '1px solid var(--border)' }}>Journal</Link>
+                    <div className="stat-card-header">
+                        <span className="stat-card-label">En cours de livraison</span>
+                    </div>
+                    <div className="stat-card-value">89</div>
+                    <div className="stat-card-meta">
+                        <span className="status-badge status-actif">ACTIF</span>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <span style={{ fontSize: '2rem', marginBottom: '1rem', display: 'block' }}>📈</span>
-                    <h3 style={{ marginBottom: '0.5rem' }}>Statistiques</h3>
-                    <div style={{ marginTop: '1rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Missions en cours</span>
-                            <span className="status-badge status-Validé">En attente</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Taux de livraison</span>
-                            <span style={{ fontWeight: '600' }}>94%</span>
-                        </div>
+                    <div className="stat-card-header">
+                        <span className="stat-card-label">En transit</span>
+                    </div>
+                    <div className="stat-card-value">342</div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-card-header">
+                        <span className="stat-card-label">Retards</span>
+                    </div>
+                    <div className="stat-card-value">12</div>
+                    <div className="stat-card-meta">
+                        <span className="status-badge status-action-requise">ACTION REQUISE</span>
                     </div>
                 </div>
             </div>
 
-            <div className="section-header" style={{ marginTop: '3rem', marginBottom: '1.5rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Référentiels Métier</h2>
+            <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem' }}>
+                    Accès Rapide
+                </h2>
+                <div className="stats-grid">
+                    <Link to="/expeditions" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    background: 'var(--sidebar-active-bg)', 
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--primary)'
+                                }}>
+                                    <Package size={24} />
+                                </div>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                                        Expéditions
+                                    </h3>
+                                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                                        Gérez les envois
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+
+                    <Link to="/tournees" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    background: 'var(--status-transit-bg)', 
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--status-transit-text)'
+                                }}>
+                                    <Truck size={24} />
+                                </div>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                                        Tournées
+                                    </h3>
+                                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                                        Planifier les livraisons
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+
+                    <Link to="/clients" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    background: 'var(--status-delivered-bg)', 
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--status-delivered-text)'
+                                }}>
+                                    <Users size={24} />
+                                </div>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                                        Clients
+                                    </h3>
+                                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                                        Base clients
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+
+                    <Link to="/factures" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ 
+                                    width: '48px', 
+                                    height: '48px', 
+                                    background: '#DBEAFE', 
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#1E40AF'
+                                }}>
+                                    <FileText size={24} />
+                                </div>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                                        Facturation
+                                    </h3>
+                                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                                        Factures et paiements
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
             </div>
 
-            <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-                <Link to="/chauffeurs" style={{ textDecoration: 'none' }}>
-                    <div className="stat-card" style={{ textAlign: 'center', transition: 'transform 0.2s' }}>
-                        <span style={{ fontSize: '1.5rem' }}>👨‍✈️</span>
-                        <h4 style={{ color: 'var(--text-main)', marginTop: '0.5rem' }}>Chauffeurs</h4>
-                    </div>
-                </Link>
-                <Link to="/vehicules" style={{ textDecoration: 'none' }}>
-                    <div className="stat-card" style={{ textAlign: 'center', transition: 'transform 0.2s' }}>
-                        <span style={{ fontSize: '1.5rem' }}>🚛</span>
-                        <h4 style={{ color: 'var(--text-main)', marginTop: '0.5rem' }}>Véhicules</h4>
-                    </div>
-                </Link>
-                <Link to="/destinations" style={{ textDecoration: 'none' }}>
-                    <div className="stat-card" style={{ textAlign: 'center', transition: 'transform 0.2s' }}>
-                        <span style={{ fontSize: '1.5rem' }}>📍</span>
-                        <h4 style={{ color: 'var(--text-main)', marginTop: '0.5rem' }}>Destinations</h4>
-                    </div>
-                </Link>
+            <div style={{ marginTop: '3rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem' }}>
+                    Référentiels Métier
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                    <Link to="/chauffeurs" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
+                            <div style={{ 
+                                width: '56px', 
+                                height: '56px', 
+                                background: 'var(--bg-page)', 
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--primary)',
+                                margin: '0 auto 1rem'
+                            }}>
+                                <Users size={28} />
+                            </div>
+                            <h4 style={{ color: 'var(--text-main)', margin: 0, fontWeight: '600' }}>Chauffeurs</h4>
+                        </div>
+                    </Link>
+
+                    <Link to="/vehicules" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
+                            <div style={{ 
+                                width: '56px', 
+                                height: '56px', 
+                                background: 'var(--bg-page)', 
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--primary)',
+                                margin: '0 auto 1rem'
+                            }}>
+                                <Truck size={28} />
+                            </div>
+                            <h4 style={{ color: 'var(--text-main)', margin: 0, fontWeight: '600' }}>Véhicules</h4>
+                        </div>
+                    </Link>
+
+                    <Link to="/destinations" style={{ textDecoration: 'none' }}>
+                        <div className="stat-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
+                            <div style={{ 
+                                width: '56px', 
+                                height: '56px', 
+                                background: 'var(--bg-page)', 
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--primary)',
+                                margin: '0 auto 1rem'
+                            }}>
+                                <MapPin size={28} />
+                            </div>
+                            <h4 style={{ color: 'var(--text-main)', margin: 0, fontWeight: '600' }}>Destinations</h4>
+                        </div>
+                    </Link>
+                </div>
             </div>
         </div>
     );
