@@ -75,8 +75,21 @@ const InvoiceForm = () => {
             <div className="form-card" style={{ maxWidth: '900px' }}>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Sélectionner un Client</label>
-                        <select value={selectedClient} onChange={e => setSelectedClient(e.target.value)} required>
+                        <label>SÉLECTIONNER UN CLIENT</label>
+                        <select
+                            value={selectedClient}
+                            onChange={e => setSelectedClient(e.target.value)}
+                            required
+                            style={{
+                                borderRadius: '12px',
+                                appearance: 'none',
+                                backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 12px center',
+                                paddingRight: '35px',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <option value="">-- Choisir un client --</option>
                             {clients.map(c => <option key={c.id} value={c.id}>{c.nom} {c.prenom}</option>)}
                         </select>
@@ -136,11 +149,30 @@ const InvoiceForm = () => {
                         </>
                     )}
 
-                    <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                        <button type="submit" disabled={loading || selectedExpeditions.length === 0}>
-                            {loading ? 'Création...' : 'Générer la facture'}
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                        <button
+                            type="submit"
+                            disabled={loading || selectedExpeditions.length === 0}
+                            style={{
+                                borderRadius: '25px',
+                                padding: '0.75rem 2rem',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                background: '#0d9488',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {loading ? 'Création...' : 'Enregistrer les modifications'}
                         </button>
-                        <button type="button" className="secondary" onClick={() => navigate('/factures')}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => navigate('/factures')}
+                            style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                        >
                             Annuler
                         </button>
                     </div>

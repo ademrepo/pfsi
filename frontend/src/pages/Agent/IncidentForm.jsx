@@ -121,16 +121,40 @@ const IncidentForm = () => {
                 <form onSubmit={submit}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div className="form-group">
-                            <label>Concerne</label>
-                            <select value={targetType} onChange={(e) => setTargetType(e.target.value)}>
+                            <label>CONCERNE</label>
+                            <select
+                                value={targetType}
+                                onChange={(e) => setTargetType(e.target.value)}
+                                style={{
+                                    borderRadius: '12px',
+                                    appearance: 'none',
+                                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '35px',
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 <option value="EXPEDITION">Expédition</option>
                                 <option value="TOURNEE">Tournée</option>
                             </select>
                         </div>
 
                         <div className="form-group">
-                            <label>Type d'incident</label>
-                            <select value={typeIncident} onChange={(e) => setTypeIncident(e.target.value)}>
+                            <label>TYPE D'INCIDENT</label>
+                            <select
+                                value={typeIncident}
+                                onChange={(e) => setTypeIncident(e.target.value)}
+                                style={{
+                                    borderRadius: '12px',
+                                    appearance: 'none',
+                                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '35px',
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 {INCIDENT_TYPES.map((t) => (
                                     <option key={t.value} value={t.value}>{t.label}</option>
                                 ))}
@@ -215,11 +239,30 @@ const IncidentForm = () => {
                         )}
                     </div>
 
-                    <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                        <button type="submit" disabled={loading}>
-                            {loading ? 'Enregistrement...' : 'Créer l’incident'}
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                borderRadius: '25px',
+                                padding: '0.75rem 2rem',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                background: '#0d9488',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
                         </button>
-                        <button type="button" className="secondary" onClick={() => navigate(-1)}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => navigate(-1)}
+                            style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                        >
                             Annuler
                         </button>
                     </div>

@@ -56,7 +56,7 @@ const AlerteList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Alertes"
                 subtitle="Notifications système et alertes importantes"
             />
@@ -90,9 +90,9 @@ const AlerteList = () => {
                                 </td>
                                 <td>{a.destination}</td>
                                 <td>
-                                    {a.created_at ? new Date(a.created_at).toLocaleDateString('fr-FR', { 
-                                        day: '2-digit', 
-                                        month: 'short', 
+                                    {a.created_at ? new Date(a.created_at).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'short',
                                         year: 'numeric',
                                         hour: '2-digit',
                                         minute: '2-digit'

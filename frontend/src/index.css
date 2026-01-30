@@ -4,8 +4,8 @@
   --primary: #65350F;
   --primary-hover: #7D5F33;
   --primary-dark: #6B5029;
-  --bg-main: #FAF8F5;
-  --bg-page: #F5F3EF;
+  --bg-main: #F3F1ED;
+  --bg-page: #E8E6E2;
   --bg-sidebar: #FFFFFF;
   --sidebar-text: #6B7280;
   --sidebar-active: #96753D;
@@ -18,8 +18,8 @@
   --text-black: #000000;
   /* Explicit black */
   --surface: #FFFFFF;
-  --border: #E5E7EB;
-  --border-light: #F3F4F6;
+  --border: #D1D5DB;
+  --border-light: #E5E7EB;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -84,7 +84,16 @@ body {
   border-right: 1px solid var(--border-light);
   z-index: 50;
   position: relative;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar--collapsed {
@@ -424,7 +433,7 @@ table {
 }
 
 th {
-  background: var(--bg-page);
+  background: #F9FAFB;
   padding: 1rem 1.5rem;
   font-size: 0.7rem;
   font-weight: 700;
@@ -541,49 +550,64 @@ button.secondary:hover {
 
 /* Badges */
 /* Strict Status Colors for Expeditions */
+/* Badges */
+/* Strict Status Colors for Expeditions */
 .status-badge {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.status-en-cours,
+.status-en_livraison,
 .status-En-cours,
-.status-actif,
-.status-ACTIF {
+.status-en-cours {
   background: #E0F2F1 !important;
   color: #00695C !important;
 }
 
-.status-en-transit,
-.status-En-transit {
-  background: #E0F7FA !important;
-  color: #00838F !important;
-}
-
-.status-en-centre,
+.status-centre_tri,
 .status-centre-tri {
   background: #EFEBE9 !important;
   color: #5D4037 !important;
 }
 
-.status-Livré,
+.status-en_transit,
+.status-en-transit {
+  background: #E0F7FA !important;
+  color: #00838F !important;
+}
+
 .status-livre,
 .status-delivered {
   background: #E8F5E9 !important;
   color: #2E7D32 !important;
 }
 
-.status-retard,
-.status-delayed {
-  background: #FFEBEE !important;
-  color: #C62828 !important;
+.status-enregistre,
+.status-neutral {
+  background: #F5F5F5 !important;
+  color: #757575 !important;
 }
 
+.status-retard,
+.status-delayed,
 .status-action-requise {
-  background: #FFEBEE !important;
-  color: #C62828 !important;
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+}
+
+.status-conge {
+  background: #FDF2E9 !important;
+  color: #966840 !important;
+}
+
+.status-indisponible {
+  background: #F1F3F5 !important;
+  color: #6B7280 !important;
 }
 
 .badge-increase {

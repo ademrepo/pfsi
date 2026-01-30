@@ -1,22 +1,35 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Download, Plus, Calendar, Filter, MoreVertical } from 'lucide-react';
+import { TrendingUp, Printer, Plus, Calendar, MoreVertical, Trash2 } from 'lucide-react';
 import api from '../api';
 
 const PAGE_SIZE = 10;
 const JOURS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
-const getStatusClass = (status) => {
-  const map = {
-    'Enregistré': 'status-enregistre',
-    'Validé': 'status-valide',
-    'En transit': 'status-en-transit',
-    'En centre de tri': 'status-centre-tri',
-    'En cours de livraison': 'status-en-cours',
-    'Livré': 'status-livre',
-    'Échec de livraison': 'status-retard',
-  };
-  return map[status] || 'status-neutral';
+const getStatusInfo = (status) => {
+  const norm = (status || '').toString().toLowerCase().trim();
+  switch (norm) {
+    case 'en_livraison':
+    case 'en cours de livraison':
+      return { label: 'En cours de livraison', className: 'status-en_livraison' };
+    case 'centre_tri':
+    case 'en centre de tri':
+      return { label: 'En centre de tri', className: 'status-centre_tri' };
+    case 'en_transit':
+    case 'en transit':
+      return { label: 'En transit', className: 'status-en_transit' };
+    case 'livre':
+    case 'livré':
+      return { label: 'Livré', className: 'status-livre' };
+    case 'enregistre':
+    case 'enregistré':
+      return { label: 'Enregistré', className: 'status-enregistre' };
+    case 'echec_livraison':
+    case 'échec de livraison':
+      return { label: 'Échec de livraison', className: 'status-retard' };
+    default:
+      return { label: status || '—', className: 'status-neutral' };
+  }
 };
 
 const Dashboard = ({ user }) => {
@@ -71,13 +84,17 @@ const Dashboard = ({ user }) => {
 
   const stats = useMemo(() => {
     const list = expeditions;
+    // Helper for stats counting using the normalized status keys if possible, or just string matching
+    // We'll normalize for consistency when counting
+    const count = (matches) => list.filter(e => matches.includes((e.statut || '').toLowerCase())).length;
+
     return {
       total: list.length,
-      enCours: list.filter((e) => e.statut === 'En cours de livraison').length,
-      enTransit: list.filter((e) => e.statut === 'En transit').length,
-      centreTri: list.filter((e) => e.statut === 'En centre de tri').length,
-      livres: list.filter((e) => e.statut === 'Livré').length,
-      retards: list.filter((e) => e.statut === 'Échec de livraison').length,
+      enCours: count(['en_livraison', 'en cours de livraison']),
+      enTransit: count(['en_transit', 'en transit']),
+      centreTri: count(['centre_tri', 'en centre de tri']),
+      livres: count(['livre', 'livré']),
+      retards: count(['echec_livraison', 'échec de livraison']),
     };
   }, [expeditions]);
 
@@ -95,11 +112,12 @@ const Dashboard = ({ user }) => {
   );
 
   const filteredByTab = useMemo(() => {
+    const norm = (s) => (s || '').toLowerCase();
     if (tableTab === 'all') return expeditions;
-    if (tableTab === 'transit') return expeditions.filter((e) => e.statut === 'En transit');
-    if (tableTab === 'sorting') return expeditions.filter((e) => e.statut === 'En centre de tri');
-    if (tableTab === 'delivered') return expeditions.filter((e) => e.statut === 'Livré');
-    if (tableTab === 'delayed') return expeditions.filter((e) => e.statut === 'Échec de livraison');
+    if (tableTab === 'transit') return expeditions.filter((e) => ['en_transit', 'en transit'].includes(norm(e.statut)));
+    if (tableTab === 'sorting') return expeditions.filter((e) => ['centre_tri', 'en centre de tri'].includes(norm(e.statut)));
+    if (tableTab === 'delivered') return expeditions.filter((e) => ['livre', 'livré', 'livrÃ©'].includes(norm(e.statut))); // Handle encoding issue just in case
+    if (tableTab === 'delayed') return expeditions.filter((e) => ['echec_livraison', 'échec de livraison'].includes(norm(e.statut)));
     return expeditions;
   }, [expeditions, tableTab]);
 
@@ -179,6 +197,19 @@ const Dashboard = ({ user }) => {
     }
   }
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Voulez-vous vraiment supprimer cette expédition ?')) {
+      try {
+        await api.delete(`/expeditions/${id}/`);
+        // Refresh local state without full reload
+        setExpeditions(current => current.filter(e => e.id !== id));
+      } catch (err) {
+        const errorMsg = err.response?.data?.[0] || "Impossible de supprimer cette expédition (déjà liée à une tournée).";
+        alert(errorMsg);
+      }
+    }
+  };
+
   if (loading && expeditions.length === 0) {
     return (
       <div className="page-container">
@@ -196,8 +227,8 @@ const Dashboard = ({ user }) => {
         </div>
         <div className="dashboard-header-actions">
           <button type="button" className="dashboard-btn-export" onClick={handleExport}>
-            <Download size={18} />
-            Exporter
+            <Printer size={18} />
+            Imprimer
           </button>
           <Link to="/expeditions/nouveau" className="dashboard-btn-create">
             <Plus size={18} />
@@ -294,9 +325,7 @@ const Dashboard = ({ user }) => {
                 ))}
               </div>
             )}
-            <button type="button" className="btn-icon" title="Filtres">
-              <Filter size={18} />
-            </button>
+
           </div>
         </div>
 
@@ -304,9 +333,6 @@ const Dashboard = ({ user }) => {
           <table>
             <thead>
               <tr>
-                <th style={{ width: 48 }}>
-                  <input type="checkbox" aria-label="Tout sélectionner" />
-                </th>
                 <th>N° de suivi</th>
                 <th>Expéditeur</th>
                 <th>Destinataire</th>
@@ -333,11 +359,11 @@ const Dashboard = ({ user }) => {
                   ? new Date(exp.date_creation).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
                   : '';
                 const service = exp.type_service_details?.libelle || '—';
+
+                const { label: statusLabel, className: statusClass } = getStatusInfo(exp.statut);
+
                 return (
                   <tr key={exp.id}>
-                    <td>
-                      <input type="checkbox" aria-label={`Sélectionner ${exp.code_expedition}`} />
-                    </td>
                     <td>
                       <Link
                         to={`/expeditions/${exp.id}/edit`}
@@ -381,17 +407,28 @@ const Dashboard = ({ user }) => {
                       <p className="table-secondary-text" style={{ margin: 0 }}>{timeStr}</p>
                     </td>
                     <td>
-                      <span className={`status-badge ${getStatusClass(exp.statut)}`}>{exp.statut}</span>
+                      <span className={`status-badge ${statusClass}`}>{statusLabel}</span>
                     </td>
                     <td>
-                      <Link
-                        to={`/expeditions/${exp.id}/edit`}
-                        className="btn-icon"
-                        title="Voir / modifier"
-                        style={{ display: 'inline-flex' }}
-                      >
-                        <MoreVertical size={20} />
-                      </Link>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <Link
+                          to={`/expeditions/${exp.id}/edit`}
+                          className="btn-icon"
+                          title="Voir / modifier"
+                          style={{ display: 'inline-flex' }}
+                        >
+                          <MoreVertical size={20} />
+                        </Link>
+                        <button
+                          className="btn-icon"
+                          type="button"
+                          title="Supprimer"
+                          onClick={() => handleDelete(exp.id)}
+                          style={{ color: '#b91c1c' }}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

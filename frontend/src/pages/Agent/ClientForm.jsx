@@ -77,7 +77,7 @@ const ClientForm = () => {
 
     return (
         <div className="page-container">
-            <button 
+            <button
                 onClick={() => navigate('/clients')}
                 style={{
                     background: 'transparent',
@@ -96,7 +96,7 @@ const ClientForm = () => {
                 Retour aux clients
             </button>
 
-            <PageHeader 
+            <PageHeader
                 title={isEdit ? 'Modifier le client' : 'Nouveau client'}
                 subtitle={isEdit ? 'Modifiez les informations du client' : 'Créez un nouveau client dans la base de données'}
             />
@@ -105,8 +105,22 @@ const ClientForm = () => {
                 <form onSubmit={handleSubmit}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div className="form-group">
-                            <label>Type de client</label>
-                            <select name="type_client" value={formData.type_client} onChange={handleChange} required>
+                            <label>TYPE DE CLIENT</label>
+                            <select
+                                name="type_client"
+                                value={formData.type_client}
+                                onChange={handleChange}
+                                required
+                                style={{
+                                    borderRadius: '12px',
+                                    appearance: 'none',
+                                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '35px',
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 <option value="particulier">Particulier</option>
                                 <option value="entreprise">Entreprise</option>
                             </select>
@@ -148,11 +162,30 @@ const ClientForm = () => {
                         <textarea name="adresse" value={formData.adresse} onChange={handleChange} rows="3" placeholder="123 Rue de la République, 75001 Paris" />
                     </div>
 
-                    <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                        <button type="submit" disabled={loading}>
-                            {loading ? 'Enregistrement...' : isEdit ? 'Mettre à jour' : 'Créer le client'}
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                borderRadius: '25px',
+                                padding: '0.75rem 2rem',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                background: '#0d9488',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {loading ? 'Enregistrement...' : isEdit ? 'Enregistrer les modifications' : 'Créer le client'}
                         </button>
-                        <button type="button" className="secondary" onClick={() => navigate('/clients')}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => navigate('/clients')}
+                            style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                        >
                             Annuler
                         </button>
                     </div>

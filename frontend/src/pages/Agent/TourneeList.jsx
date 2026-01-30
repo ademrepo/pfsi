@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { Truck, Plus, Download, MapPin, Trash2 } from 'lucide-react';
+import { Truck, Plus, Printer, MapPin, Trash2, MoreVertical } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -84,7 +84,7 @@ const TourneeList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Journal des Tournées"
                 subtitle="Planifiez et suivez vos tournées de livraison"
             />
@@ -95,9 +95,9 @@ const TourneeList = () => {
                 searchPlaceholder="Rechercher une tournée, chauffeur..."
                 actions={
                     <>
-                        <button className="secondary">
-                            <Download size={18} />
-                            Exporter
+                        <button className="secondary" onClick={() => window.print()}>
+                            <Printer size={18} />
+                            Imprimer
                         </button>
                         <Link to="/tournees/nouveau" style={{ textDecoration: 'none' }}>
                             <button>
@@ -147,7 +147,7 @@ const TourneeList = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <span style={{ 
+                                    <span style={{
                                         background: 'var(--bg-page)',
                                         padding: '0.35rem 0.75rem',
                                         borderRadius: '6px',
@@ -166,14 +166,11 @@ const TourneeList = () => {
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                         <Link
                                             to={`/tournees/${t.id}/edit`}
-                                            style={{
-                                                textDecoration: 'none',
-                                                color: 'var(--text-secondary)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: '500'
-                                            }}
+                                            className="btn-icon"
+                                            title="Modifier"
+                                            style={{ color: 'var(--text-secondary)' }}
                                         >
-                                            Modifier
+                                            <MoreVertical size={20} />
                                         </Link>
                                         <button
                                             className="btn-icon"

@@ -110,10 +110,12 @@ const UserForm = () => {
     };
 
     return (
-        <div className="page-container">
-            <h1>{isEdit ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'}</h1>
+        <div className="page-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <h1 style={{ width: '100%', maxWidth: '600px', textAlign: 'left', marginBottom: '1.5rem' }}>
+                {isEdit ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'}
+            </h1>
 
-            <form onSubmit={handleSubmit} style={{ background: 'white', padding: '2rem', maxWidth: '600px', borderRadius: '8px' }}>
+            <form onSubmit={handleSubmit} style={{ background: 'white', padding: '2.5rem', maxWidth: '600px', width: '100%', borderRadius: '12px', boxShadow: 'var(--shadow-md)' }}>
 
                 <div className="form-group">
                     <label>Nom d'utilisateur</label>
@@ -142,9 +144,23 @@ const UserForm = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Rôle</label>
-                    <select name="role_id" value={formData.role_id} onChange={handleChange} required>
-                        <option value="">Sélectionner...</option>
+                    <label>RÔLE</label>
+                    <select
+                        name="role_id"
+                        value={formData.role_id}
+                        onChange={handleChange}
+                        required
+                        style={{
+                            borderRadius: '12px',
+                            appearance: 'none',
+                            backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 12px center',
+                            paddingRight: '35px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <option value="">Sélectionner un rôle...</option>
                         {roles.map(r => (
                             <option key={r.id} value={r.id}>{r.libelle}</option>
                         ))}
@@ -152,36 +168,81 @@ const UserForm = () => {
                 </div>
 
                 <div className="form-group">
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <input type="checkbox" name="is_active" checked={formData.is_active} onChange={handleChange} />
-                        Compte Actif
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontWeight: '500' }}>
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            checked={formData.is_active}
+                            onChange={handleChange}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        />
+                        COMPTE ACTIF
                     </label>
                 </div>
 
                 {!isEdit && (
                     <>
-                        <hr />
-                        <div className="form-group">
-                            <label>Mot de passe</label>
-                            <input type="password" name="password" value={formData.password} onChange={handleChange} required={!isEdit} />
-                        </div>
-                        <div className="form-group">
-                            <label>Confirmer Mot de passe</label>
-                            <input type="password" name="password_confirm" value={formData.password_confirm} onChange={handleChange} required={!isEdit} />
+                        <hr style={{ margin: '1.5rem 0', border: '0', borderTop: '1px solid var(--border)' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="form-group">
+                                <label>MOT DE PASSE</label>
+                                <input type="password" name="password" value={formData.password} onChange={handleChange} required={!isEdit} style={{ borderRadius: '12px' }} />
+                            </div>
+                            <div className="form-group">
+                                <label>CONFIRMER MOT DE PASSE</label>
+                                <input type="password" name="password_confirm" value={formData.password_confirm} onChange={handleChange} required={!isEdit} style={{ borderRadius: '12px' }} />
+                            </div>
                         </div>
                     </>
                 )}
 
-                <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                    <button type="submit" disabled={loading}>{loading ? 'Enregistrement...' : 'Enregistrer'}</button>
+                <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        style={{
+                            borderRadius: '25px',
+                            padding: '0.75rem 2rem',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            transition: 'all 0.2s',
+                            background: '#0d9488',
+                            color: 'white',
+                            border: 'none',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                    </button>
 
                     {isEdit && (
-                        <button type="button" className="secondary" onClick={handleResetPassword} style={{ background: '#ecc94b', opacity: 1 }}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={handleResetPassword}
+                            style={{
+                                background: '#C68E17',
+                                color: 'white',
+                                borderRadius: '25px',
+                                padding: '0.75rem 1.5rem',
+                                border: 'none',
+                                fontWeight: '600',
+                                opacity: 1,
+                                cursor: 'pointer'
+                            }}
+                        >
                             Réinitialiser MDP
                         </button>
                     )}
 
-                    <button type="button" className="secondary" onClick={() => navigate('/admin/users')}>Annuler</button>
+                    <button
+                        type="button"
+                        className="secondary"
+                        onClick={() => navigate('/admin/users')}
+                        style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                    >
+                        Annuler
+                    </button>
                 </div>
             </form>
         </div>

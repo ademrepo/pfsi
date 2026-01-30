@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { Users, Plus, Download, Trash2 } from 'lucide-react';
+import { Users, Plus, Printer, Trash2, MoreVertical } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -73,7 +73,7 @@ const ClientList = () => {
         {
             label: 'Solde Total',
             value: `${totalBalance.toFixed(2)} €`,
-            badge: totalBalance < 0 ? 
+            badge: totalBalance < 0 ?
                 <span className="status-badge status-livre">Crédit</span> :
                 <span className="status-badge status-retard">Débit</span>
         }
@@ -81,7 +81,7 @@ const ClientList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Clients"
                 subtitle="Gérez votre base de données clients"
             />
@@ -92,9 +92,9 @@ const ClientList = () => {
                 searchPlaceholder="Rechercher un client..."
                 actions={
                     <>
-                        <button className="secondary">
-                            <Download size={18} />
-                            Exporter
+                        <button className="secondary" onClick={() => window.print()}>
+                            <Printer size={18} />
+                            Imprimer
                         </button>
                         <Link to="/clients/nouveau" style={{ textDecoration: 'none' }}>
                             <button>
@@ -145,7 +145,7 @@ const ClientList = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <div style={{ 
+                                    <div style={{
                                         fontWeight: '600',
                                         color: Number(client.solde) < 0 ? 'var(--status-delivered-text)' : 'var(--status-delayed-text)'
                                     }}>
@@ -156,14 +156,11 @@ const ClientList = () => {
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                         <Link
                                             to={`/clients/${client.id}/edit`}
-                                            style={{
-                                                textDecoration: 'none',
-                                                color: 'var(--text-secondary)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: '500'
-                                            }}
+                                            className="btn-icon"
+                                            title="Modifier"
+                                            style={{ color: 'var(--text-secondary)' }}
                                         >
-                                            Modifier
+                                            <MoreVertical size={20} />
                                         </Link>
                                         <button
                                             className="btn-icon"

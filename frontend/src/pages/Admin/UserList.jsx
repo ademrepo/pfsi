@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { Users, Plus, Download, MoreVertical } from 'lucide-react';
+import { Users, Plus, Printer, MoreVertical, Ban } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -66,7 +66,7 @@ const UserList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Utilisateurs"
                 subtitle="Gestion des comptes utilisateurs et des accès"
             />
@@ -77,9 +77,9 @@ const UserList = () => {
                 searchPlaceholder="Rechercher un utilisateur..."
                 actions={
                     <>
-                        <button className="secondary">
-                            <Download size={18} />
-                            Exporter
+                        <button className="secondary" onClick={() => window.print()}>
+                            <Printer size={18} />
+                            Imprimer
                         </button>
                         <Link to="/admin/users/create" style={{ textDecoration: 'none' }}>
                             <button>
@@ -108,9 +108,12 @@ const UserList = () => {
                         {filteredUsers.map(u => (
                             <tr key={u.id}>
                                 <td>
-                                    <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>
+                                    <Link
+                                        to={`/admin/users/${u.id}/edit`}
+                                        style={{ fontWeight: '600', color: 'var(--primary)', textDecoration: 'none' }}
+                                    >
                                         {u.username}
-                                    </div>
+                                    </Link>
                                 </td>
                                 <td>{u.full_name}</td>
                                 <td>
@@ -126,35 +129,29 @@ const UserList = () => {
                                     )}
                                 </td>
                                 <td>
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', marginLeft: '-4px' }}>
                                         <Link
                                             to={`/admin/users/${u.id}/edit`}
-                                            style={{
-                                                textDecoration: 'none',
-                                                color: 'var(--text-secondary)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: '500'
-                                            }}
+                                            className="btn-icon"
+                                            title="Modifier"
+                                            style={{ color: 'var(--text-secondary)' }}
                                         >
-                                            Modifier
+                                            <MoreVertical size={20} />
                                         </Link>
                                         <button
                                             onClick={() => toggleStatus(u)}
+                                            className="btn-icon"
+                                            title={u.is_active ? 'Désactiver' : 'Activer'}
                                             style={{
+                                                color: u.is_active ? '#ef4444' : '#10b981',
                                                 background: 'transparent',
-                                                border: '1px solid var(--border)',
-                                                color: u.is_active ? 'var(--status-delayed-text)' : 'var(--status-delivered-text)',
-                                                padding: '0.5rem 1rem',
-                                                borderRadius: 'var(--radius-sm)',
+                                                border: 'none',
                                                 cursor: 'pointer',
-                                                fontSize: '0.875rem',
-                                                fontWeight: '500'
+                                                display: 'flex',
+                                                alignItems: 'center'
                                             }}
                                         >
-                                            {u.is_active ? 'Désactiver' : 'Activer'}
-                                        </button>
-                                        <button className="btn-icon">
-                                            <MoreVertical size={18} />
+                                            <Ban size={20} />
                                         </button>
                                     </div>
                                 </td>

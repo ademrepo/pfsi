@@ -173,11 +173,20 @@ const TourneeForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Statut</label>
+                            <label>STATUT</label>
                             <select
                                 value={formData.statut}
                                 onChange={e => setFormData({ ...formData, statut: e.target.value })}
                                 required
+                                style={{
+                                    borderRadius: '12px',
+                                    appearance: 'none',
+                                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '35px',
+                                    cursor: 'pointer'
+                                }}
                             >
                                 <option value="Préparée">Préparée</option>
                                 <option value="En cours">En cours</option>
@@ -187,11 +196,20 @@ const TourneeForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Chauffeur</label>
+                            <label>CHAUFFEUR</label>
                             <select
                                 value={formData.chauffeur}
                                 onChange={e => setFormData({ ...formData, chauffeur: e.target.value })}
                                 required
+                                style={{
+                                    borderRadius: '12px',
+                                    appearance: 'none',
+                                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '35px',
+                                    cursor: 'pointer'
+                                }}
                             >
                                 <option value="">Choisir un chauffeur</option>
                                 {data.chauffeurs.map(c => (
@@ -201,11 +219,20 @@ const TourneeForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Véhicule</label>
+                            <label>VÉHICULE</label>
                             <select
                                 value={formData.vehicule}
                                 onChange={e => setFormData({ ...formData, vehicule: e.target.value })}
                                 required
+                                style={{
+                                    borderRadius: '12px',
+                                    appearance: 'none',
+                                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '35px',
+                                    cursor: 'pointer'
+                                }}
                             >
                                 <option value="">Choisir un véhicule</option>
                                 {data.vehicules.map(v => (
@@ -323,20 +350,40 @@ const TourneeForm = () => {
                         </table>
                     </div>
 
-                    <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                        <button type="submit" disabled={loading}>
-                            {loading ? 'Enregistrement...' : isEdit ? 'Mettre à jour' : 'Créer la tournée'}
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                borderRadius: '25px',
+                                padding: '0.75rem 2rem',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                background: '#0d9488',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {loading ? 'Enregistrement...' : isEdit ? 'Enregistrer les modifications' : 'Créer la tournée'}
                         </button>
                         {isEdit && (
                             <button
                                 type="button"
                                 className="secondary"
                                 onClick={() => navigate(`/incidents/nouveau?tournee_id=${id}`)}
+                                style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
                             >
                                 Signaler un incident
                             </button>
                         )}
-                        <button type="button" className="secondary" onClick={() => navigate('/tournees')}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => navigate('/tournees')}
+                            style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                        >
                             Annuler
                         </button>
                     </div>

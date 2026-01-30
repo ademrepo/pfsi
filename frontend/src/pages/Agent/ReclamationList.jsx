@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api';
-import { FileText, Plus, Download, Trash2 } from 'lucide-react';
+import { FileText, Plus, Printer, Trash2, MoreVertical } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -85,7 +85,7 @@ const ReclamationList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Réclamations"
                 subtitle="Gestion des réclamations clients"
             />
@@ -96,9 +96,9 @@ const ReclamationList = () => {
                 searchPlaceholder="Rechercher une réclamation..."
                 actions={
                     <>
-                        <button className="secondary">
-                            <Download size={18} />
-                            Exporter
+                        <button className="secondary" onClick={() => window.print()}>
+                            <Printer size={18} />
+                            Imprimer
                         </button>
                         <Link to="/reclamations/nouveau" style={{ textDecoration: 'none' }}>
                             <button>
@@ -134,10 +134,10 @@ const ReclamationList = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    {r.date_reclamation ? new Date(r.date_reclamation).toLocaleDateString('fr-FR', { 
-                                        day: '2-digit', 
-                                        month: 'short', 
-                                        year: 'numeric' 
+                                    {r.date_reclamation ? new Date(r.date_reclamation).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric'
                                     }) : '-'}
                                 </td>
                                 <td>
@@ -167,14 +167,11 @@ const ReclamationList = () => {
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                         <Link
                                             to={`/reclamations/${r.id}/edit`}
-                                            style={{
-                                                textDecoration: 'none',
-                                                color: 'var(--text-secondary)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: '500'
-                                            }}
+                                            className="btn-icon"
+                                            title="Modifier"
+                                            style={{ color: 'var(--text-secondary)' }}
                                         >
-                                            Modifier
+                                            <MoreVertical size={20} />
                                         </Link>
                                         <button
                                             className="btn-icon"
