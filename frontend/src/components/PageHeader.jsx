@@ -8,7 +8,7 @@ const PageHeader = ({ title, subtitle, actions }) => {
                 {subtitle && <p className="page-subtitle">{subtitle}</p>}
             </div>
             {actions && (
-                <div className="page-header-actions">
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
                     {actions}
                 </div>
             )}
