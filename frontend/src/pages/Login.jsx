@@ -40,7 +40,7 @@ const Login = ({ onLogin }) => {
                     <div className="login-logo-icon">
                         <Truck size={24} strokeWidth={2.5} />
                     </div>
-                    <span className="login-logo-text">Logistique Pro</span>
+                    <span className="login-logo-text">DeliveryForSure</span>
                 </div>
 
                 <h1 className="login-title">Connexion</h1>
@@ -50,8 +50,8 @@ const Login = ({ onLogin }) => {
                 </p>
 
                 {error && (
-                    <div style={{ 
-                        background: 'var(--status-delayed-bg)', 
+                    <div style={{
+                        background: 'var(--status-delayed-bg)',
                         color: 'var(--status-delayed-text)',
                         padding: '0.75rem 1rem',
                         borderRadius: 'var(--radius-sm)',

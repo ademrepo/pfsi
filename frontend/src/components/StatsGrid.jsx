@@ -1,7 +1,9 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatCard = ({ label, value, badge, trend, icon: Icon, borderColor, valueColor }) => {
+const StatCard = ({ label, value, badge, trend, icon: Icon, borderColor, valueColor, variant }) => {
+    const isBold = variant === 'bold';
+
     return (
         <div
             className="stat-card"
@@ -43,8 +45,8 @@ const StatCard = ({ label, value, badge, trend, icon: Icon, borderColor, valueCo
                 className="stat-card-value"
                 style={{
                     fontSize: '3rem',
-                    fontWeight: '300',
-                    letterSpacing: '-0.05em',
+                    fontWeight: isBold ? '700' : '300',
+                    letterSpacing: isBold ? 'normal' : '-0.05em',
                     color: valueColor || 'var(--text-main)'
                 }}
             >
@@ -63,11 +65,11 @@ const StatCard = ({ label, value, badge, trend, icon: Icon, borderColor, valueCo
     );
 };
 
-const StatsGrid = ({ stats }) => {
+const StatsGrid = ({ stats, variant }) => {
     return (
         <div className="stats-grid">
             {stats.map((stat, index) => (
-                <StatCard key={index} {...stat} />
+                <StatCard key={index} {...stat} variant={variant} />
             ))}
         </div>
     );

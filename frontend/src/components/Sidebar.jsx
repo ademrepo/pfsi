@@ -35,7 +35,7 @@ const Sidebar = ({ user, onLogout, collapsed = false, onToggle }) => {
                     <Truck size={20} strokeWidth={2.5} />
                 </div>
                 <div className="sidebar-logo-text">
-                    <h2>Logistique Pro</h2>
+                    <h2>DeliveryForSure</h2>
                     <p>{portalLabel}</p>
                 </div>
             </div>

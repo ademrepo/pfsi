@@ -91,7 +91,7 @@ const UserList = () => {
                 }
             />
 
-            <StatsGrid stats={stats} />
+            <StatsGrid stats={stats} variant="bold" />
 
             <div className="table-container">
                 <table>
