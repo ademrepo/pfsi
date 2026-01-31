@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
 import Layout from './components/Layout';
 import ExpeditionList from './pages/Agent/ExpeditionList';
+import ExpeditionDetail from './pages/Agent/ExpeditionDetail';
 import ExpeditionForm from './pages/Agent/ExpeditionForm';
 import ClientList from './pages/Agent/ClientList';
 import ClientForm from './pages/Agent/ClientForm';
@@ -23,6 +24,8 @@ import InvoiceForm from './pages/Agent/InvoiceForm';
 import InvoiceDetail from './pages/Agent/InvoiceDetail';
 import PaymentList from './pages/Agent/PaymentList';
 import PaymentForm from './pages/Agent/PaymentForm';
+import ChauffeurList from './pages/Agent/ChauffeurList';
+import ChauffeurForm from './pages/Agent/ChauffeurForm';
 
 import UserList from './pages/Admin/UserList';
 import UserForm from './pages/Admin/UserForm';
@@ -99,6 +102,7 @@ function App() {
 
                     {/* Opérations & Référentiels (Unified Access) */}
                     <Route path="/expeditions" element={<ExpeditionList />} />
+                    <Route path="/expeditions/:id" element={<ExpeditionDetail />} />
                     <Route path="/expeditions/nouveau" element={<ExpeditionForm />} />
                     <Route path="/expeditions/:id/edit" element={<ExpeditionForm />} />
                     <Route path="/clients" element={<ClientList />} />
@@ -121,18 +125,9 @@ function App() {
                     <Route path="/paiements" element={<PaymentList />} />
                     <Route path="/paiements/nouveau" element={<PaymentForm />} />
 
-                    <Route path="/chauffeurs" element={
-                        <ReadOnlyTable
-                            title="Référentiel Chauffeurs"
-                            endpoint="/chauffeurs/"
-                            columns={[
-                                { header: 'Nom', key: 'nom' },
-                                { header: 'Prénom', key: 'prenom' },
-                                { header: 'Téléphone', key: 'telephone' },
-                                { header: 'Permis', key: 'num_permis' }
-                            ]}
-                        />
-                    } />
+                    <Route path="/chauffeurs" element={<ChauffeurList />} />
+                    <Route path="/chauffeurs/nouveau" element={<ChauffeurForm />} />
+                    <Route path="/chauffeurs/:id/edit" element={<ChauffeurForm />} />
 
                     <Route path="/vehicules" element={
                         <ReadOnlyTable
@@ -141,8 +136,7 @@ function App() {
                             columns={[
                                 { header: 'Matricule', key: 'immatriculation' },
                                 { header: 'Marque', key: 'marque' },
-                                { header: 'Modèle', key: 'modele' },
-                                { header: 'Chauffeur', key: 'chauffeur_details', render: (v) => v.chauffeur_details ? `${v.chauffeur_details.nom} ${v.chauffeur_details.prenom}` : '-' }
+                                { header: 'Modèle', key: 'modele' }
                             ]}
                         />
                     } />
