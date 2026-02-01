@@ -54,6 +54,10 @@ echo Django Admin at: http://127.0.0.1:8000/admin/
 echo.
 echo Default login: admin / password123
 echo.
+echo Email: par défaut les emails s'affichent dans la console (console backend).
+echo Pour activer un vrai envoi SMTP, définissez EMAIL_HOST / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD avant de lancer.
+echo Exemple: voir docs\\email_smtp.md
+echo.
 
 REM Start both servers using npm scripts
 start "" cmd /k "npm run backend"

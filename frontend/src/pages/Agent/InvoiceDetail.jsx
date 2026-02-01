@@ -42,7 +42,7 @@ const InvoiceDetail = () => {
             <div className="invoice-print-container" style={{ background: 'white', padding: '3rem', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', maxWidth: '1000px', margin: '0 auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '2rem' }}>
                     <div>
-                        <h2 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>LOGISTIQUE PRO</h2>
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>DELIVERYFORSURE</h2>
                         <p>123 Rue de la Logistique</p>
                         <p>75000 PARIS</p>
                         <p>Tel: +33 1 23 45 67 89</p>

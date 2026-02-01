@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Logistique Pro - Incidents</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        'ups-brown': "#6F4B35",
+                        'ups-gold': "#C68E17",
+                        'ups-light-brown': "#966840",
+                        'background-high-contrast': "#F0F2F5",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body { @apply bg-background-high-contrast text-slate-900 antialiased; font-family: 'Inter', sans-serif; }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            @apply text-ups-brown relative;
+        }
+        .sidebar-active::after {
+            content: '';
+            @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-ups-gold rounded-r-full;
+        }
+        .crisp-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+        .sidebar-shadow {
+            box-shadow: 4px 0 24px -12px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+
+<body class="bg-background-high-contrast dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-72 flex-shrink-0 bg-white dark:bg-slate-900 relative flex flex-col sidebar-shadow z-20">
+            <div class="p-8 flex items-center space-x-3">
+                <div class="w-9 h-9 bg-ups-brown rounded flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-xl">local_shipping</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight text-ups-brown">Logistique Pro</h1>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Enterprise</p>
+                </div>
+            </div>
+            <nav class="flex-1 px-6 mt-4 space-y-2">
+                <a class="flex items-center space-x-4 px-4 py-3 text-slate-400 hover:text-ups-brown transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-medium text-sm">Tableau de bord</span>
+                </a>
+                <a class="flex items-center space-x-4 px-4 py-3 text-slate-400 hover:text-ups-brown transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <span class="font-medium text-sm">Expéditions</span>
+                </a>
+                <a class="sidebar-active flex items-center space-x-4 px-4 py-3 group" href="#">
+                    <span class="material-symbols-outlined">report_problem</span>
+                    <span class="font-medium text-sm">Incidents &amp; Litiges</span>
+                </a>
+                <a class="flex items-center space-x-4 px-4 py-3 text-slate-400 hover:text-ups-brown transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined">conveyor_belt</span>
+                    <span class="font-medium text-sm">Flotte &amp; Parc</span>
+                </a>
+                <a class="flex items-center space-x-4 px-4 py-3 text-slate-400 hover:text-ups-brown transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span class="font-medium text-sm">Analytiques</span>
+                </a>
+            </nav>
+            <div class="p-6 border-t border-slate-50 dark:border-slate-800">
+                <div class="flex items-center space-x-3 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <img alt="User" class="w-9 h-9 rounded-lg object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0a3N7QTldwvg92j0_ikAmofJuhmLbtb-RRqmDIQlEwvWSniA9-4p-TMj7tZHaogxU5B6lmAqkITS_AiBhRdVav-XllHrFWKPisqxXULwsarxwZjG9QIBm9I3AFxAJdTbXIWzX9uk6Ti8Op06stjkaRME0YpzMySXOKwSgh29aA3BUgIFDwcx-6dXhoiBlo7tGZiwTWGr7ZYO5SOqsqOb681VA6gdY8hEKPL6NAvO0MBBAJO9qads99W01UN9mb7SdDMTMyXGNDg" />
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-sm font-semibold truncate">Alex Morgan</p>
+                        <p class="text-[10px] text-slate-500 truncate uppercase tracking-tighter">Gestionnaire
+                            Logistique</p>
+                    </div>
+                    <button class="text-slate-400 hover:text-ups-brown">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                    </button>
+                </div>
+            </div>
+            <div class="absolute -right-3 top-1/2 -translate-y-1/2 z-10">
+                <button
+                    class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 w-6 h-6 rounded-full flex items-center justify-center shadow-sm text-slate-400 hover:text-ups-brown transition-all">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                </button>
+            </div>
+        </aside>
+        <main class="flex-1 overflow-y-auto p-12">
+            <header class="flex justify-between items-end mb-12">
+                <div>
+                    <nav class="flex items-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        <span>Console</span>
+                        <span class="material-symbols-outlined text-xs mx-2">chevron_right</span>
+                        <span class="text-ups-gold">Incidents</span>
+                    </nav>
+                    <h2 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Incidents</h2>
+                    <p class="text-slate-500 text-sm mt-1">Suivez et gérez les incidents signalés</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button
+                        class="bg-white border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded font-medium transition-all hover:bg-slate-50 dark:hover:bg-slate-900 flex items-center space-x-2 text-sm shadow-sm">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        <span>Exporter</span>
+                    </button>
+                    <button
+                        class="bg-ups-brown hover:bg-ups-light-brown text-white px-6 py-3 rounded font-medium transition-all shadow-md shadow-ups-brown/10 flex items-center space-x-2 text-sm">
+                        <span class="material-symbols-outlined text-lg">add</span>
+                        <span>Signaler un incident</span>
+                    </button>
+                </div>
+            </header>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-lg p-8 border-l-4 border-ups-brown crisp-shadow flex flex-col justify-between h-40">
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Incidents</h3>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-light text-ups-brown tracking-tighter">0</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-lg p-8 border-l-4 border-ups-gold crisp-shadow flex flex-col justify-between h-40">
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Retards</h3>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-light text-ups-gold tracking-tighter">0</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-lg p-8 border-l-4 border-slate-300 crisp-shadow flex flex-col justify-between h-40">
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pertes</h3>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-light text-slate-300 tracking-tighter">0</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-lg p-8 border-l-4 border-slate-400 crisp-shadow flex flex-col justify-between h-40">
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Endommagements</h3>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-light text-slate-400 tracking-tighter">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-6 mb-8">
+                <div class="flex-1 min-w-[400px] relative group">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-ups-brown">search</span>
+                    <input
+                        class="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md focus:ring-1 focus:ring-ups-brown focus:border-ups-brown outline-none text-sm transition-all placeholder:text-slate-400 crisp-shadow"
+                        placeholder="Rechercher par code, type ou référence..." type="text" />
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <button
+                            class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-ups-brown px-5 py-3 rounded-md flex items-center space-x-3 text-sm font-semibold hover:border-ups-gold transition-colors crisp-shadow">
+                            <span>Tous les statuts</span>
+                            <span class="material-symbols-outlined text-ups-gold text-lg">keyboard_arrow_down</span>
+                        </button>
+                    </div>
+                    <button
+                        class="p-3 bg-white border border-slate-200 dark:border-slate-800 rounded-md text-slate-400 hover:bg-slate-50 hover:text-ups-brown transition-all crisp-shadow">
+                        <span class="material-symbols-outlined">tune</span>
+                    </button>
+                </div>
+            </div>
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl crisp-shadow border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-100 dark:border-slate-800">
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">CODE
+                            </th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">DATE
+                            </th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">TYPE
+                            </th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+                                RÉFÉRENCE</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+                                ACTION STATUT</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+                                PIÈCES JOINTES</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+                                ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="px-8 py-24 text-center" colspan="7">
+                                <div class="flex flex-col items-center justify-center text-slate-400">
+                                    <span
+                                        class="material-symbols-outlined text-5xl mb-4 text-slate-200">folder_off</span>
+                                    <p class="text-sm font-medium">Aucun incident trouvé</p>
+                                    <p class="text-xs mt-1">Les nouveaux incidents apparaîtront ici.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div
+                    class="px-8 py-6 bg-white dark:bg-slate-900 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Affichage 0 sur 0
+                        incidents</span>
+                    <div class="flex items-center space-x-2">
+                        <button
+                            class="px-4 py-2 border border-slate-100 dark:border-slate-800 rounded text-[10px] font-bold uppercase tracking-widest text-slate-300 cursor-not-allowed">Précédent</button>
+                        <button
+                            class="px-4 py-2 border border-slate-100 dark:border-slate-800 rounded text-[10px] font-bold uppercase tracking-widest text-slate-300 cursor-not-allowed">Suivant</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

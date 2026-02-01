@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Logistique Pro - Annuaire des Chauffeurs</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#966840", // Gold / Main Brand Color
+                        "primary-dark": "#5e422a", // Darker Brown
+                        "background-light": "#F9F8F6",
+                        "background-dark": "#121212",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active {
+            background-color: #FFFFFF;
+            border-left: 4px solid #966840;
+            color: #966840;
+        }
+        .dark .sidebar-active {
+            background-color: #1F1F1F;
+            border-left: 4px solid #966840;
+            color: #966840;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex">
+    <aside
+        class="w-64 border-r border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark relative flex flex-col shrink-0">
+        <div class="p-6 flex items-center gap-3">
+            <div class="bg-primary p-2 rounded-lg">
+                <span class="material-symbols-outlined text-white">local_shipping</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight">Logistique Pro</h1>
+                <p class="text-xs text-slate-500">Portal Admin</p>
+            </div>
+        </div>
+        <nav class="flex-1 mt-4 px-4 space-y-2">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-medium">Tableau de bord</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-medium">Expéditions</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 sidebar-active shadow-sm transition-colors" href="#">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-medium">Chauffeurs</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined">group</span>
+                <span class="font-medium">Clients</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="font-medium">Facturation</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="font-medium">Rapports</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors mb-4"
+                href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-medium">Paramètres</span>
+            </a>
+            <div class="flex items-center gap-3 p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+                <img alt="Avatar" class="w-10 h-10 rounded-lg"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZk_ig8E7pJDEmup5u-Pv2IwIIOjXlEzhlYW6tO3Wr4dRoDf1qoIA9L5Xfu3gQgrFlPC1ESJ6dVi_1vUh4UlbVMvZhC17oOxWBXEVOjchyU4lTYwjPzPMOchqzWyXz0gigzOnofRRB-lqXB_SGbBYFIm3deGqVhWFzUEtUiY-_zOfxOdS4GdCdWA6khaQ17aXICnBIZa-RF6PtWsgifHWhNkOH5hnkTQZPtUk56SvMvippI5Aq0FkuAOZZ_98sYS_e6etqFnELuQ" />
+                <div class="overflow-hidden">
+                    <p class="text-sm font-semibold truncate">Jean Dupont</p>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-wider">Responsable Logistique</p>
+                </div>
+            </div>
+        </div>
+        <button
+            class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform z-50">
+            <span class="material-symbols-outlined text-[16px] text-primary">chevron_left</span>
+        </button>
+    </aside>
+    <main class="flex-1 overflow-y-auto flex flex-col">
+        <header
+            class="h-20 flex items-center justify-between px-8 bg-white dark:bg-[#1A1A1A] border-b border-slate-200 dark:border-slate-800">
+            <div class="relative w-96">
+                <span
+                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                <input
+                    class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    placeholder="Rechercher un chauffeur, matricule..." type="text" />
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="relative p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span
+                        class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#1A1A1A]"></span>
+                </button>
+                <button
+                    class="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">help</span>
+                    Aide
+                </button>
+            </div>
+        </header>
+        <div class="p-8 space-y-8">
+            <div class="flex items-end justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Gestion des Chauffeurs</h2>
+                    <p class="text-slate-500 mt-1">Supervisez et gérez votre flotte de conducteurs en temps réel.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button
+                        class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold hover:shadow-md transition-all">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        Exporter
+                    </button>
+                    <button
+                        class="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-all shadow-lg shadow-primary/10">
+                        <span class="material-symbols-outlined text-[18px]">add</span>
+                        Ajouter un Chauffeur
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div
+                    class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <p class="text-sm text-slate-500 font-medium">Total Chauffeurs</p>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <span class="text-3xl font-bold">142</span>
+                        <span
+                            class="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">+4%</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <p class="text-sm text-slate-500 font-medium">Chauffeurs Actifs</p>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <span class="text-3xl font-bold">118</span>
+                        <span
+                            class="text-xs font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">Actif</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <p class="text-sm text-slate-500 font-medium">En Congé</p>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <span class="text-3xl font-bold">16</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <p class="text-sm text-slate-500 font-medium">Indisponibles</p>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <span class="text-3xl font-bold">8</span>
+                        <span
+                            class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Hors
+                            ligne</span>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div
+                    class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex gap-2">
+                        <button
+                            class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">Tous
+                            (142)</button>
+                        <button
+                            class="px-4 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium rounded-xl transition-colors">Actifs
+                            (118)</button>
+                        <button
+                            class="px-4 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium rounded-xl transition-colors">En
+                            congé (16)</button>
+                        <button
+                            class="px-4 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium rounded-xl transition-colors">Indisponibles
+                            (8)</button>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium">
+                            <span class="material-symbols-outlined text-[18px] text-slate-400">calendar_month</span>
+                            Oct 2023
+                            <span class="material-symbols-outlined text-[18px] text-slate-400">expand_more</span>
+                        </div>
+                        <button
+                            class="p-2 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <span class="material-symbols-outlined text-[20px] text-slate-500">filter_list</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead
+                            class="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
+                            <tr>
+                                <th class="p-5 w-10">
+                                    <input
+                                        class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary"
+                                        type="checkbox" />
+                                </th>
+                                <th class="p-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Chauffeur</th>
+                                <th class="p-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Matricule /
+                                    Véhicule</th>
+                                <th class="p-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Zone Actuelle
+                                </th>
+                                <th class="p-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Dernière
+                                    Livraison</th>
+                                <th class="p-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Statut</th>
+                                <th class="p-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="p-5">
+                                    <input
+                                        class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary"
+                                        type="checkbox" />
+                                </td>
+                                <td class="p-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Driver" class="w-10 h-10 rounded-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUXLf3Pdt3vBd5PVocPUuIcJ-rG6Z6B8lL7RSXJTdX43qonFVHoEEyb9ps_okeUyx0KKH_KFXDy4YH_XrqHQrnTxq6Mp3Ux3YvYmL42viGirZ9uQZq136F8Z6hvXxfsJUElqp3mm8LsTUDZSnVazPFUYXFW59PY9UN5KVkabcIgxhJ0iE-NYZDQjC2LES4Y8YEeyFEkNfNoDV_GtYEGr10TQpCYWutwL5yeFoggIwLhkDJkZA6MIM_IDyS_qOqsJuTSPyuocQdow" />
+                                        <div>
+                                            <p class="font-bold text-slate-900 dark:text-white">Marc Bernard</p>
+                                            <p class="text-xs text-slate-500">ID: #CH-10123</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">FR-908-JK</p>
+                                    <p class="text-xs text-slate-500">Mercedes Sprinter</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">Paris, FR</p>
+                                    <p class="text-xs text-slate-500">Secteur Nord</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">24 Oct. 2023</p>
+                                    <p class="text-xs text-slate-500">10:30 AM</p>
+                                </td>
+                                <td class="p-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E6F4F1] text-[#2D6A4F] dark:bg-emerald-900/30 dark:text-emerald-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Actif
+                                    </span>
+                                </td>
+                                <td class="p-5">
+                                    <button
+                                        class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                        <span class="material-symbols-outlined">more_vert</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="p-5">
+                                    <input
+                                        class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary"
+                                        type="checkbox" />
+                                </td>
+                                <td class="p-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Driver" class="w-10 h-10 rounded-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1WGspGzIOhhdNS1BCA03a8DXPGo7KIsvw5_v94AKoJEHo3gek-El7V1fAhnh2nATCYy2gHH6FzxawA2FuSRTSFjKAzO9-4PPOXOc9xtMTv_gjciKv1b2irv2iWi3lWcsjYXGdwjDcYvblHoHIvZmTvpy3bB-gZAQYfKK1mdhWjWIyT2iXsd9O8sZdLDdKgDQPKy8eO2KgQqQUdq5UDpHAciV6-J72YpDKHuLwDTGTO4KIwxUo_4ZFcNT-QC23FFpB490TkxHToQ" />
+                                        <div>
+                                            <p class="font-bold text-slate-900 dark:text-white">Thomas Lefebvre</p>
+                                            <p class="text-xs text-slate-500">ID: #CH-10145</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">AA-123-BB</p>
+                                    <p class="text-xs text-slate-500">Iveco Daily</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">Lyon, FR</p>
+                                    <p class="text-xs text-slate-500">Secteur Est</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">23 Oct. 2023</p>
+                                    <p class="text-xs text-slate-500">04:15 PM</p>
+                                </td>
+                                <td class="p-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FDF2E9] text-[#966840] dark:bg-amber-900/30 dark:text-amber-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        En congé
+                                    </span>
+                                </td>
+                                <td class="p-5">
+                                    <button
+                                        class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                        <span class="material-symbols-outlined">more_vert</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="p-5">
+                                    <input
+                                        class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary"
+                                        type="checkbox" />
+                                </td>
+                                <td class="p-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Driver" class="w-10 h-10 rounded-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnQwPvcNc1mdvNNYYsAiFcxuykliounUTxVD_eIlQanCQelh1QmkmFs4c013XlRv1KX0Vg3nFRh42flYWAt5T5iiQbGosPG-9CYH9pOUQ5UutGmv9C5UXjO1bkL6boL2WC3w7s3Rq2IvuF0tIZtqduFWPfbNk1v2mtTBgbMq3JxJixFkuUT8ResoN-8DYgwn6eQT0-FF6HCcNYPld60iNgVgIg9BZEKkjlGs1uPo34ZwuiGobRAEMsSxbf1TWsPoOxsRq8Xz6p-A" />
+                                        <div>
+                                            <p class="font-bold text-slate-900 dark:text-white">Sophie Durand</p>
+                                            <p class="text-xs text-slate-500">ID: #CH-10188</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">CC-456-DD</p>
+                                    <p class="text-xs text-slate-500">Renault Master</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">Marseille, FR</p>
+                                    <p class="text-xs text-slate-500">Secteur Sud</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">24 Oct. 2023</p>
+                                    <p class="text-xs text-slate-500">09:00 AM</p>
+                                </td>
+                                <td class="p-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#F1F3F5] text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                        Indisponible
+                                    </span>
+                                </td>
+                                <td class="p-5">
+                                    <button
+                                        class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                        <span class="material-symbols-outlined">more_vert</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="p-5">
+                                    <input
+                                        class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary"
+                                        type="checkbox" />
+                                </td>
+                                <td class="p-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Driver" class="w-10 h-10 rounded-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN6Xx1Iesv2of6wDuPDkfj53xfKlHvWH9EK6iEcY-kViBLZy7Y_F8G0DwsLWja8vfrB8xNtaS5pQpbex8JAZyvyDEGHduWHTtdf4AfLMObj90GGvZaZnY9_EOllPXmgIUXmeeLJEjqRBcSs8z1K8Dvo4xqEeeksskGZLDIQW0_wKRJM7V7M7mSQ6K-5-UIUtLZ32gnUh-_nzTESqv72PYNsN3E1-7qpGfqgwca581csMrkoS9toO_FJ4NWXKXQpttaiUATHhvXgQ" />
+                                        <div>
+                                            <p class="font-bold text-slate-900 dark:text-white">Julien Robert</p>
+                                            <p class="text-xs text-slate-500">ID: #CH-10202</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">EE-789-FF</p>
+                                    <p class="text-xs text-slate-500">Ford Transit</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">Nantes, FR</p>
+                                    <p class="text-xs text-slate-500">Secteur Ouest</p>
+                                </td>
+                                <td class="p-5 text-sm">
+                                    <p class="font-medium text-slate-700 dark:text-slate-300">22 Oct. 2023</p>
+                                    <p class="text-xs text-slate-500">11:20 AM</p>
+                                </td>
+                                <td class="p-5">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E6F4F1] text-[#2D6A4F] dark:bg-emerald-900/30 dark:text-emerald-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Actif
+                                    </span>
+                                </td>
+                                <td class="p-5">
+                                    <button
+                                        class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                        <span class="material-symbols-outlined">more_vert</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div
+                    class="p-5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <p class="text-sm text-slate-500">Affichage de <span
+                            class="font-bold text-slate-900 dark:text-white">1 à 4</span> sur <span
+                            class="font-bold text-slate-900 dark:text-white">142</span> résultats</p>
+                    <div class="flex gap-2">
+                        <button
+                            class="px-4 py-2 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-400"
+                            disabled="">Précédent</button>
+                        <button
+                            class="px-4 py-2 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Suivant</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

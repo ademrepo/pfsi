@@ -11,9 +11,37 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def _load_dotenv(path: Path) -> None:
+    """
+    Minimal .env loader (no external dependency).
+    Loads KEY=VALUE lines into os.environ only if not already set.
+    """
+    if not path.exists():
+        return
+    try:
+        for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key:
+                os.environ.setdefault(key, value)
+    except Exception:
+        # Keep settings import-safe; misconfigured .env shouldn't crash server
+        pass
+
+
+_load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -174,5 +202,52 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 FRONTEND_BASE_URL = 'http://localhost:3000'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'no-reply@localhost'
+# Logging (dev-friendly): ensures core errors (e.g. SMTP) show up in the console.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {name}: {message}',
+            'style': '{',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        }
+    },
+    'loggers': {
+        # Our app code
+        'core': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+# Email
+# - Default: console backend (dev)
+# - If EMAIL_HOST is set: use real SMTP backend
+EMAIL_HOST = os.getenv('EMAIL_HOST', '').strip()
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true').lower() in ('1', 'true', 'yes', 'on')
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'false').lower() in ('1', 'true', 'yes', 'on')
+    if EMAIL_USE_SSL and EMAIL_USE_TLS:
+        # Django's SMTP backend can't use SSL and STARTTLS at the same time.
+        EMAIL_USE_TLS = False
+    EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', '20'))
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = (os.getenv('DEFAULT_FROM_EMAIL', '') or '').strip()
+if not DEFAULT_FROM_EMAIL:
+    DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', '').strip() or 'no-reply@localhost'
+
+SERVER_EMAIL = (os.getenv('SERVER_EMAIL', '') or '').strip() or DEFAULT_FROM_EMAIL

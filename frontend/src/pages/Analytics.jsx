@@ -143,7 +143,7 @@ const Analytics = () => {
                 marginBottom: '2rem',
                 display: 'flex',
                 gap: '1rem',
-                alignItems: 'flex-end',
+                alignItems: 'center',
                 flexWrap: 'wrap'
             }}>
                 <div className="form-group" style={{ marginBottom: 0, flex: 1, minWidth: '200px' }}>
@@ -154,7 +154,21 @@ const Analytics = () => {
                     <label>Date de fin</label>
                     <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
                 </div>
-                <button onClick={fetchData}>Appliquer les filtres</button>
+                <button
+                    onClick={fetchData}
+                    style={{
+                        background: '#C68E17',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        marginTop: '24px' // To align with inputs under labels
+                    }}
+                >
+                    Appliquer les filtres
+                </button>
             </div>
 
             <div className="stats-grid" style={{ marginBottom: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
@@ -181,7 +195,7 @@ const Analytics = () => {
                                 <XAxis dataKey="month" stroke="var(--text-muted)" />
                                 <YAxis stroke="var(--text-muted)" />
                                 <Tooltip />
-                                <Line type="monotone" dataKey="shipments" stroke="var(--primary)" strokeWidth={3} dot={{ fill: 'var(--primary)', r: 4 }} />
+                                <Line type="monotone" dataKey="shipments" stroke="#C68E17" strokeWidth={3} dot={{ fill: '#C68E17', r: 4 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
@@ -197,7 +211,7 @@ const Analytics = () => {
                                 <YAxis stroke="var(--text-muted)" />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="revenue" fill="var(--status-delivered-text)" radius={[8, 8, 0, 0]} />
+                                <Bar dataKey="revenue" name="Revenus" fill="var(--status-delivered-text)" radius={[8, 8, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -214,7 +228,7 @@ const Analytics = () => {
                                 <XAxis dataKey="month" />
                                 <YAxis />
                                 <Tooltip />
-                                <Line type="monotone" dataKey="fuel" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                                <Line type="monotone" dataKey="fuel" stroke="#351c15" strokeWidth={2} dot={false} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>

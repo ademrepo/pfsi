@@ -108,16 +108,44 @@ const PaymentForm = () => {
             <div className="form-card" style={{ maxWidth: '600px' }}>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Client</label>
-                        <select name="client" value={formData.client} onChange={handleChange} required>
+                        <label>CLIENT</label>
+                        <select
+                            name="client"
+                            value={formData.client}
+                            onChange={handleChange}
+                            required
+                            style={{
+                                borderRadius: '12px',
+                                appearance: 'none',
+                                backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 12px center',
+                                paddingRight: '35px',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <option value="">-- Choisir un client --</option>
                             {clients.map(c => <option key={c.id} value={c.id}>{c.nom} {c.prenom}</option>)}
                         </select>
                     </div>
 
                     <div className="form-group">
-                        <label>Facture à régler</label>
-                        <select name="facture" value={formData.facture} onChange={handleChange} required>
+                        <label>FACTURE À RÉGLER</label>
+                        <select
+                            name="facture"
+                            value={formData.facture}
+                            onChange={handleChange}
+                            required
+                            style={{
+                                borderRadius: '12px',
+                                appearance: 'none',
+                                backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>')`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 12px center',
+                                paddingRight: '35px',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <option value="">Paiement Libre (Acompte / Solde)</option>
                             {invoices.map(f => (
                                 <option key={f.id} value={f.id}>
@@ -148,11 +176,30 @@ const PaymentForm = () => {
                         </select>
                     </div>
 
-                    <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                        <button type="submit" disabled={loading}>
-                            {loading ? 'Enregistrement...' : 'Enregistrer le paiement'}
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                borderRadius: '25px',
+                                padding: '0.75rem 2rem',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                background: '#0d9488',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
                         </button>
-                        <button type="button" className="secondary" onClick={() => navigate('/paiements')}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => navigate('/paiements')}
+                            style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                        >
                             Annuler
                         </button>
                     </div>
