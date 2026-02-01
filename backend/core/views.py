@@ -451,8 +451,18 @@ def analytics_summary_view(request):
     shipments_forecast = _forecast(shipments_series, 'count')
     revenue_forecast = _forecast(revenue_series, 'total')
 
+    # Status Breakdowns for KPI Cards
+    shipments_status_breakdown = list(exp_current_qs.values('statut').annotate(count=Count('id')))
+    invoices_status_breakdown = list(fac_current_qs.values('statut').annotate(count=Count('id')))
+    payments_mode_breakdown = list(Paiement.objects.filter(date_paiement__gte=start_dt, date_paiement__lte=end_dt).values('mode_paiement').annotate(count=Count('id')))
+
     return Response({
         'period': {'start': start_dt.isoformat(), 'end': end_dt.isoformat()},
+        'breakdowns': {
+            'shipments': shipments_status_breakdown,
+            'invoices': invoices_status_breakdown,
+            'payments': payments_mode_breakdown,
+        },
         'shipments': {
             'total': shipments_total,
             'growth_rate_percent': shipments_growth,

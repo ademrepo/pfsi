@@ -213,9 +213,25 @@ class ChauffeurSerializer(serializers.ModelSerializer):
 
 
 class VehiculeSerializer(serializers.ModelSerializer):
+    chauffeur_details = serializers.SerializerMethodField()
+
     class Meta:
         model = Vehicule
         fields = '__all__'
+
+    def get_chauffeur_details(self, obj):
+        # Find current active tour (En cours or Préparée)
+        # Note: Importing Tournee locally to avoid circular import if necessary, 
+        # but models are imported at top. 
+        # 'statut' in DB might be 'En cours', 'Préparée'.
+        current_tour = Tournee.objects.filter(
+            vehicule=obj, 
+            statut__in=['En cours', 'Préparée']
+        ).select_related('chauffeur').order_by('-date_tournee').first()
+        
+        if current_tour and current_tour.chauffeur:
+            return ChauffeurSerializer(current_tour.chauffeur).data
+        return None
 
 
 class DestinationSerializer(serializers.ModelSerializer):

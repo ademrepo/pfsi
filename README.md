@@ -121,14 +121,14 @@ python manage.py migrate
 #### Option 2: Initialisation avec Données de Démo (Recommandé)
 ```bash
 cd backend
-python ../scripts/init_db.py --reset --seed-demo
+python ../scripts/init_db.py --reset --seed
 python manage.py migrate
 ```
 
 Cette option charge:
 - **schema.sql** - Structure de la base de données
 - **data.sql** - Données de base (rôles, utilisateurs, destinations)
-- **seed_demo.sql** - Données de démonstration réalistes
+- **complete_seed_2024_2026.sql** - Données de démonstration réalistes 2024-2026
 
 ### 5. Lancement de l'Application
 
@@ -205,7 +205,7 @@ PF-KHRA/
 ├── db/                    # Scripts SQL
 │   ├── schema.sql         # Structure de la base
 │   ├── data.sql          # Données de base
-│   └── seed_demo.sql     # Données de démonstration
+│   └── complete_seed_2024_2026.sql  # Données de démonstration
 ├── scripts/              # Scripts utilitaires
 └── docs/                 # Documentation
 ```
@@ -215,7 +215,7 @@ PF-KHRA/
 ### 1. Initialisation (Recommandé)
 ```bash
 # Lancer le script d'initialisation avec données de démo
-python backend/scripts/init_db.py --reset --seed-demo
+python backend/scripts/init_db.py --reset --seed
 
 # Appliquer les migrations Django
 cd backend && python manage.py migrate

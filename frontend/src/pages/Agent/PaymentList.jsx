@@ -84,12 +84,16 @@ const PaymentList = () => {
         {
             label: 'Carte/Virement',
             value: payments.filter(p => ['Carte', 'Virement'].includes(p.mode_paiement)).length
+        },
+        {
+            label: 'Chèque',
+            value: payments.filter(p => p.mode_paiement === 'Chèque').length
         }
     ];
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Journal des Paiements"
                 subtitle="Suivi des paiements reçus"
             />
@@ -116,9 +120,9 @@ const PaymentList = () => {
 
             <StatsGrid stats={stats} />
 
-            <div style={{ 
-                background: 'var(--surface)', 
-                padding: '1.5rem', 
+            <div style={{
+                background: 'var(--surface)',
+                padding: '1.5rem',
                 borderRadius: 'var(--radius)',
                 border: '1px solid var(--border-light)',
                 marginBottom: '1.5rem',
@@ -154,10 +158,10 @@ const PaymentList = () => {
                         {filteredPayments.map(p => (
                             <tr key={p.id}>
                                 <td>
-                                    {new Date(p.date_paiement).toLocaleDateString('fr-FR', { 
-                                        day: '2-digit', 
-                                        month: 'short', 
-                                        year: 'numeric' 
+                                    {new Date(p.date_paiement).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric'
                                     })}
                                 </td>
                                 <td>

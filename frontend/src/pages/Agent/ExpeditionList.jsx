@@ -59,6 +59,8 @@ const ExpeditionList = () => {
         enCours: expeditions.filter(e => e.statut === 'En cours de livraison').length,
         enTransit: expeditions.filter(e => e.statut === 'En transit').length,
         retards: expeditions.filter(e => e.statut === 'Échec de livraison').length,
+        enCentreTri: expeditions.filter(e => e.statut === 'En centre de tri').length,
+        enAttente: expeditions.filter(e => e.statut === 'En attente').length,
     };
 
     // Filter expeditions based on active tab
@@ -76,7 +78,7 @@ const ExpeditionList = () => {
             clientNom.includes(query) ||
             clientPrenom.includes(query) ||
             destVille.includes(query);
-        
+
         if (!matchesSearch) return false;
 
         if (activeTab === 'all') return true;
@@ -84,6 +86,7 @@ const ExpeditionList = () => {
         if (activeTab === 'sorting') return exp.statut === 'En centre de tri';
         if (activeTab === 'delivered') return exp.statut === 'Livré';
         if (activeTab === 'delayed') return exp.statut === 'Échec de livraison';
+        if (activeTab === 'pending') return exp.statut === 'En attente';
         return true;
     });
 
@@ -99,8 +102,8 @@ const ExpeditionList = () => {
             <div className="top-bar">
                 <div className="search-bar">
                     <Search size={18} className="search-icon" />
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         placeholder="Rechercher un n° de suivi, client, ville..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -153,6 +156,20 @@ const ExpeditionList = () => {
 
                 <div className="stat-card">
                     <div className="stat-card-header">
+                        <span className="stat-card-label">En centre de tri</span>
+                    </div>
+                    <div className="stat-card-value">{stats.enCentreTri}</div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-card-header">
+                        <span className="stat-card-label">En attente</span>
+                    </div>
+                    <div className="stat-card-value">{stats.enAttente}</div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-card-header">
                         <span className="stat-card-label">Retards</span>
                     </div>
                     <div className="stat-card-value">{stats.retards}</div>
@@ -164,31 +181,31 @@ const ExpeditionList = () => {
 
             <div className="tabs-container">
                 <div className="tabs">
-                    <button 
+                    <button
                         className={`tab ${activeTab === 'all' ? 'active' : ''}`}
                         onClick={() => setActiveTab('all')}
                     >
                         Tous ({stats.total})
                     </button>
-                    <button 
+                    <button
                         className={`tab ${activeTab === 'transit' ? 'active' : ''}`}
                         onClick={() => setActiveTab('transit')}
                     >
                         En transit ({stats.enTransit})
                     </button>
-                    <button 
+                    <button
                         className={`tab ${activeTab === 'sorting' ? 'active' : ''}`}
                         onClick={() => setActiveTab('sorting')}
                     >
                         En centre de tri ({expeditions.filter(e => e.statut === 'En centre de tri').length})
                     </button>
-                    <button 
+                    <button
                         className={`tab ${activeTab === 'delivered' ? 'active' : ''}`}
                         onClick={() => setActiveTab('delivered')}
                     >
                         Livrés ({expeditions.filter(e => e.statut === 'Livré').length})
                     </button>
-                    <button 
+                    <button
                         className={`tab ${activeTab === 'delayed' ? 'active' : ''}`}
                         onClick={() => setActiveTab('delayed')}
                     >
@@ -258,11 +275,11 @@ const ExpeditionList = () => {
                                 </td>
                                 <td>
                                     <span className={`status-badge ${getStatusClass(exp.statut)}`}>
-                                        {exp.statut === 'En cours de livraison' ? 'En cours de livraison' : 
-                                         exp.statut === 'En centre de tri' ? 'En centre de tri' :
-                                         exp.statut === 'En transit' ? 'En transit' :
-                                         exp.statut === 'Livré' ? 'Livré' :
-                                         exp.statut}
+                                        {exp.statut === 'En cours de livraison' ? 'En cours de livraison' :
+                                            exp.statut === 'En centre de tri' ? 'En centre de tri' :
+                                                exp.statut === 'En transit' ? 'En transit' :
+                                                    exp.statut === 'Livré' ? 'Livré' :
+                                                        exp.statut}
                                     </span>
                                 </td>
                                 <td>
@@ -317,10 +334,10 @@ const ExpeditionList = () => {
                 </table>
             </div>
 
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 marginTop: '1.5rem',
                 fontSize: '0.875rem',
                 color: 'var(--text-muted)'

@@ -71,7 +71,9 @@ const Analytics = () => {
             cur.incidents = i.incidents;
             byMonth.set(i.month, cur);
         });
-        return Array.from(byMonth.values()).sort((a, b) => a.month.localeCompare(b.month));
+        return Array.from(byMonth.values())
+            .filter((x) => x.month <= '2025-12')
+            .sort((a, b) => a.month.localeCompare(b.month));
     }, [data]);
 
     const mapModel = useMemo(() => {
@@ -121,23 +123,21 @@ const Analytics = () => {
             value: data.operations?.avg_cost_per_route_estimated === null ? '-' : `${data.operations?.avg_cost_per_route_estimated} €`,
             sub: `Colis / tournée: ${data.operations?.avg_shipments_per_route ?? '-'}`,
         },
-        {
-            label: 'Marge (estim.)',
-            value: data.profitability?.margin_percent === null ? '-' : `${data.profitability?.margin_percent}%`,
-            sub: `Profit: ${(data.profitability?.profit_estimated ?? 0).toFixed(2)} €`,
-        },
     ];
+
+    // Helper to extract count from breakdowns
+    // (Removed as requested: cards moved to specific list pages)
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Rapports & Analytics"
                 subtitle={`Période d'analyse: ${data.period?.start || ''} → ${data.period?.end || ''}`}
             />
 
-            <div style={{ 
-                background: 'var(--surface)', 
-                padding: '1.5rem', 
+            <div style={{
+                background: 'var(--surface)',
+                padding: '1.5rem',
                 borderRadius: 'var(--radius)',
                 border: '1px solid var(--border-light)',
                 marginBottom: '2rem',

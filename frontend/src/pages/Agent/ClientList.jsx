@@ -57,7 +57,8 @@ const ClientList = () => {
     });
 
     const totalBalance = clients.reduce((sum, c) => sum + (Number(c.solde) || 0), 0);
-    const activeClients = clients.filter(c => c.solde < 0).length;
+    // Active clients based on status (case-insensitive check)
+    const activeClients = clients.filter(c => (c.statut || '').toLowerCase() === 'actif').length;
 
     const stats = [
         {
@@ -73,7 +74,7 @@ const ClientList = () => {
         {
             label: 'Solde Total',
             value: `${totalBalance.toFixed(2)} €`,
-            badge: totalBalance < 0 ? 
+            badge: totalBalance < 0 ?
                 <span className="status-badge status-livre">Crédit</span> :
                 <span className="status-badge status-retard">Débit</span>
         }
@@ -81,7 +82,7 @@ const ClientList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Clients"
                 subtitle="Gérez votre base de données clients"
             />
@@ -145,7 +146,7 @@ const ClientList = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <div style={{ 
+                                    <div style={{
                                         fontWeight: '600',
                                         color: Number(client.solde) < 0 ? 'var(--status-delivered-text)' : 'var(--status-delayed-text)'
                                     }}>

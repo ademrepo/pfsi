@@ -105,12 +105,21 @@ const InvoiceList = () => {
         {
             label: 'Payées',
             value: invoices.filter(f => f.statut === 'Payée').length
+        },
+        {
+            label: 'Émises',
+            value: invoices.filter(f => f.statut === 'Émise').length,
+            badge: <span className="status-badge status-valide">Active</span>
+        },
+        {
+            label: 'Brouillon',
+            value: invoices.filter(f => f.statut === 'Brouillon').length
         }
     ];
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Journal des Factures"
                 subtitle="Gérez vos factures et suivez les paiements"
             />
@@ -137,9 +146,9 @@ const InvoiceList = () => {
 
             <StatsGrid stats={stats} />
 
-            <div style={{ 
-                background: 'var(--surface)', 
-                padding: '1.5rem', 
+            <div style={{
+                background: 'var(--surface)',
+                padding: '1.5rem',
                 borderRadius: 'var(--radius)',
                 border: '1px solid var(--border-light)',
                 marginBottom: '1.5rem',
@@ -200,9 +209,9 @@ const InvoiceList = () => {
                                     <div style={{ fontWeight: '600' }}>{f.total_ttc} €</div>
                                 </td>
                                 <td>
-                                    <div style={{ 
-                                        color: Number(f.reste_a_payer) > 0 ? 'var(--status-delayed-text)' : 'var(--status-delivered-text)', 
-                                        fontWeight: '600' 
+                                    <div style={{
+                                        color: Number(f.reste_a_payer) > 0 ? 'var(--status-delayed-text)' : 'var(--status-delivered-text)',
+                                        fontWeight: '600'
                                     }}>
                                         {f.reste_a_payer} €
                                     </div>

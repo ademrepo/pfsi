@@ -41,7 +41,7 @@ if not exist "backend\venv" (
 echo 🔧 Initializing database...
 cd backend
 call venv\Scripts\activate
-python ../scripts/init_db.py --reset --seed-demo
+python ../scripts/init_db.py --reset --seed
 python manage.py migrate --fake core 0013
 python manage.py migrate
 cd ..
