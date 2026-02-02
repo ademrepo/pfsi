@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../../api';
-import { AlertTriangle, Plus, Download, Trash2 } from 'lucide-react';
+import { AlertTriangle, Plus, Printer, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -37,7 +37,7 @@ const IncidentList = () => {
 
     useEffect(() => {
         fetchIncidents();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [expeditionId, tourneeId]);
 
     const fetchIncidents = async () => {
@@ -103,7 +103,7 @@ const IncidentList = () => {
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Incidents"
                 subtitle="Suivez et gérez les incidents signalés"
             />
@@ -114,9 +114,9 @@ const IncidentList = () => {
                 searchPlaceholder="Rechercher un incident..."
                 actions={
                     <>
-                        <button className="secondary">
-                            <Download size={18} />
-                            Exporter
+                        <button className="secondary" onClick={() => window.print()}>
+                            <Printer size={18} />
+                            Imprimer
                         </button>
                         <Link
                             to={`/incidents/nouveau${expeditionId ? `?expedition_id=${expeditionId}` : tourneeId ? `?tournee_id=${tourneeId}` : ''}`}
@@ -131,7 +131,7 @@ const IncidentList = () => {
                 }
             />
 
-            <StatsGrid stats={stats} />
+            <StatsGrid stats={stats} variant="bold" />
 
             <div className="table-container">
                 <table>
@@ -155,10 +155,10 @@ const IncidentList = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    {inc.created_at ? new Date(inc.created_at).toLocaleDateString('fr-FR', { 
-                                        day: '2-digit', 
-                                        month: 'short', 
-                                        year: 'numeric' 
+                                    {inc.created_at ? new Date(inc.created_at).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric'
                                     }) : '-'}
                                 </td>
                                 <td>
@@ -173,7 +173,7 @@ const IncidentList = () => {
                                 </td>
                                 <td>{ACTION_LABELS[inc.action_appliquee] || inc.action_appliquee}</td>
                                 <td>
-                                    <span style={{ 
+                                    <span style={{
                                         background: 'var(--bg-page)',
                                         padding: '0.35rem 0.75rem',
                                         borderRadius: '6px',

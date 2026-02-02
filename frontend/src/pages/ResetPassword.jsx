@@ -50,7 +50,7 @@ const ResetPassword = () => {
                     <div className="login-logo-icon">
                         <Truck size={24} strokeWidth={2.5} />
                     </div>
-                    <span className="login-logo-text">Logistique Pro</span>
+                    <span className="login-logo-text">DeliveryForSure</span>
                 </div>
 
                 <h1 className="login-title">Nouveau mot de passe</h1>
@@ -59,8 +59,8 @@ const ResetPassword = () => {
                 </p>
 
                 {missingToken && (
-                    <div style={{ 
-                        background: 'var(--status-delayed-bg)', 
+                    <div style={{
+                        background: 'var(--status-delayed-bg)',
                         color: 'var(--status-delayed-text)',
                         padding: '0.75rem 1rem',
                         borderRadius: 'var(--radius-sm)',
@@ -73,8 +73,8 @@ const ResetPassword = () => {
                 )}
 
                 {error && (
-                    <div style={{ 
-                        background: 'var(--status-delayed-bg)', 
+                    <div style={{
+                        background: 'var(--status-delayed-bg)',
                         color: 'var(--status-delayed-text)',
                         padding: '0.75rem 1rem',
                         borderRadius: 'var(--radius-sm)',
@@ -87,8 +87,8 @@ const ResetPassword = () => {
                 )}
 
                 {message && (
-                    <div style={{ 
-                        background: 'var(--status-delivered-bg)', 
+                    <div style={{
+                        background: 'var(--status-delivered-bg)',
                         color: 'var(--status-delivered-text)',
                         padding: '0.75rem 1rem',
                         borderRadius: 'var(--radius-sm)',
@@ -137,7 +137,7 @@ const ResetPassword = () => {
                 </form>
 
                 <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                    <Link to="/login" style={{ 
+                    <Link to="/login" style={{
                         color: 'var(--text-muted)',
                         textDecoration: 'none',
                         fontSize: '0.875rem',

@@ -41,7 +41,10 @@ if not exist "backend\venv" (
 echo 🔧 Initializing database...
 cd backend
 call venv\Scripts\activate
-python ../scripts/init_db.py --reset --seed-demo
+python ../scripts/init_db.py --reset --seed
+python ../scripts/thin_db.py
+python ../scripts/apply_data_fixes.py
+python ../scripts/test_email.py
 python manage.py migrate --fake core 0013
 python manage.py migrate
 cd ..
@@ -53,6 +56,10 @@ echo Backend API will be available at: http://127.0.0.1:8000
 echo Django Admin at: http://127.0.0.1:8000/admin/
 echo.
 echo Default login: admin / password123
+echo.
+echo Email: par défaut les emails s'affichent dans la console (console backend).
+echo Pour activer un vrai envoi SMTP, définissez EMAIL_HOST / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD avant de lancer.
+echo Exemple: voir docs\\email_smtp.md
 echo.
 
 REM Start both servers using npm scripts

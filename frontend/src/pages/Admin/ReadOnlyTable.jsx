@@ -28,7 +28,7 @@ const ReadOnlyTable = ({ title, endpoint, columns }) => {
 
     const filteredData = data.filter(item => {
         if (!search) return true;
-        // Search in all columns
+         
         return columns.some(col => {
             const val = item[col.key];
             if (val == null) return false;

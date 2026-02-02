@@ -175,20 +175,40 @@ const ExpeditionForm = () => {
                         <textarea name="adresse_livraison" value={formData.adresse_livraison} onChange={handleChange} rows="2" />
                     </div>
 
-                    <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                        <button type="submit" disabled={loading}>
-                            {loading ? 'Enregistrement...' : isEdit ? 'Mettre à jour' : 'Créer l\'expédition'}
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1.25rem' }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                borderRadius: '25px',
+                                padding: '0.75rem 2rem',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                background: '#0d9488',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {loading ? 'Enregistrement...' : isEdit ? 'Enregistrer les modifications' : 'Créer l\'expédition'}
                         </button>
                         {isEdit && (
                             <button
                                 type="button"
                                 className="secondary"
                                 onClick={() => navigate(`/incidents/nouveau?expedition_id=${id}`)}
+                                style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
                             >
                                 Signaler un incident
                             </button>
                         )}
-                        <button type="button" className="secondary" onClick={() => navigate('/expeditions')}>
+                        <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => navigate('/expeditions')}
+                            style={{ borderRadius: '25px', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+                        >
                             Annuler
                         </button>
                     </div>

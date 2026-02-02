@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Logistique Pro - Tableau de Bord</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#C68E17", // UPS Gold
+            accent: "#966840",  // Light UPS Brown
+            "background-light": "#F8F8F7",
+            "background-dark": "#121212",
+            "sidebar-light": "#FFFFFF",
+            "sidebar-dark": "#1A1A1A",
+          },
+          fontFamily: {
+            display: ["Plus Jakarta Sans", "sans-serif"],
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "12px",
+          },
+        },
+      },
+    };
+  </script>
+  <style type="text/tailwindcss">
+    @layer base {
+            body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        }
+        .sidebar-item-active {
+            color: theme('colors.accent');
+            position: relative;
+        }
+        .sidebar-item-active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 15%;
+            bottom: 15%;
+            width: 4px;
+            background-color: theme('colors.accent');
+            border-radius: 0 4px 4px 0;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .sidebar-toggle {
+            top: 50%;
+            right: 0;
+            transform: translate(50%, -50%);
+        }
+    </style>
+</head>
+
+<body
+  class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 antialiased min-h-screen flex">
+  <aside
+    class="w-64 bg-sidebar-light dark:bg-sidebar-dark border-r border-slate-200 dark:border-slate-800 flex flex-col sticky top-0 h-screen z-50 transition-colors duration-300">
+    <div
+      class="absolute sidebar-toggle w-8 h-8 bg-accent rounded-full flex items-center justify-center cursor-pointer shadow-lg z-50 hover:brightness-110 transition-all border-2 border-white dark:border-slate-800">
+      <span class="material-icons-round text-white text-lg">chevron_left</span>
+    </div>
+    <div class="p-6 flex items-center gap-3">
+      <div class="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shadow-lg">
+        <span class="material-icons-round text-white">local_shipping</span>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Logistique Pro</h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Admin</p>
+      </div>
+    </div>
+    <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-hide py-4 relative">
+      <a class="flex items-center gap-3 px-4 py-3 sidebar-item-active transition-all duration-200" href="#">
+        <span class="material-icons-round text-xl">dashboard</span>
+        <span class="font-bold">Tableau de bord</span>
+      </a>
+      <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        href="#">
+        <span class="material-icons-round text-xl">inventory_2</span>
+        <span class="font-medium">Expéditions</span>
+      </a>
+      <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        href="#">
+        <span class="material-icons-round text-xl">group</span>
+        <span class="font-medium">Clients</span>
+      </a>
+      <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        href="#">
+        <span class="material-icons-round text-xl">receipt_long</span>
+        <span class="font-medium">Facturation</span>
+      </a>
+      <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200"
+        href="#">
+        <span class="material-icons-round text-xl">bar_chart</span>
+        <span class="font-medium">Rapports</span>
+      </a>
+    </nav>
+    <div class="p-4 border-t border-slate-100 dark:border-slate-800">
+      <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200 mb-2"
+        href="#">
+        <span class="material-icons-round text-xl">settings</span>
+        <span class="font-medium">Paramètres</span>
+      </a>
+      <div
+        class="flex items-center gap-3 px-4 py-2 border border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+        <img alt="Profile of Jean Dupont" class="w-10 h-10 rounded-full bg-slate-200"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwiVXLJ25jkjwyXOuYQ364ezq_UCUW4duuKMiL8mzE_7DHLcx_mBcDlkOfKRfBY_b3FfTsSunZbK3YlxJV1XMnEfb9ms5_zZbTlHoUdIn6U1szgmfOacs9D6Jy2_UOCYfDufBM6ScUsDIMEEYv314aH7jJm8KVht-F8WKNhKgdfi4FEFlFXJ98eDi0bwZbaJitD4hdpw86rCj7ryez4XT1CRBsl6Ji0f1yFgVT-J2MXWDw7cEfB3A8JcTYHww2xabSWwStgA7uKQ" />
+        <div class="overflow-hidden">
+          <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">Jean Dupont</p>
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Responsable Logistique</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <main class="flex-1 flex flex-col min-w-0">
+    <header
+      class="h-20 bg-background-light dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-40 px-8 flex items-center justify-between transition-colors">
+      <div class="relative w-full max-w-lg">
+        <span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+        <input
+          class="w-full pl-12 pr-4 py-2.5 bg-white dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-sm text-slate-600 dark:text-slate-300 placeholder-slate-400 shadow-sm transition-all"
+          placeholder="Rechercher un n° de suivi, client, ville..." type="text" />
+      </div>
+      <div class="flex items-center gap-4">
+        <button
+          class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 relative shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+          <span class="material-icons-round">notifications</span>
+          <span
+            class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+        </button>
+        <button
+          class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+          <span class="material-icons-round text-lg">help_outline</span>
+          Aide
+        </button>
+      </div>
+    </header>
+    <div class="p-8 space-y-8 overflow-y-auto">
+      <div class="flex items-end justify-between">
+        <div>
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Tableau de Bord</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">Aperçu global de votre activité logistique</p>
+        </div>
+        <div class="flex gap-3">
+          <button
+            class="flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 transition-all">
+            <span class="material-icons-round text-lg">download</span>
+            Exporter
+          </button>
+          <button
+            class="flex items-center gap-2 px-6 py-2.5 bg-accent text-white rounded-xl text-sm font-bold shadow-lg shadow-accent/20 hover:brightness-110 transition-all">
+            <span class="material-icons-round text-lg">add</span>
+            Créer une expédition
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          class="bg-white dark:bg-slate-800 p-6 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Expéditions</p>
+          <div class="mt-2 flex items-baseline gap-3">
+            <span class="text-4xl font-extrabold text-primary">1,248</span>
+            <span
+              class="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+              <span class="material-icons-round text-xs">arrow_upward</span> 12%
+            </span>
+          </div>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 p-6 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">En cours de livraison</p>
+          <div class="mt-2 flex items-baseline gap-3">
+            <span class="text-4xl font-extrabold text-primary">89</span>
+            <span
+              class="text-[10px] font-black uppercase tracking-wider text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">Actif</span>
+          </div>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 p-6 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">En transit</p>
+          <div class="mt-2">
+            <span class="text-4xl font-extrabold text-primary">342</span>
+          </div>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 p-6 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Retards</p>
+          <div class="mt-2 flex items-baseline gap-3">
+            <span class="text-4xl font-extrabold text-primary">12</span>
+            <span
+              class="text-[10px] font-black uppercase tracking-wider text-red-600 bg-red-100 px-2 py-0.5 rounded-full">Action
+              requise</span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bg-white dark:bg-slate-800 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+        <div
+          class="p-6 border-b border-slate-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex gap-2 overflow-x-auto scrollbar-hide">
+            <button class="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl whitespace-nowrap">Tous
+              (1248)</button>
+            <button
+              class="px-5 py-2.5 text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl whitespace-nowrap transition-all">En
+              transit (342)</button>
+            <button
+              class="px-5 py-2.5 text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl whitespace-nowrap transition-all">En
+              centre de tri (115)</button>
+            <button
+              class="px-5 py-2.5 text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl whitespace-nowrap transition-all">Livrés
+              (702)</button>
+            <button
+              class="px-5 py-2.5 text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl whitespace-nowrap transition-all">Retards
+              (12)</button>
+          </div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer">
+              <span class="material-icons-round text-lg text-slate-400">calendar_today</span>
+              <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Oct 2023</span>
+              <span class="material-icons-round text-lg text-slate-400">expand_more</span>
+            </div>
+            <button
+              class="w-10 h-10 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400">
+              <span class="material-icons-round">filter_list</span>
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+              <tr>
+                <th class="py-4 px-6"><input
+                    class="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20"
+                    type="checkbox" /></th>
+                <th class="py-4 px-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">N° de suivi</th>
+                <th class="py-4 px-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Expéditeur</th>
+                <th class="py-4 px-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Destinataire</th>
+                <th class="py-4 px-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                <th class="py-4 px-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Statut</th>
+                <th class="py-4 px-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-all">
+                <td class="py-5 px-6"><input
+                    class="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20"
+                    type="checkbox" /></td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">1Z999AA10123456784</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Standard Ground</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">Tech Solutions Inc.</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Paris, FR</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">Martin Dubois</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Lyon, FR</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">24 Oct. 2023</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">10:30 AM</p>
+                </td>
+                <td class="py-5 px-4">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
+                    En cours de livraison
+                  </span>
+                </td>
+                <td class="py-5 px-4">
+                  <button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400">
+                    <span class="material-icons-round">more_vert</span>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-all">
+                <td class="py-5 px-6"><input
+                    class="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20"
+                    type="checkbox" /></td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">1Z888BB20987654321</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Express Saver</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">Mode Parisienne</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Bordeaux, FR</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">Sophie Laurent</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Marseille, FR</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">23 Oct. 2023</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">04:15 PM</p>
+                </td>
+                <td class="py-5 px-4">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-accent/10 text-accent">
+                    En centre de tri
+                  </span>
+                </td>
+                <td class="py-5 px-4">
+                  <button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400">
+                    <span class="material-icons-round">more_vert</span>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-all">
+                <td class="py-5 px-6"><input
+                    class="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20"
+                    type="checkbox" /></td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-bold text-slate-900 dark:text-white">1Z777CC30564738291</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Freight LTL</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">Auto Parts Ltd.</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Lille, FR</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">Garage Central</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Nice, FR</p>
+                </td>
+                <td class="py-5 px-4">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white">22 Oct. 2023</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">09:00 AM</p>
+                </td>
+                <td class="py-5 px-4">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                    En transit
+                  </span>
+                </td>
+                <td class="py-5 px-4">
+                  <button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400">
+                    <span class="material-icons-round">more_vert</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="p-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Affichage de <span
+              class="font-bold text-slate-900 dark:text-white">1 à 10</span> sur <span
+              class="font-bold text-slate-900 dark:text-white">1,248</span> résultats</p>
+          <div class="flex gap-2">
+            <button
+              class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-400 cursor-not-allowed">Précédent</button>
+            <button
+              class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition-all">Suivant</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div
+          class="bg-white dark:bg-slate-800 p-8 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <h3 class="font-bold text-lg mb-6">Volume des Expéditions</h3>
+          <div class="h-48 w-full flex items-end justify-between gap-2 px-2">
+            <div
+              class="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg h-[40%] hover:bg-primary/20 transition-all cursor-pointer relative group">
+              <div
+                class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Lun</div>
+            </div>
+            <div
+              class="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg h-[65%] hover:bg-primary/20 transition-all cursor-pointer relative group">
+            </div>
+            <div
+              class="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg h-[45%] hover:bg-primary/20 transition-all cursor-pointer relative group">
+            </div>
+            <div class="w-full bg-primary rounded-t-lg h-[85%] relative group">
+              <div
+                class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] py-1 px-2 rounded opacity-100 transition-opacity">
+                Jeu (Auj)</div>
+            </div>
+            <div
+              class="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg h-[30%] hover:bg-primary/20 transition-all cursor-pointer relative group">
+            </div>
+            <div
+              class="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg h-[55%] hover:bg-primary/20 transition-all cursor-pointer relative group">
+            </div>
+            <div
+              class="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg h-[20%] hover:bg-primary/20 transition-all cursor-pointer relative group">
+            </div>
+          </div>
+          <div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <span>Lun</span><span>Mar</span><span>Mer</span><span
+              class="text-primary">Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+          </div>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 p-8 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <h3 class="font-bold text-lg mb-6">Répartition par région</h3>
+          <div class="space-y-4">
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs font-bold">
+                <span class="text-slate-600 dark:text-slate-400">Île-de-France</span>
+                <span class="text-slate-900 dark:text-white">42%</span>
+              </div>
+              <div class="w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="bg-primary h-full rounded-full" style="width: 42%"></div>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs font-bold">
+                <span class="text-slate-600 dark:text-slate-400">Auvergne-Rhône-Alpes</span>
+                <span class="text-slate-900 dark:text-white">18%</span>
+              </div>
+              <div class="w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="bg-accent h-full rounded-full" style="width: 18%"></div>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs font-bold">
+                <span class="text-slate-600 dark:text-slate-400">Nouvelle-Aquitaine</span>
+                <span class="text-slate-900 dark:text-white">12%</span>
+              </div>
+              <div class="w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="bg-slate-300 dark:bg-slate-600 h-full rounded-full" style="width: 12%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</body>
+
+</html>

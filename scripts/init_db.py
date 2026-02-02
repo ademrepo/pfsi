@@ -1,112 +1,92 @@
-import argparse
-import sqlite3
-from pathlib import Path
-import time
-import sys
+import argparse 
+import sqlite3 
+from pathlib import Path 
+import time 
+import sys 
+import os 
 
 
-def _exec_sql_file(cur, path: Path):
-    sql = path.read_text(encoding="utf-8", errors="replace")
-    # Disable foreign key constraints during data loading
-    cur.execute("PRAGMA foreign_keys = OFF;")
-    cur.executescript(sql)
-    cur.execute("PRAGMA foreign_keys = ON;")
 
-
-def _db_has_any_tables(con: sqlite3.Connection) -> bool:
-    cur = con.cursor()
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
-    return cur.fetchone() is not None
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Initialize backend/db.sqlite3 from SQL files (schema + data + optional demo seed)."
+def main ():
+    parser =argparse .ArgumentParser (
+    description ="Initialize backend/db.sqlite3 from SQL files."
     )
-    parser.add_argument("--reset", action="store_true", help="Delete existing db.sqlite3 and recreate it.")
-    parser.add_argument("--seed-demo", action="store_true", help="Load seed_demo.sql for realistic test data.")
-    args = parser.parse_args()
-
-    base_dir = Path(__file__).resolve().parent.parent  # 16avril/
-    db_path = base_dir / "backend" / "db.sqlite3"
-    schema_path = base_dir / "db" / "schema.sql"
-    data_path = base_dir / "db" / "data.sql"
-    seed_demo_path = base_dir / "db" / "seed_demo.sql"
-
-    # Check for required files
-    for p in (schema_path, data_path):
-        if not p.exists():
-            raise SystemExit(f"Missing SQL file: {p}")
-
-    if args.reset and db_path.exists():
-        attempts = 3
-        for i in range(attempts):
-            try:
-                db_path.unlink()
-                break  # Success
-            except PermissionError:
-                if i < attempts - 1:
-                    print(f"Warning: Could not delete database file '{db_path}'. Retrying in 2 seconds...")
-                    time.sleep(2)
-                else:
-                    print(f"Error: Could not delete existing database file at {db_path}.")
-                    print("Please ensure no other programs are using this file (e.g., a database viewer or a previous run of the application).")
-                    sys.exit(1)
-
-    con = sqlite3.connect(db_path)
-    try:
-        con.execute("PRAGMA foreign_keys = ON;")
-        cur = con.cursor()
-
-        if not args.reset and _db_has_any_tables(con):
-            print(f"DB already initialized: {db_path}")
-            if args.seed_demo and seed_demo_path.exists():
-                print("Loading seed_demo.sql...")
-                _exec_sql_file(cur, seed_demo_path)
-                con.commit()
-                print("Demo data loaded successfully!")
-            return
-
-        print(f"Initializing DB: {db_path}")
-        _exec_sql_file(cur, schema_path)
-        _exec_sql_file(cur, data_path)
-        
-        # Load demo seed data if requested
-        if args.seed_demo:
-            if seed_demo_path.exists():
-                print("Loading seed_demo.sql...")
-                _exec_sql_file(cur, seed_demo_path)
-            else:
-                print(f"Warning: seed_demo.sql not found at {seed_demo_path}")
-        
-        # Fix foreign key constraints after data insertion
-        print("Fixing foreign key constraints...")
-        cur.execute("""
-            UPDATE expedition 
-            SET client_id = NULL 
-            WHERE client_id NOT IN (SELECT id FROM client)
-        """)
-        cur.execute("""
-            UPDATE expedition 
-            SET destination_id = NULL 
-            WHERE destination_id NOT IN (SELECT id FROM destination)
-        """)
-        cur.execute("""
-            UPDATE expedition 
-            SET type_service_id = NULL 
-            WHERE type_service_id NOT IN (SELECT id FROM type_service)
-        """)
-        cur.execute("""
-            UPDATE expedition 
-            SET tournee_id = NULL 
-            WHERE tournee_id NOT IN (SELECT id FROM tournee)
-        """)
-        
-        con.commit()
-        print("DB initialized OK - Django will handle all business logic (no SQL triggers).")
-    finally:
-        con.close()
+    parser .add_argument ("--reset",action ="store_true",help ="Delete existing db.sqlite3 and recreate it.")
+    parser .add_argument ("--seed",action ="store_true",help ="Load complete_seed_2024_2026.sql.")
+    args =parser .parse_args ()
 
 
-if __name__ == "__main__":
-    main()
+
+
+
+
+
+    current_file =Path (__file__ ).resolve ()
+    if current_file .parent .name =='scripts':
+        base_dir =current_file .parent .parent 
+    else :
+
+        base_dir =current_file .parent 
+
+    db_path =base_dir /"backend"/"db.sqlite3"
+    schema_path =base_dir /"db"/"schema.sql"
+    data_path =base_dir /"db"/"data.sql"
+    seed_path =base_dir /"db"/"complete_seed_2024_2026.sql"
+
+    print (f"Project root detected at: {base_dir }")
+    print (f"Target Database: {db_path }")
+
+
+    for p in (schema_path ,data_path ):
+        if not p .exists ():
+            print (f"Error: Missing SQL file: {p }")
+            sys .exit (1 )
+
+    if args .reset and db_path .exists ():
+        print ("Resetting database...")
+        try :
+            db_path .unlink ()
+        except OSError as e :
+            print (f"Error deleting database: {e }")
+            sys .exit (1 )
+
+
+    con =sqlite3 .connect (db_path )
+    cur =con .cursor ()
+
+    try :
+
+        print (f"Loading schema from {schema_path .name }...")
+        schema_sql =schema_path .read_text (encoding ='utf-8',errors ='replace')
+
+        schema_sql ="PRAGMA foreign_keys = OFF;\n"+schema_sql 
+        cur .executescript (schema_sql )
+
+
+        if args .seed :
+
+            if seed_path .exists ():
+                print (f"Loading seed from {seed_path .name }...")
+                seed_sql =seed_path .read_text (encoding ='utf-8',errors ='replace')
+                seed_sql ="PRAGMA foreign_keys = OFF;\n"+seed_sql 
+                cur .executescript (seed_sql )
+            else :
+                print (f"Warning: Seed file {seed_path } not found.")
+        else :
+
+            print (f"Loading data from {data_path .name }...")
+            data_sql =data_path .read_text (encoding ='utf-8',errors ='replace')
+            data_sql ="PRAGMA foreign_keys = OFF;\n"+data_sql 
+            cur .executescript (data_sql )
+
+        con .commit ()
+        print ("Database initialized successfully.")
+
+    except Exception as e :
+        print (f"Database initialization failed: {e }")
+        sys .exit (1 )
+    finally :
+        con .close ()
+
+if __name__ =="__main__":
+    main ()

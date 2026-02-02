@@ -1,16 +1,36 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatCard = ({ label, value, badge, trend, icon: Icon }) => {
+const StatCard = ({ label, value, badge, trend, icon: Icon, borderColor, valueColor, variant }) => {
+    const isBold = variant === 'bold';
+
     return (
-        <div className="stat-card">
+        <div
+            className="stat-card"
+            style={{
+                borderLeft: borderColor ? `4px solid ${borderColor}` : undefined,
+                height: '160px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+            }}
+        >
             <div className="stat-card-header">
-                <span className="stat-card-label">{label}</span>
+                <span
+                    className="stat-card-label"
+                    style={{
+                        fontSize: '0.688rem',
+                        letterSpacing: '0.15em',
+                        fontWeight: '700'
+                    }}
+                >
+                    {label}
+                </span>
                 {Icon && (
-                    <div style={{ 
-                        width: '40px', 
-                        height: '40px', 
-                        background: 'var(--bg-page)', 
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        background: 'var(--bg-page)',
                         borderRadius: '10px',
                         display: 'flex',
                         alignItems: 'center',
@@ -21,7 +41,17 @@ const StatCard = ({ label, value, badge, trend, icon: Icon }) => {
                     </div>
                 )}
             </div>
-            <div className="stat-card-value">{value}</div>
+            <div
+                className="stat-card-value"
+                style={{
+                    fontSize: '3rem',
+                    fontWeight: isBold ? '700' : '300',
+                    letterSpacing: isBold ? 'normal' : '-0.05em',
+                    color: valueColor || 'var(--text-main)'
+                }}
+            >
+                {value}
+            </div>
             <div className="stat-card-meta">
                 {trend && (
                     <span className="badge-increase">
@@ -35,11 +65,11 @@ const StatCard = ({ label, value, badge, trend, icon: Icon }) => {
     );
 };
 
-const StatsGrid = ({ stats }) => {
+const StatsGrid = ({ stats, variant }) => {
     return (
         <div className="stats-grid">
             {stats.map((stat, index) => (
-                <StatCard key={index} {...stat} />
+                <StatCard key={index} {...stat} variant={variant} />
             ))}
         </div>
     );

@@ -1,17 +1,17 @@
 import axios from 'axios';
 
-// Créer une instance axios avec configuration de base
+ 
 const api = axios.create({
-    baseURL: '/api',  // Le proxy Vite redirigera vers http://localhost:8000/api
+    baseURL: '/api',   
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true, // Important pour envoyer/recevoir les cookies de session
+    withCredentials: true,  
 });
 
-// Intercepteur pour gérer le token CSRF
+ 
 api.interceptors.request.use(async (config) => {
-    // Fonction pour récupérer le cookie CSRF (standard Django)
+     
     const getCookie = (name) => {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { Link } from 'react-router-dom';
-import { CreditCard, Plus, Download, Trash2 } from 'lucide-react';
+import { CreditCard, Plus, Printer, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import TopBar from '../../components/TopBar';
 import StatsGrid from '../../components/StatsGrid';
@@ -84,12 +84,16 @@ const PaymentList = () => {
         {
             label: 'Carte/Virement',
             value: payments.filter(p => ['Carte', 'Virement'].includes(p.mode_paiement)).length
+        },
+        {
+            label: 'Chèque',
+            value: payments.filter(p => p.mode_paiement === 'Chèque').length
         }
     ];
 
     return (
         <div className="page-container">
-            <PageHeader 
+            <PageHeader
                 title="Journal des Paiements"
                 subtitle="Suivi des paiements reçus"
             />
@@ -100,9 +104,9 @@ const PaymentList = () => {
                 searchPlaceholder="Rechercher un paiement, client..."
                 actions={
                     <>
-                        <button className="secondary">
-                            <Download size={18} />
-                            Exporter
+                        <button className="secondary" onClick={() => window.print()}>
+                            <Printer size={18} />
+                            Imprimer
                         </button>
                         <Link to="/paiements/nouveau" style={{ textDecoration: 'none' }}>
                             <button>
@@ -116,26 +120,51 @@ const PaymentList = () => {
 
             <StatsGrid stats={stats} />
 
-            <div style={{ 
-                background: 'var(--surface)', 
-                padding: '1.5rem', 
+            <div style={{
+                background: 'var(--surface)',
+                padding: '1.5rem',
                 borderRadius: 'var(--radius)',
                 border: '1px solid var(--border-light)',
                 marginBottom: '1.5rem',
                 display: 'flex',
                 gap: '1rem',
-                alignItems: 'flex-end'
+                alignItems: 'center'
             }}>
                 <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
                     <label>Filtrer par Client</label>
-                    <select name="client_id" value={filters.client_id} onChange={handleFilterChange}>
+                    <select
+                        name="client_id"
+                        value={filters.client_id}
+                        onChange={handleFilterChange}
+                        style={{
+                            appearance: 'none',
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'calc(100% - 12px) center',
+                            paddingRight: '2.5rem'
+                        }}
+                    >
                         <option value="">Tous les clients</option>
                         {clients.map(c => <option key={c.id} value={c.id}>{c.nom} {c.prenom}</option>)}
                     </select>
                 </div>
-                <button className="secondary" onClick={() => { setFilters({ client_id: '' }); fetchPayments({ client_id: '' }); }}>
-                    Réinitialiser
-                </button>
+                <div style={{ paddingTop: '1.375rem' }}> { }
+                    <button
+                        className="secondary"
+                        onClick={() => { setFilters({ client_id: '' }); fetchPayments({ client_id: '' }); }}
+                        style={{
+                            background: '#C68E17',
+                            color: 'white',
+                            borderRadius: '12px',
+                            padding: '0.5rem 1.5rem',
+                            border: 'none',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Réinitialiser
+                    </button>
+                </div>
             </div>
 
             <div className="table-container">
@@ -154,10 +183,10 @@ const PaymentList = () => {
                         {filteredPayments.map(p => (
                             <tr key={p.id}>
                                 <td>
-                                    {new Date(p.date_paiement).toLocaleDateString('fr-FR', { 
-                                        day: '2-digit', 
-                                        month: 'short', 
-                                        year: 'numeric' 
+                                    {new Date(p.date_paiement).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric'
                                     })}
                                 </td>
                                 <td>

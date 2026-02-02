@@ -3,13 +3,13 @@ PRAGMA foreign_keys = ON;
 -- ===========================
 -- AUTHENTIFICATION
 -- ===========================
-CREATE TABLE role (
+CREATE TABLE IF NOT EXISTS role (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT NOT NULL UNIQUE,
     libelle TEXT NOT NULL
 );
 
-CREATE TABLE utilisateur (
+CREATE TABLE IF NOT EXISTS utilisateur (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
@@ -24,7 +24,7 @@ CREATE TABLE utilisateur (
     FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
-CREATE TABLE audit_log (
+CREATE TABLE IF NOT EXISTS audit_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     utilisateur_id INTEGER,
     username TEXT NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE audit_log (
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id)
 );
 
-CREATE TABLE password_reset_token (
+CREATE TABLE IF NOT EXISTS password_reset_token (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     utilisateur_id INTEGER NOT NULL,
     token_hash TEXT UNIQUE NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE password_reset_token (
 -- ===========================
 -- FAVORIS
 -- ===========================
-CREATE TABLE favori (
+CREATE TABLE IF NOT EXISTS favori (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     utilisateur_id INTEGER NOT NULL,
     titre TEXT NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE favori (
 -- ===========================
 -- CLIENT
 -- ===========================
-CREATE TABLE client (
+CREATE TABLE IF NOT EXISTS client (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code_client TEXT UNIQUE,
     type_client TEXT CHECK (type_client IN ('particulier','entreprise')),
@@ -84,7 +84,7 @@ CREATE TABLE client (
 -- ===========================
 -- CHAUFFEUR
 -- ===========================
-CREATE TABLE chauffeur (
+CREATE TABLE IF NOT EXISTS chauffeur (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     matricule TEXT UNIQUE,
     nom TEXT NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE chauffeur (
 -- ===========================
 -- VEHICULE
 -- ===========================
-CREATE TABLE vehicule (
+CREATE TABLE IF NOT EXISTS vehicule (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     immatriculation TEXT UNIQUE NOT NULL,
     type_vehicule TEXT,
@@ -121,7 +121,7 @@ CREATE TABLE vehicule (
 -- ===========================
 -- DESTINATION / SERVICE / TARIFICATION
 -- ===========================
-CREATE TABLE destination (
+CREATE TABLE IF NOT EXISTS destination (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pays TEXT,
     ville TEXT,
@@ -134,7 +134,7 @@ CREATE TABLE destination (
     updated_at DATETIME
 );
 
-CREATE TABLE type_service (
+CREATE TABLE IF NOT EXISTS type_service (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT UNIQUE,
     libelle TEXT,
@@ -145,7 +145,7 @@ CREATE TABLE type_service (
     updated_at DATETIME
 );
 
-CREATE TABLE tarification (
+CREATE TABLE IF NOT EXISTS tarification (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type_service_id INTEGER,
     destination_id INTEGER,
@@ -163,7 +163,7 @@ CREATE TABLE tarification (
 -- ===========================
 -- TOURNEE (DOIT ÊTRE AVANT TRACKING)
 -- ===========================
-CREATE TABLE tournee (
+CREATE TABLE IF NOT EXISTS tournee (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code_tournee TEXT UNIQUE,
     date_tournee DATE,
@@ -188,7 +188,7 @@ CREATE TABLE tournee (
 -- ===========================
 -- EXPEDITION
 -- ===========================
-CREATE TABLE expedition (
+CREATE TABLE IF NOT EXISTS expedition (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code_expedition TEXT UNIQUE,
     client_id INTEGER,
@@ -213,7 +213,7 @@ CREATE TABLE expedition (
     FOREIGN KEY (tournee_id) REFERENCES tournee(id)
 );
 
-CREATE TABLE tracking_expedition (
+CREATE TABLE IF NOT EXISTS tracking_expedition (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     expedition_id INTEGER,
     chauffeur_id INTEGER,
@@ -230,7 +230,7 @@ CREATE TABLE tracking_expedition (
 -- ===========================
 -- FACTURATION
 -- ===========================
-CREATE TABLE facture (
+CREATE TABLE IF NOT EXISTS facture (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     numero_facture TEXT UNIQUE,
     client_id INTEGER,
@@ -243,7 +243,7 @@ CREATE TABLE facture (
     FOREIGN KEY (client_id) REFERENCES client(id)
 );
 
-CREATE TABLE facture_expedition (
+CREATE TABLE IF NOT EXISTS facture_expedition (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     facture_id INTEGER,
     expedition_id INTEGER,
@@ -252,7 +252,7 @@ CREATE TABLE facture_expedition (
     FOREIGN KEY (expedition_id) REFERENCES expedition(id)
 );
 
-CREATE TABLE paiement (
+CREATE TABLE IF NOT EXISTS paiement (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     facture_id INTEGER,
     client_id INTEGER,
@@ -268,7 +268,7 @@ CREATE TABLE paiement (
 -- ===========================
 -- INCIDENT / RECLAMATION
 -- ===========================
-CREATE TABLE incident (
+CREATE TABLE IF NOT EXISTS incident (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code_incident TEXT UNIQUE,
     type_incident TEXT,
@@ -286,7 +286,7 @@ CREATE TABLE incident (
     FOREIGN KEY (created_by) REFERENCES utilisateur(id)
 );
 
-CREATE TABLE reclamation (
+CREATE TABLE IF NOT EXISTS reclamation (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     client_id INTEGER,
     objet TEXT,
@@ -304,7 +304,7 @@ CREATE TABLE reclamation (
 -- TABLES MANQUANTES (pour seed_demo.sql)
 -- ===========================
 
-CREATE TABLE reclamation_expedition (
+CREATE TABLE IF NOT EXISTS reclamation_expedition (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     reclamation_id INTEGER,
     expedition_id INTEGER,
@@ -313,7 +313,7 @@ CREATE TABLE reclamation_expedition (
     FOREIGN KEY (expedition_id) REFERENCES expedition(id)
 );
 
-CREATE TABLE incident_attachment (
+CREATE TABLE IF NOT EXISTS incident_attachment (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     incident_id INTEGER,
     file TEXT,
@@ -324,7 +324,7 @@ CREATE TABLE incident_attachment (
     FOREIGN KEY (uploaded_by) REFERENCES utilisateur(id)
 );
 
-CREATE TABLE alerte (
+CREATE TABLE IF NOT EXISTS alerte (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type_alerte TEXT,
     destination TEXT,
