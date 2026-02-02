@@ -64,7 +64,7 @@ const TourneeForm = () => {
                     const linked = Array.isArray(t.expeditions) ? t.expeditions : [];
                     setSelectedExpeditions(linked.map(e => e.id));
 
-                    // Ne pas "perdre" les expéditions déjà liées (même si elles ne sont plus "Enregistré").
+                     
                     setAvailableExpeditions(prev => {
                         const existingIds = new Set(prev.map(e => e.id));
                         const missing = linked.filter(e => !existingIds.has(e.id));
@@ -92,7 +92,7 @@ const TourneeForm = () => {
         setLoading(true);
         try {
             if (isTerminee) {
-                // Lightweight client-side guards to avoid round-trips.
+                 
                 const kd = kmDepartFilled ? Number(formData.kilometrage_depart) : null;
                 const kr = kmRetourFilled ? Number(formData.kilometrage_retour) : null;
 
@@ -107,11 +107,11 @@ const TourneeForm = () => {
             }
 
             const payload = { ...formData, expedition_ids: selectedExpeditions };
-            // distance_km est calculée automatiquement côté backend à partir des kilométrages.
+             
             delete payload.distance_km;
             if (payload.duree_minutes === '') delete payload.duree_minutes;
 
-            // Les données trajet ne doivent être envoyées que si la tournée est "Terminée"
+             
             if (!isTerminee) {
                 delete payload.kilometrage_depart;
                 delete payload.kilometrage_retour;
@@ -135,7 +135,7 @@ const TourneeForm = () => {
             } else if (data?.detail) {
                 msg = data.detail;
             } else if (data && typeof data === 'object') {
-                // DRF returns field errors as { field: ["msg"] } or { non_field_errors: [...] }
+                 
                 const parts = [];
                 for (const [k, v] of Object.entries(data)) {
                     if (Array.isArray(v)) {

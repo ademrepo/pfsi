@@ -41,22 +41,22 @@ const UserForm = () => {
     const fetchUser = async () => {
         try {
             const res = await api.get(`/utilisateurs/${id}/`);
-            // Adjust data to match form expectations
+             
             const user = res.data;
             setFormData({
                 ...user,
-                role_id: user.role, // role is object or id? in serializer output it is object usually but we need ID for update
-                // Wait, UserSerializer has "role" field which is PK? No, usually nested or PK.
-                // Let's check UserSerializer. It has 'role' field.
-                // Actually UserSerializer: role = ForeignKey. Default serialization is PK unless depth set.
-                // But core/serializers.py line 67: role = models.ForeignKey. 
-                // BUT UserSerializer (Read) has: role_display, role_code. And 'role' field.
-                // If it is ModelSerializer default, it returns ID.
-                // Let's assume ID. If fail, I debug.
-                // Also "role" in formData should be ID.
+                role_id: user.role,  
+                 
+                 
+                 
+                 
+                 
+                 
+                 
+                 
             });
 
-            // Fix role_id if 'role' is object
+             
             if (typeof user.role === 'object') {
                 setFormData(prev => ({ ...prev, role_id: user.role.id }));
             } else {

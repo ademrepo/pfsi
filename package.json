@@ -11,7 +11,12 @@
     "start": "concurrently \"npm run backend\" \"npm run dev\"",
     "install-all": "npm run setup"
   },
-  "keywords": ["transport", "logistics", "django", "react"],
+  "keywords": [
+    "transport",
+    "logistics",
+    "django",
+    "react"
+  ],
   "author": "PF KHRA Team",
   "license": "MIT",
   "devDependencies": {

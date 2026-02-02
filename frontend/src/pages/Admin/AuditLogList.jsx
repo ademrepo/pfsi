@@ -49,7 +49,7 @@ const AuditLogList = () => {
             case 'LOGIN_FAILED': return 'status-retard';
             case 'LOGOUT': return 'status-neutral';
             case 'USER_CREATED': return 'status-en_cours';
-            case 'USER_UPDATED': return 'status-retard'; // Using beige/orange for update
+            case 'USER_UPDATED': return 'status-retard';  
             default: return 'status-neutral';
         }
     };

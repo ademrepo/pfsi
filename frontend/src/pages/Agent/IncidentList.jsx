@@ -37,7 +37,7 @@ const IncidentList = () => {
 
     useEffect(() => {
         fetchIncidents();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [expeditionId, tourneeId]);
 
     const fetchIncidents = async () => {

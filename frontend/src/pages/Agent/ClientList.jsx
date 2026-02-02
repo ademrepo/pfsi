@@ -57,7 +57,7 @@ const ClientList = () => {
     });
 
     const totalBalance = clients.reduce((sum, c) => sum + (Number(c.solde) || 0), 0);
-    // Active clients based on status (case-insensitive check)
+     
     const activeClients = clients.filter(c => (c.statut || '').toLowerCase() === 'actif').length;
 
     const stats = [

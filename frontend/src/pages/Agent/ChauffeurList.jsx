@@ -40,7 +40,7 @@ const ChauffeurList = () => {
         if (s === 'actif' || s === 'active') return { label: 'Actif', class: 'status-en_livraison' };
         if (s === 'conge' || s === 'congé') return { label: 'En congé', class: 'status-conge' };
         if (s === 'indisponible') return { label: 'Indisponible', class: 'status-indisponible' };
-        return { label: statut || 'Actif', class: 'status-en_livraison' }; // Fallback
+        return { label: statut || 'Actif', class: 'status-en_livraison' };  
     };
 
     const filteredChauffeurs = chauffeurs.filter(c => {

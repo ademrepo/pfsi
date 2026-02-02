@@ -20,7 +20,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix Leaflet default icon issue in React
+ 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -64,7 +64,7 @@ const ExpeditionDetail = () => {
 
     const getStatusStyle = (status) => {
         const norm = (status || '').toString().toLowerCase().trim();
-        // Catch specific failure cases first (to avoid matching 'livraison' in 'échec de livraison')
+         
         if (norm.includes('échec') || norm.includes('echec') || norm.includes('retard')) return { bg: '#FEF2F2', text: '#DC2626' };
         if (norm.includes('livraison') || norm.includes('cours')) return { bg: '#E0F2F1', text: '#00695C' };
         if (norm.includes('livr')) return { bg: '#E8F5E9', text: '#2E7D32' };
@@ -76,7 +76,7 @@ const ExpeditionDetail = () => {
 
     const statusStyle = getStatusStyle(expedition.statut);
 
-    // Calculate estimated date (simple logic: +2 days from creation if not delivered)
+     
     const creationDate = new Date(expedition.date_creation);
     const estimatedDate = new Date(creationDate);
     estimatedDate.setDate(creationDate.getDate() + 2);
@@ -84,7 +84,7 @@ const ExpeditionDetail = () => {
 
     return (
         <div style={{ background: '#f8f9fa', minHeight: '100vh' }}>
-            {/* Main Header Area */}
+            { }
             <section style={{ background: 'white', padding: '3rem 2rem', borderBottom: '1px solid #e5e7eb' }}>
                 <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
                     <button
@@ -144,15 +144,15 @@ const ExpeditionDetail = () => {
                             </div>
 
                             <div style={{ padding: '2.5rem', position: 'relative' }}>
-                                {/* Vertical Line */}
+                                { }
                                 <div style={{ position: 'absolute', top: '2.5rem', bottom: '2.5rem', left: 'calc(2.5rem + 15px)', width: '2px', background: '#e2e8f0' }} />
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem' }}>
 
-                                    {/* Mock Future Steps / Current Step logic */}
-                                    {/* For a real app, logic would map expedition.tracking_history here */}
+                                    { }
+                                    { }
 
-                                    {/* Final Destination Step (Top of timeline in mockup) */}
+                                    { }
                                     <div style={{ position: 'relative', paddingLeft: '3rem', opacity: expedition.statut === 'Livré' ? 1 : 0.4 }}>
                                         <div style={{ position: 'absolute', left: 0, top: 0, width: '32px', height: '32px', borderRadius: '50%', background: 'white', border: '2px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, backgroundColor: expedition.statut === 'Livré' ? '#351c15' : 'white' }}>
                                             <Home size={14} color={expedition.statut === 'Livré' ? 'white' : '#94a3b8'} />
@@ -163,7 +163,7 @@ const ExpeditionDetail = () => {
                                         </div>
                                     </div>
 
-                                    {/* Current/Latest Tracking Step */}
+                                    { }
                                     <div style={{ position: 'relative', paddingLeft: '3rem' }}>
                                         <div style={{
                                             position: 'absolute',
@@ -172,7 +172,7 @@ const ExpeditionDetail = () => {
                                             width: '32px',
                                             height: '32px',
                                             borderRadius: '50%',
-                                            background: '#e3b12a', // Gold
+                                            background: '#e3b12a',  
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -191,7 +191,7 @@ const ExpeditionDetail = () => {
                                         </div>
                                     </div>
 
-                                    {/* Creation Step */}
+                                    { }
                                     <div style={{ position: 'relative', paddingLeft: '3rem' }}>
                                         <div style={{ position: 'absolute', left: 0, top: 0, width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', border: '2px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
                                             <Check size={14} color="#64748b" />
@@ -208,7 +208,7 @@ const ExpeditionDetail = () => {
                             </div>
                         </div>
 
-                        {/* Full History Table */}
+                        { }
                         <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', marginTop: '2.5rem', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
                             <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.025em', margin: 0 }}>
@@ -231,7 +231,7 @@ const ExpeditionDetail = () => {
                                         </tr>
                                     </thead>
                                     <tbody style={{ fontSize: '0.875rem' }}>
-                                        {/* Show actual history if available, else static entries */}
+                                        { }
                                         {(expedition.tracking_history || []).length > 0 ? (
                                             expedition.tracking_history.map((t, idx) => (
                                                 <tr key={idx} style={{ borderBottom: '1px solid #f8fafc' }}>
@@ -263,7 +263,7 @@ const ExpeditionDetail = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Info Cards */}
+                    { }
                     <div style={{ gridColumn: 'span 5', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                         <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>

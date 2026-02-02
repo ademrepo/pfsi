@@ -13,7 +13,7 @@ const ExpeditionList = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const navigate = useNavigate();
 
-    // Pagination state
+     
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -74,7 +74,7 @@ const ExpeditionList = () => {
         }
     };
 
-    // Calculate stats
+     
     const stats = {
         total: expeditions.length,
         enCours: expeditions.filter(e => ['en_livraison', 'en cours de livraison'].includes((e.statut || '').toLowerCase())).length,
@@ -84,7 +84,7 @@ const ExpeditionList = () => {
         enAttente: expeditions.filter(e => ['attente', 'en attente'].includes((e.statut || '').toLowerCase())).length,
     };
 
-    // Filter expeditions based on active tab
+     
     const filteredExpeditions = expeditions.filter((exp) => {
         const query = (searchTerm || '').trim().toLowerCase();
 
@@ -101,7 +101,7 @@ const ExpeditionList = () => {
 
         if (!matchesSearch) return false;
 
-        // Date Filtering
+         
         if (exp.date_creation) {
             const d = new Date(exp.date_creation);
             if (d.getFullYear() !== dateFilter.year || d.getMonth() + 1 !== dateFilter.month) {
@@ -120,7 +120,7 @@ const ExpeditionList = () => {
         return true;
     });
 
-    // Pagination Logic
+     
     const totalPages = Math.ceil(filteredExpeditions.length / itemsPerPage);
     const currentRows = filteredExpeditions.slice(
         (currentPage - 1) * itemsPerPage,
@@ -129,7 +129,7 @@ const ExpeditionList = () => {
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
-        setCurrentPage(1); // Reset to page 1 on tab change
+        setCurrentPage(1);  
     };
 
     return (

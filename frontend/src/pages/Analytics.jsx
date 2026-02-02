@@ -44,7 +44,7 @@ const Analytics = () => {
 
     useEffect(() => {
         fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, []);
 
     const series = useMemo(() => {
@@ -125,8 +125,8 @@ const Analytics = () => {
         },
     ];
 
-    // Helper to extract count from breakdowns
-    // (Removed as requested: cards moved to specific list pages)
+     
+     
 
     return (
         <div className="page-container">
@@ -164,7 +164,7 @@ const Analytics = () => {
                         borderRadius: '12px',
                         fontWeight: '600',
                         cursor: 'pointer',
-                        marginTop: '24px' // To align with inputs under labels
+                        marginTop: '24px'  
                     }}
                 >
                     Appliquer les filtres

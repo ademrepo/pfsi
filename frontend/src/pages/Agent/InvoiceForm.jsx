@@ -31,7 +31,7 @@ const InvoiceForm = () => {
 
     const fetchExpeditions = async () => {
         try {
-            // On filtre les expéditions non facturées pour ce client
+             
             const res = await api.get(`/expeditions/?client_id=${selectedClient}`);
             setAvailableExpeditions(res.data.filter(e => !e.est_facturee));
         } catch (err) { console.error(err); }
@@ -67,7 +67,7 @@ const InvoiceForm = () => {
     const totalHT = availableExpeditions
         .filter(e => selectedExpeditions.includes(e.id))
         .reduce((sum, e) => sum + e.montant_total, 0);
-    const totalTTC = totalHT * 1.20; // 20% TVA
+    const totalTTC = totalHT * 1.20;  
 
     return (
         <div className="page-container">

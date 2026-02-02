@@ -148,7 +148,7 @@ const PaymentList = () => {
                         {clients.map(c => <option key={c.id} value={c.id}>{c.nom} {c.prenom}</option>)}
                     </select>
                 </div>
-                <div style={{ paddingTop: '1.375rem' }}> {/* Adjusted +2px to be lower */}
+                <div style={{ paddingTop: '1.375rem' }}> { }
                     <button
                         className="secondary"
                         onClick={() => { setFilters({ client_id: '' }); fetchPayments({ client_id: '' }); }}

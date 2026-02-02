@@ -10,244 +10,244 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
-import os
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+from pathlib import Path 
+import os 
 
 
-def _load_dotenv(path: Path) -> None:
+BASE_DIR =Path (__file__ ).resolve ().parent .parent 
+
+
+def _load_dotenv (path :Path )->None :
     """
     Minimal .env loader (no external dependency).
     Loads KEY=VALUE lines into os.environ only if not already set.
     """
-    if not path.exists():
-        return
-    try:
-        for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
-            line = raw.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" not in line:
-                continue
-            key, value = line.split("=", 1)
-            key = key.strip()
-            value = value.strip().strip('"').strip("'")
-            if key:
-                os.environ.setdefault(key, value)
-    except Exception:
-        # Keep settings import-safe; misconfigured .env shouldn't crash server
-        pass
+    if not path .exists ():
+        return 
+    try :
+        for raw in path .read_text (encoding ="utf-8",errors ="replace").splitlines ():
+            line =raw .strip ()
+            if not line or line .startswith ("#"):
+                continue 
+            if "="not in line :
+                continue 
+            key ,value =line .split ("=",1 )
+            key =key .strip ()
+            value =value .strip ().strip ('"').strip ("'")
+            if key :
+                os .environ .setdefault (key ,value )
+    except Exception :
+
+        pass 
 
 
-_load_dotenv(BASE_DIR / ".env")
+_load_dotenv (BASE_DIR /".env")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rgtdr-@2xrb15d1u%zc-qeid&g2g$2wcg)fr1c8$7lgpdaq63t'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
-# Application definition
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'core',
+
+SECRET_KEY ='django-insecure-rgtdr-@2xrb15d1u%zc-qeid&g2g$2wcg)fr1c8$7lgpdaq63t'
+
+
+DEBUG =True 
+
+ALLOWED_HOSTS =['localhost','127.0.0.1']
+
+
+
+
+INSTALLED_APPS =[
+'django.contrib.admin',
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+'django.contrib.messages',
+'django.contrib.staticfiles',
+'rest_framework',
+'corsheaders',
+'core',
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'core.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.AuditLoggingMiddleware',
+MIDDLEWARE =[
+'django.middleware.security.SecurityMiddleware',
+'django.contrib.sessions.middleware.SessionMiddleware',
+'corsheaders.middleware.CorsMiddleware',
+'django.middleware.common.CommonMiddleware',
+'django.middleware.csrf.CsrfViewMiddleware',
+'django.contrib.auth.middleware.AuthenticationMiddleware',
+'core.middleware.AuthenticationMiddleware',
+'django.contrib.messages.middleware.MessageMiddleware',
+'django.middleware.clickjacking.XFrameOptionsMiddleware',
+'core.middleware.AuditLoggingMiddleware',
 ]
 
-ROOT_URLCONF = 'mon_projet.urls'
+ROOT_URLCONF ='mon_projet.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+TEMPLATES =[
+{
+'BACKEND':'django.template.backends.django.DjangoTemplates',
+'DIRS':[],
+'APP_DIRS':True ,
+'OPTIONS':{
+'context_processors':[
+'django.template.context_processors.debug',
+'django.template.context_processors.request',
+'django.contrib.auth.context_processors.auth',
+'django.contrib.messages.context_processors.messages',
+],
+},
+},
 ]
 
-WSGI_APPLICATION = 'mon_projet.wsgi.application'
+WSGI_APPLICATION ='mon_projet.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+
+
+DATABASES ={
+'default':{
+'ENGINE':'django.db.backends.sqlite3',
+'NAME':BASE_DIR /'db.sqlite3',
+}
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+
+
+AUTH_PASSWORD_VALIDATORS =[
+{
+'NAME':'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+},
+{
+'NAME':'django.contrib.auth.password_validation.MinimumLengthValidator',
+'OPTIONS':{
+'min_length':8 ,
+}
+},
+{
+'NAME':'django.contrib.auth.password_validation.CommonPasswordValidator',
+},
+{
+'NAME':'django.contrib.auth.password_validation.NumericPasswordValidator',
+},
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
-LANGUAGE_CODE = 'fr-fr'
-
-TIME_ZONE = 'Africa/Algiers'
-
-USE_I18N = True
-
-USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+LANGUAGE_CODE ='fr-fr'
 
-# Media (uploads: photos/documents)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+TIME_ZONE ='Africa/Algiers'
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+USE_I18N =True 
 
-# Django REST Framework
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
-    'DEFAULT_PERMISSION_CLASSES': [],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ],
+USE_TZ =True 
+
+
+
+
+
+STATIC_URL ='static/'
+
+
+MEDIA_URL ='/media/'
+MEDIA_ROOT =BASE_DIR /'media'
+
+
+DEFAULT_AUTO_FIELD ='django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK ={
+'DEFAULT_AUTHENTICATION_CLASSES':[],
+'DEFAULT_PERMISSION_CLASSES':[],
+'DEFAULT_RENDERER_CLASSES':[
+'rest_framework.renderers.JSONRenderer',
+],
 }
 
-# CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3001',
+
+CORS_ALLOWED_ORIGINS =[
+'http://localhost:3000',
+'http://127.0.0.1:3000',
+'http://localhost:3001',
+'http://127.0.0.1:3001',
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS =True 
 
-# CSRF Settings
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3001',
+
+CSRF_TRUSTED_ORIGINS =[
+'http://localhost:3000',
+'http://127.0.0.1:3000',
+'http://localhost:3001',
+'http://127.0.0.1:3001',
 ]
 
-# Session Settings
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SECURE = False  # True in production with HTTPS
-SESSION_COOKIE_AGE = 86400  # 24 hours
-SESSION_COOKIE_NAME = 'transport_sessionid'
 
-# Security Settings
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_HTTPONLY =True 
+SESSION_COOKIE_SAMESITE ='Lax'
+SESSION_COOKIE_SECURE =False 
+SESSION_COOKIE_AGE =86400 
+SESSION_COOKIE_NAME ='transport_sessionid'
 
-FRONTEND_BASE_URL = 'http://localhost:3000'
 
-# Logging (dev-friendly): ensures core errors (e.g. SMTP) show up in the console.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '[{levelname}] {name}: {message}',
-            'style': '{',
-        }
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        }
-    },
-    'loggers': {
-        # Our app code
-        'core': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
+SECURE_BROWSER_XSS_FILTER =True 
+X_FRAME_OPTIONS ='DENY'
+SECURE_CONTENT_TYPE_NOSNIFF =True 
+
+FRONTEND_BASE_URL ='http://localhost:3000'
+
+
+LOGGING ={
+'version':1 ,
+'disable_existing_loggers':False ,
+'formatters':{
+'simple':{
+'format':'[{levelname}] {name}: {message}',
+'style':'{',
+}
+},
+'handlers':{
+'console':{
+'class':'logging.StreamHandler',
+'formatter':'simple',
+}
+},
+'loggers':{
+
+'core':{
+'handlers':['console'],
+'level':'INFO',
+'propagate':True ,
+},
+},
 }
 
-# Email
-# - Default: console backend (dev)
-# - If EMAIL_HOST is set: use real SMTP backend
-EMAIL_HOST = os.getenv('EMAIL_HOST', '').strip()
-if EMAIL_HOST:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true').lower() in ('1', 'true', 'yes', 'on')
-    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'false').lower() in ('1', 'true', 'yes', 'on')
-    if EMAIL_USE_SSL and EMAIL_USE_TLS:
-        # Django's SMTP backend can't use SSL and STARTTLS at the same time.
-        EMAIL_USE_TLS = False
-    EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', '20'))
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-DEFAULT_FROM_EMAIL = (os.getenv('DEFAULT_FROM_EMAIL', '') or '').strip()
-if not DEFAULT_FROM_EMAIL:
-    DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', '').strip() or 'no-reply@localhost'
 
-SERVER_EMAIL = (os.getenv('SERVER_EMAIL', '') or '').strip() or DEFAULT_FROM_EMAIL
+
+EMAIL_HOST =os .getenv ('EMAIL_HOST','').strip ()
+if EMAIL_HOST :
+    EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT =int (os .getenv ('EMAIL_PORT','587'))
+    EMAIL_HOST_USER =os .getenv ('EMAIL_HOST_USER','').strip ()
+    EMAIL_HOST_PASSWORD =os .getenv ('EMAIL_HOST_PASSWORD','')
+    EMAIL_USE_TLS =os .getenv ('EMAIL_USE_TLS','true').lower ()in ('1','true','yes','on')
+    EMAIL_USE_SSL =os .getenv ('EMAIL_USE_SSL','false').lower ()in ('1','true','yes','on')
+    if EMAIL_USE_SSL and EMAIL_USE_TLS :
+
+        EMAIL_USE_TLS =False 
+    EMAIL_TIMEOUT =int (os .getenv ('EMAIL_TIMEOUT','20'))
+else :
+    EMAIL_BACKEND ='django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL =(os .getenv ('DEFAULT_FROM_EMAIL','')or '').strip ()
+if not DEFAULT_FROM_EMAIL :
+    DEFAULT_FROM_EMAIL =os .getenv ('EMAIL_HOST_USER','').strip ()or 'no-reply@localhost'
+
+SERVER_EMAIL =(os .getenv ('SERVER_EMAIL','')or '').strip ()or DEFAULT_FROM_EMAIL 

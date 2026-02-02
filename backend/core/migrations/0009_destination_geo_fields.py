@@ -1,13 +1,13 @@
-from django.db import migrations, models
+from django .db import migrations ,models 
 
 
-def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
-    db_name = str(schema_editor.connection.settings_dict.get('NAME', '')).lower()
-    if 'test' not in db_name and 'memory' not in db_name:
-        return
+def bootstrap_unmanaged_tables_for_tests (apps ,schema_editor ):
+    db_name =str (schema_editor .connection .settings_dict .get ('NAME','')).lower ()
+    if 'test'not in db_name and 'memory'not in db_name :
+        return 
 
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS role (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code VARCHAR(50) UNIQUE,
@@ -15,8 +15,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS utilisateur (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username VARCHAR(150) UNIQUE,
@@ -32,8 +32,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS client (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code_client VARCHAR(50),
@@ -52,8 +52,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS destination (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pays VARCHAR(100),
@@ -66,8 +66,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS type_service (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code VARCHAR(50) UNIQUE,
@@ -80,8 +80,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS vehicule (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             immatriculation VARCHAR(50) UNIQUE,
@@ -98,8 +98,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS chauffeur (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             matricule VARCHAR(50) UNIQUE,
@@ -117,8 +117,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS tournee (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code_tournee VARCHAR(50) UNIQUE,
@@ -140,8 +140,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS expedition (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code_expedition VARCHAR(50) UNIQUE,
@@ -164,8 +164,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS tracking_expedition (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             expedition_id INTEGER,
@@ -178,8 +178,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS incident (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code_incident VARCHAR(50) UNIQUE,
@@ -196,8 +196,8 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
         );
         """
     )
-    schema_editor.execute(
-        """
+    schema_editor .execute (
+    """
         CREATE TABLE IF NOT EXISTS facture (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             numero_facture VARCHAR(50) UNIQUE,
@@ -213,22 +213,22 @@ def bootstrap_unmanaged_tables_for_tests(apps, schema_editor):
     )
 
 
-class Migration(migrations.Migration):
+class Migration (migrations .Migration ):
 
-    dependencies = [
-        ('core', '0008_password_reset_token'),
+    dependencies =[
+    ('core','0008_password_reset_token'),
     ]
 
-    operations = [
-        migrations.RunPython(bootstrap_unmanaged_tables_for_tests, migrations.RunPython.noop),
-        migrations.AddField(
-            model_name='destination',
-            name='latitude',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='destination',
-            name='longitude',
-            field=models.FloatField(blank=True, null=True),
-        ),
+    operations =[
+    migrations .RunPython (bootstrap_unmanaged_tables_for_tests ,migrations .RunPython .noop ),
+    migrations .AddField (
+    model_name ='destination',
+    name ='latitude',
+    field =models .FloatField (blank =True ,null =True ),
+    ),
+    migrations .AddField (
+    model_name ='destination',
+    name ='longitude',
+    field =models .FloatField (blank =True ,null =True ),
+    ),
     ]

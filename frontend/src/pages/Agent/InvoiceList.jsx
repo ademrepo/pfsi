@@ -195,7 +195,7 @@ const InvoiceList = () => {
                         <option value="Payée">Payée</option>
                     </select>
                 </div>
-                <div style={{ paddingTop: '1.375rem' }}> {/* Adjusted +2px to be lower */}
+                <div style={{ paddingTop: '1.375rem' }}> { }
                     <button
                         className="secondary"
                         onClick={() => { setFilters({ client_id: '', statut: '' }); fetchInvoices({ client_id: '', statut: '' }); }}

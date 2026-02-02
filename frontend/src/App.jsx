@@ -44,13 +44,13 @@ function App() {
 
     const checkUserSession = async () => {
         try {
-            await api.get('/auth/csrf/'); // Ensure CSRF cookie
+            await api.get('/auth/csrf/');  
             const response = await api.get('/auth/me/');
             setUser(response.data);
         } catch (error) {
             console.log("No active session or backend not available:", error.message);
             setUser(null);
-            // Clear any stale session cookies
+             
             document.cookie.split(";").forEach((c) => {
                 document.cookie = c
                     .replace(/^ +/, "")
@@ -100,7 +100,7 @@ function App() {
                     <Route path="/" element={<Dashboard user={user} />} />
                     <Route path="/analytics" element={<Analytics />} />
 
-                    {/* Opérations & Référentiels (Unified Access) */}
+                    { }
                     <Route path="/expeditions" element={<ExpeditionList />} />
                     <Route path="/expeditions/:id" element={<ExpeditionDetail />} />
                     <Route path="/expeditions/nouveau" element={<ExpeditionForm />} />
@@ -154,7 +154,7 @@ function App() {
                         />
                     } />
 
-                    {/* Admin Specific Routes */}
+                    { }
                     <Route path="/admin/users" element={<UserList />} />
                     <Route path="/admin/users/create" element={<UserForm />} />
                     <Route path="/admin/users/:id/edit" element={<UserForm />} />

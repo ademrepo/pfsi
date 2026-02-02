@@ -39,7 +39,7 @@ const ReclamationForm = () => {
 
     useEffect(() => {
         if (isEdit) fetchItem();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [id]);
 
     const fetchRefs = async () => {

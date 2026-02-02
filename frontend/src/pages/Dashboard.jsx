@@ -84,8 +84,8 @@ const Dashboard = ({ user }) => {
 
   const stats = useMemo(() => {
     const list = expeditions;
-    // Helper for stats counting using the normalized status keys if possible, or just string matching
-    // We'll normalize for consistency when counting
+     
+     
     const count = (matches) => list.filter(e => matches.includes((e.statut || '').toLowerCase())).length;
 
     return {
@@ -116,7 +116,7 @@ const Dashboard = ({ user }) => {
     if (tableTab === 'all') return expeditions;
     if (tableTab === 'transit') return expeditions.filter((e) => ['en_transit', 'en transit'].includes(norm(e.statut)));
     if (tableTab === 'sorting') return expeditions.filter((e) => ['centre_tri', 'en centre de tri'].includes(norm(e.statut)));
-    if (tableTab === 'delivered') return expeditions.filter((e) => ['livre', 'livré', 'livrÃ©'].includes(norm(e.statut))); // Handle encoding issue just in case
+    if (tableTab === 'delivered') return expeditions.filter((e) => ['livre', 'livré', 'livrÃ©'].includes(norm(e.statut)));  
     if (tableTab === 'delayed') return expeditions.filter((e) => ['echec_livraison', 'échec de livraison'].includes(norm(e.statut)));
     return expeditions;
   }, [expeditions, tableTab]);
@@ -201,7 +201,7 @@ const Dashboard = ({ user }) => {
     if (window.confirm('Voulez-vous vraiment supprimer cette expédition ?')) {
       try {
         await api.delete(`/expeditions/${id}/`);
-        // Refresh local state without full reload
+         
         setExpeditions(current => current.filter(e => e.id !== id));
       } catch (err) {
         const errorMsg = err.response?.data?.[0] || "Impossible de supprimer cette expédition (déjà liée à une tournée).";
