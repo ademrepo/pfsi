@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 Starting PF KHRA Transport ^& Logistics Management System...
+echo 🚀 Starting Delivery for sure...
 echo.
 
 REM Check if npm is installed

@@ -170,6 +170,3 @@ htmlcov/
 backend/.env
 backend/.env.local
 frontend/.env
-
-.qodo
-.kombai

@@ -1,5 +1,5 @@
 {
-  "name": "pfkhra-transport",
+  "name": "delivery-for-sure",
   "version": "1.0.0",
   "description": "Transport & Logistics Management System",
   "scripts": {
@@ -17,7 +17,7 @@
     "django",
     "react"
   ],
-  "author": "PF KHRA Team",
+  "author": "HMMB Team",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
