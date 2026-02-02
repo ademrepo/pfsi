@@ -42,6 +42,9 @@ echo 🔧 Initializing database...
 cd backend
 call venv\Scripts\activate
 python ../scripts/init_db.py --reset --seed
+python ../scripts/thin_db.py
+python ../scripts/apply_data_fixes.py
+python ../scripts/test_email.py
 python manage.py migrate --fake core 0013
 python manage.py migrate
 cd ..

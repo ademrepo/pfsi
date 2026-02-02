@@ -1,0 +1,84 @@
+﻿python : Traceback 
+(most recent call 
+last):
+At line:1 char:1
++ python scripts/debu
+g_seed.py 2>&1 | 
+Out-File -FilePath 
+"seed_debug_ou ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Traceba   
+ ck (most recent     
+call last)::Stri    
+ng) [], RemoteEx    
+ception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  File "C:\L3 ISIL A 
+2025-2026\PFKHRA\scri
+pts\debug_seed.py", 
+line 49, in <module>
+    cur.execute(stmt)
+    ~~~~~~~~~~~^^^^^^
+sqlite3.IntegrityErro
+r: FOREIGN KEY 
+constraint failed
+
+During handling of 
+the above exception, 
+another exception 
+occurred:
+
+Traceback (most 
+recent call last):
+  File "C:\L3 ISIL A 
+2025-2026\PFKHRA\scri
+pts\debug_seed.py", 
+line 51, in <module>
+    print(f"\n\u274c 
+ERROR at statement 
+{i}:")
+    ~~~~~^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adem
+\AppData\Local\Progra
+ms\Python\Python314\L
+ib\encodings\cp1252.p
+y", line 19, in 
+encode
+    return codecs.cha
+rmap_encode(input,sel
+f.errors,encoding_tab
+le)[0]
+           ~~~~~~~~~~
+~~~~~~~~~~~^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^
+UnicodeEncodeError: 
+'charmap' codec 
+can't encode 
+character '\u274c' 
+in position 2: 
+character maps to 
+<undefined>
+Loading schema...
+Schema loaded successfully
+
+Loading seed...
+Found 885 SQL statements
+Processing statement 0/885...
+Processing statement 10/885...
+Processing statement 20/885...
+Processing statement 30/885...
+Processing statement 40/885...
+Processing statement 50/885...
+Processing statement 60/885...
+Processing statement 70/885...
+Processing statement 80/885...
+Processing statement 90/885...
+Failed: 'charmap' codec can't encode character '\u274c' in position 2: character maps to <undefined>

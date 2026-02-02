@@ -89,6 +89,11 @@ INSERT INTO client (code_client, type_client, nom, prenom, telephone, email, adr
 ('CLI-00003', 'particulier', 'Khelifa', 'Amine', '0777555666', 'khelifa@email.dz', '23 CitÃ© El Bir', 'SÃ©tif', 'AlgÃ©rie', 0, 'actif', '2024-01-20 09:30:00'),
 ('CLI-00004', 'particulier', 'Messaoud', 'Leila', '0555666777', 'messaoud@email.dz', 'Rue Larbi Ben Mhidi', 'Annaba', 'AlgÃ©rie', 0, 'actif', '2024-03-05 14:00:00'),
 ('CLI-00005', 'particulier', 'Zaai', 'Mehdi', '0777888999', 'zaidi@email.dz', 'Les Palmiers', 'Tlemcen', 'AlgÃ©rie', 0, 'actif', '2024-02-15 10:00:00'),
+('CLI-00006', 'particulier', 'Client', 'Inactif', '0000000006', 'inactive6@email.dz', 'Adresse', 'Ville', 'AlgÃ©rie', 0, 'inactif', '2024-01-01 00:00:00'),
+('CLI-00007', 'particulier', 'Client', 'Inactif', '0000000007', 'inactive7@email.dz', 'Adresse', 'Ville', 'AlgÃ©rie', 0, 'inactif', '2024-01-01 00:00:00'),
+('CLI-00008', 'particulier', 'Client', 'Inactif', '0000000008', 'inactive8@email.dz', 'Adresse', 'Ville', 'AlgÃ©rie', 0, 'inactif', '2024-01-01 00:00:00'),
+('CLI-00009', 'particulier', 'Client', 'Inactif', '0000000009', 'inactive9@email.dz', 'Adresse', 'Ville', 'AlgÃ©rie', 0, 'inactif', '2024-01-01 00:00:00'),
+('CLI-00010', 'particulier', 'Client', 'Inactif', '0000000010', 'inactive10@email.dz', 'Adresse', 'Ville', 'AlgÃ©rie', 0, 'inactif', '2024-01-01 00:00:00'),
 ('CLI-00011', 'entreprise', 'SPA TechnoPlus', 'Contact', '0555333444', 'contact@technoplus.dz', 'Zone Ind.', 'Blida', 'AlgÃ©rie', 0, 'actif', '2024-01-05 10:00:00'),
 ('CLI-00012', 'entreprise', 'SARL DistriMax', 'Contact', '0666444555', 'info@distrimax.dz', 'Rue Commerce', 'Constantine', 'AlgÃ©rie', 0, 'actif', '2024-01-08 11:00:00'),
 ('CLI-00013', 'entreprise', 'EURL AutoPiÃ¨ces', 'Contact', '0666777888', 'ventes@autopieces.dz', 'RN 1', 'Oran', 'AlgÃ©rie', 0, 'actif', '2024-02-01 09:00:00'),
@@ -253,11 +258,11 @@ INSERT INTO tournee (code_tournee, date_tournee, date_depart, date_retour, chauf
 INSERT INTO tournee (code_tournee, date_tournee, date_depart, date_retour, chauffeur_id, vehicule_id, statut, kilometrage_depart, kilometrage_retour, distance_km, duree_minutes, consommation_litres, notes, created_by) VALUES
 ('TRN-2025-12-02', '2025-12-08', '2025-12-08 08:00:00', '2025-12-08 21:26:00', 3, 3, 'Terminée', 12318, 12886, 568, 806, 70.38, 'TournÃ©e December 2025', 1);
 INSERT INTO tournee (code_tournee, date_tournee, date_depart, date_retour, chauffeur_id, vehicule_id, statut, kilometrage_depart, kilometrage_retour, distance_km, duree_minutes, consommation_litres, notes, created_by) VALUES
-('TRN-2026-01-01', '2026-01-20', '2026-01-20 09:00:00', '2026-01-20 19:22:00', 3, 3, 'Terminée', 12886, 13164, 278, 622, 35.5, 'TournÃ©e January 2026', 1);
+('TRN-2026-02-01', '2026-02-20', '2026-02-20 09:00:00', '2026-02-20 19:22:00', 3, 3, 'Terminée', 12886, 13164, 278, 622, 35.5, 'TournÃ©e January 2026', 1);
 INSERT INTO tournee (code_tournee, date_tournee, date_depart, date_retour, chauffeur_id, vehicule_id, statut, kilometrage_depart, kilometrage_retour, distance_km, duree_minutes, consommation_litres, notes, created_by) VALUES
-('TRN-2026-01-02', '2026-01-22', '2026-01-22 10:00:00', '2026-01-22 19:08:00', 2, 4, 'Terminée', 12726, 12850, 124, 548, 18.63, 'TournÃ©e January 2026', 1);
+('TRN-2026-02-02', '2026-02-22', '2026-02-22 10:00:00', '2026-02-22 19:08:00', 2, 4, 'Terminée', 12726, 12850, 124, 548, 18.63, 'TournÃ©e January 2026', 1);
 INSERT INTO tournee (code_tournee, date_tournee, date_depart, date_retour, chauffeur_id, vehicule_id, statut, kilometrage_depart, kilometrage_retour, distance_km, duree_minutes, consommation_litres, notes, created_by) VALUES
-('TRN-2026-01-03', '2026-01-19', '2026-01-19 06:00:00', '2026-01-19 14:27:00', 5, 3, 'Terminée', 13164, 13686, 522, 507, 83.43, 'TournÃ©e January 2026', 1);
+('TRN-2026-02-03', '2026-02-19', '2026-02-19 06:00:00', '2026-02-19 14:27:00', 5, 3, 'Terminée', 13164, 13686, 522, 507, 83.43, 'TournÃ©e January 2026', 1);
 
 -- EXPÃ‰DITIONS
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
@@ -597,7 +602,13 @@ INSERT INTO expedition (code_expedition, client_id, type_service_id, destination
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
 ('EXP-2025-10-168', 1, 1, 3, 12.2, 1.8, 'Colis standard', 'Livraison 3', 'Destinataire 168', '0555000168', '2025-10-22 10:00:00', 'livre', 706.43, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2025-10-01'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2025-10-169', 7, 1, 2, 8.8, 0.6, 'Colis standard', 'Livraison 2', 'Destinataire 169', '0555000169', '2025-10-22 10:00:00', 'livre', 1092.47, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2025-10-01'), 1);
+('EXP-2025-10-169', 7, 1, 2, 8.8, 0.6, 'Colis standard', 'Livraison 2', 'Destinataire 169', '0555000169', '2025-10-22 10:00:00', 'Livré', 1092.47, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2025-10-01'), 1);
+
+-- Feb 2026 Dummy Data
+INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
+('EXP-2026-02-001', 1, 1, 1, 15.5, 1.2, 'Colis Fev', 'Livraison Fev 1', 'Destinataire Fev1', '0555000991', '2026-02-05 10:00:00', 'Livré', 1500.00, 1, NULL, 1),
+('EXP-2026-02-002', 2, 1, 2, 20.0, 2.0, 'Colis Fev', 'Livraison Fev 2', 'Destinataire Fev2', '0555000992', '2026-02-12 14:00:00', 'En transit', 2200.00, 0, NULL, 1),
+('EXP-2026-02-003', 3, 1, 3, 10.0, 0.5, 'Colis Fev', 'Livraison Fev 3', 'Destinataire Fev3', '0555000993', '2026-02-20 09:30:00', 'En centre de tri', 800.00, 0, NULL, 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
 ('EXP-2025-10-170', 16, 1, 7, 29.7, 1.4, 'Colis standard', 'Livraison 7', 'Destinataire 170', '0555000170', '2025-10-22 10:00:00', 'livre', 1815.81, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2025-10-01'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
@@ -639,21 +650,21 @@ INSERT INTO expedition (code_expedition, client_id, type_service_id, destination
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
 ('EXP-2025-12-189', 14, 1, 4, 11.1, 2.3, 'Colis standard', 'Livraison 4', 'Destinataire 189', '0555000189', '2025-12-07 10:00:00', 'livre', 507.92, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2025-12-02'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-190', 19, 1, 9, 18.0, 1.2, 'Colis standard', 'Livraison 9', 'Destinataire 190', '0555000190', '2026-01-19 10:00:00', 'livre', 2497.57, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-01'), 1);
+('EXP-2026-02-190', 19, 1, 9, 18.0, 1.2, 'Colis standard', 'Livraison 9', 'Destinataire 190', '0555000190', '2026-02-19 10:00:00', 'livre', 2497.57, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-01'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-191', 13, 1, 4, 9.8, 1.8, 'Colis standard', 'Livraison 4', 'Destinataire 191', '0555000191', '2026-01-19 10:00:00', 'livre', 2041.68, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-01'), 1);
+('EXP-2026-02-191', 13, 1, 4, 9.8, 1.8, 'Colis standard', 'Livraison 4', 'Destinataire 191', '0555000191', '2026-02-19 10:00:00', 'livre', 2041.68, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-01'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-192', 7, 1, 12, 16.9, 1.1, 'Colis standard', 'Livraison 12', 'Destinataire 192', '0555000192', '2026-01-19 10:00:00', 'livre', 1720.6, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-01'), 1);
+('EXP-2026-02-192', 7, 1, 12, 16.9, 1.1, 'Colis standard', 'Livraison 12', 'Destinataire 192', '0555000192', '2026-02-19 10:00:00', 'livre', 1720.6, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-01'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-193', 20, 1, 8, 16.5, 1.8, 'Colis standard', 'Livraison 8', 'Destinataire 193', '0555000193', '2026-01-21 10:00:00', 'livre', 927.01, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-02'), 1);
+('EXP-2026-02-193', 20, 1, 8, 16.5, 1.8, 'Colis standard', 'Livraison 8', 'Destinataire 193', '0555000193', '2026-02-21 10:00:00', 'livre', 927.01, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-02'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-194', 8, 1, 15, 14.1, 1.3, 'Colis standard', 'Livraison 15', 'Destinataire 194', '0555000194', '2026-01-21 10:00:00', 'livre', 2912.77, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-02'), 1);
+('EXP-2026-02-194', 8, 1, 15, 14.1, 1.3, 'Colis standard', 'Livraison 15', 'Destinataire 194', '0555000194', '2026-02-21 10:00:00', 'livre', 2912.77, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-02'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-195', 12, 1, 3, 19.4, 2.4, 'Colis standard', 'Livraison 3', 'Destinataire 195', '0555000195', '2026-01-18 10:00:00', 'livre', 1401.36, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-03'), 1);
+('EXP-2026-02-195', 12, 1, 3, 19.4, 2.4, 'Colis standard', 'Livraison 3', 'Destinataire 195', '0555000195', '2026-02-18 10:00:00', 'livre', 1401.36, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-03'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-196', 15, 1, 8, 11.4, 1.5, 'Colis standard', 'Livraison 8', 'Destinataire 196', '0555000196', '2026-01-18 10:00:00', 'livre', 1546.29, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-03'), 1);
+('EXP-2026-02-196', 15, 1, 8, 11.4, 1.5, 'Colis standard', 'Livraison 8', 'Destinataire 196', '0555000196', '2026-02-18 10:00:00', 'livre', 1546.29, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-03'), 1);
 INSERT INTO expedition (code_expedition, client_id, type_service_id, destination_id, poids_kg, volume_m3, description_colis, adresse_livraison, nom_destinataire, telephone_destinataire, date_creation, statut, montant_total, est_facturee, tournee_id, created_by) VALUES
-('EXP-2026-01-197', 1, 1, 8, 10.9, 1.0, 'Colis standard', 'Livraison 8', 'Destinataire 197', '0555000197', '2026-01-18 10:00:00', 'livre', 2442.97, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-01-03'), 1);
+('EXP-2026-02-197', 1, 1, 8, 10.9, 1.0, 'Colis standard', 'Livraison 8', 'Destinataire 197', '0555000197', '2026-02-18 10:00:00', 'livre', 2442.97, 1, (SELECT id FROM tournee WHERE code_tournee='TRN-2026-02-03'), 1);
 
 -- FACTURES ET LIENS
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
@@ -1224,28 +1235,28 @@ INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_
 ('FACT-202512-0189', 14, '2025-12-09', 426.82, 81.1, 507.92, 'payee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (189, 189);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0190', 19, '2026-01-21', 2098.8, 398.77, 2497.57, 'impayee');
+('FACT-202601-0190', 19, '2026-02-21', 2098.8, 398.77, 2497.57, 'impayee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (190, 190);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0191', 13, '2026-01-23', 1715.7, 325.98, 2041.68, 'impayee');
+('FACT-202601-0191', 13, '2026-02-23', 1715.7, 325.98, 2041.68, 'impayee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (191, 191);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0192', 7, '2026-01-23', 1445.88, 274.72, 1720.6, 'payee');
+('FACT-202601-0192', 7, '2026-02-23', 1445.88, 274.72, 1720.6, 'payee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (192, 192);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0193', 20, '2026-01-24', 779.0, 148.01, 927.01, 'payee');
+('FACT-202601-0193', 20, '2026-02-24', 779.0, 148.01, 927.01, 'payee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (193, 193);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0194', 8, '2026-01-25', 2447.71, 465.06, 2912.77, 'payee');
+('FACT-202601-0194', 8, '2026-02-25', 2447.71, 465.06, 2912.77, 'payee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (194, 194);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0195', 12, '2026-01-21', 1177.61, 223.75, 1401.36, 'impayee');
+('FACT-202601-0195', 12, '2026-02-21', 1177.61, 223.75, 1401.36, 'impayee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (195, 195);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0196', 15, '2026-01-21', 1299.4, 246.89, 1546.29, 'impayee');
+('FACT-202601-0196', 15, '2026-02-21', 1299.4, 246.89, 1546.29, 'impayee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (196, 196);
 INSERT INTO facture (numero_facture, client_id, date_facture, total_ht, montant_tva, total_ttc, statut) VALUES
-('FACT-202601-0197', 1, '2026-01-21', 2052.92, 390.05, 2442.97, 'payee');
+('FACT-202601-0197', 1, '2026-02-21', 2052.92, 390.05, 2442.97, 'payee');
 INSERT INTO facture_expedition (facture_id, expedition_id) VALUES (197, 197);
 
 -- PAIEMENTS
@@ -1546,7 +1557,7 @@ INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, monta
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
 (183, 18, '2025-11-20', 'EspÃ¨ces', 1358.91, 'ValidÃ©');
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
-(184, 2, '2026-01-04', 'ChÃ¨que', 2601.91, 'ValidÃ©');
+(184, 2, '2026-02-04', 'ChÃ¨que', 2601.91, 'ValidÃ©');
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
 (185, 20, '2025-12-31', 'ChÃ¨que', 2219.95, 'ValidÃ©');
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
@@ -1562,7 +1573,7 @@ INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, monta
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
 (193, 20, '2026-02-06', 'EspÃ¨ces', 927.01, 'ValidÃ©');
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
-(194, 8, '2026-01-28', 'ChÃ¨que', 2912.77, 'ValidÃ©');
+(194, 8, '2026-02-28', 'ChÃ¨que', 2912.77, 'ValidÃ©');
 INSERT INTO paiement (facture_id, client_id, date_paiement, mode_paiement, montant, statut) VALUES
 (197, 1, '2026-02-05', 'Virement', 2442.97, 'ValidÃ©');
 
